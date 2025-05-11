@@ -1,0 +1,6 @@
+@DATN.WebAPI_HostAddress = http://localhost:5101
+
+GET {{DATN.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

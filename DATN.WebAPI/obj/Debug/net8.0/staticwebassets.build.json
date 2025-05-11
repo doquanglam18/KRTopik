@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "BJBCHZelsvNX8EJ4OpggCGNzi6ahLwm9w4feAO1PDMw=",
+  "Source": "DATN.WebAPI",
+  "BasePath": "_content/DATN.WebAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

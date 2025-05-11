@@ -1,0 +1,17 @@
+D:\DATN2025\DATN\DATN.Infrastructure\bin\Debug\net8.0\DATN.Infrastructure.deps.json
+D:\DATN2025\DATN\DATN.Infrastructure\bin\Debug\net8.0\DATN.Infrastructure.runtimeconfig.json
+D:\DATN2025\DATN\DATN.Infrastructure\bin\Debug\net8.0\DATN.Infrastructure.dll
+D:\DATN2025\DATN\DATN.Infrastructure\bin\Debug\net8.0\DATN.Infrastructure.pdb
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\DATN.Infrastructure.csproj.AssemblyReference.cache
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\DATN.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\DATN.Infrastructure.AssemblyInfoInputs.cache
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\DATN.Infrastructure.AssemblyInfo.cs
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\DATN.Infrastructure.csproj.CoreCompileInputs.cache
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\DATN.Infrastructure.dll
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\refint\DATN.Infrastructure.dll
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\DATN.Infrastructure.pdb
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\DATN.Infrastructure.genruntimeconfig.cache
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\ref\DATN.Infrastructure.dll
+D:\DATN2025\DATN\DATN.Infrastructure\bin\Debug\net8.0\DATN.Domain.dll
+D:\DATN2025\DATN\DATN.Infrastructure\bin\Debug\net8.0\DATN.Domain.pdb
+D:\DATN2025\DATN\DATN.Infrastructure\obj\Debug\net8.0\DATN.Infrastructure.csproj.CopyComplete

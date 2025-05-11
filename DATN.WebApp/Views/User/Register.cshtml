@@ -1,0 +1,437 @@
+﻿@model DATN.Application.Dtos.UserDtos.RegisterDto
+@{
+    Layout = null;
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+
+    <!-- Bootstrap 4 & Font Awesome -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <style>
+        body {
+
+        background-size: cover;
+        background-attachment: fixed;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    /* Thêm overlay để làm tối background một chút */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+/*         background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%); */
+        z-index: -1;
+    }
+
+    .register-form {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Thêm style cho invalid input */
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + .75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(.375em + .1875rem) center;
+        background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+    }
+
+    .form-control.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+        .register-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .register-form:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .register-form h3 {
+            color: #2d3748;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .form-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4a5568;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control {
+            height: 50px;
+            padding-left: 45px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-control:focus + .form-icon {
+            color: #667eea;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            height: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .alert {
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border: none;
+        }
+
+        .alert-danger {
+            background-color: #fff5f5;
+            color: #c53030;
+            border-left: 4px solid #fc8181;
+        }
+
+        .login-link {
+            color: #667eea;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .login-link:hover {
+            color: #764ba2;
+            text-decoration: none;
+        }
+
+        /* Custom styles for date input */
+        input[type="date"] {
+            position: relative;
+            padding-right: 15px;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+       
+
+        .register-form {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+.text-danger {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+}
+
+input.form-control:focus {
+    box-shadow: none;
+    border-width: 2px;
+}
+
+
+         /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            body {
+                padding: 20px 0;
+            }
+
+            .register-form {
+                padding: 25px;
+                margin: 15px;
+            }
+
+            .register-form h3 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            .form-control {
+                height: 45px;
+                font-size: 15px;
+            }
+        }
+
+        /* Animation for form appearance */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body style="background-image: url('/themelef/images/logokr.png') !important;">
+   <div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="register-form">
+                <h3>Đăng ký tài khoản</h3>
+
+                    @if (ViewData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            @ViewData["Error"]
+                        </div>
+                    }
+
+                <form asp-controller="User" asp-action="Register" method="post">
+                        @Html.AntiForgeryToken()
+
+                    <div class="form-group input-with-icon">
+                        <i class="fas fa-user form-icon"></i>
+                        <input asp-for="FullName" class="form-control" placeholder="Họ và tên" required>
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group input-with-icon">
+                        <i class="fas fa-envelope form-icon"></i>
+                        <input asp-for="Email" class="form-control" placeholder="Email" required>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                <div class="form-group input-with-icon">
+                    <i class="fas fa-lock form-icon"></i>
+                    <input asp-for="PasswordHash" type="password" class="form-control" id="PasswordHash" placeholder="Mật khẩu" required>
+                    <i class="fas fa-eye" id="togglePassword" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                </div>
+
+                <div class="form-group input-with-icon">
+                    <i class="fas fa-lock form-icon"></i>
+                    <input asp-for="ConfirmPassword" type="password" class="form-control" id="ConfirmPassword" placeholder="Nhập lại mật khẩu" required>
+                    <i class="fas fa-eye" id="toggleConfirmPassword" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                    <small class="text-danger password-error" style="display: none;">Mật khẩu xác nhận không khớp</small>
+                </div>
+
+
+                    <div class="form-group input-with-icon">
+                        <i class="fas fa-calendar-alt form-icon"></i>
+                        <input asp-for="DateOfBirth" type="date" class="form-control" required>
+                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-user-plus mr-2"></i>Đăng ký
+                        </button>
+                    </div>
+
+                    <p class="text-center mb-0">
+                        Đã có tài khoản? 
+                        <a asp-controller="User" asp-action="Login" method="get" class="login-link">
+                            <i class="fas fa-sign-in-alt mr-1"></i>Đăng nhập
+                        </a>
+                    </p>
+
+                    <!-- Thêm nút quay về trang chủ ở đây -->
+                    <div class="text-center mt-3">
+                        <a asp-controller="Home" asp-action="Index" class="home-link">
+                            <i class="fas fa-home mr-1"></i>Quay về trang chủ
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script>
+    $(document).ready(function() {
+    // Toggle Password Visibility
+    $('#togglePassword').on('click', function() {
+        var passwordField = $('#PasswordHash');
+        var type = passwordField.attr('type') === 'password' ? 'text' : 'password';
+        passwordField.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+
+    // Toggle Confirm Password Visibility
+    $('#toggleConfirmPassword').on('click', function() {
+        var confirmPasswordField = $('#ConfirmPassword');
+        var type = confirmPasswordField.attr('type') === 'password' ? 'text' : 'password';
+        confirmPasswordField.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+
+    // Handle form submission
+    $('form').on('submit', function(e) {
+        e.preventDefault();
+
+        var password = $('#PasswordHash').val();
+        var confirmPassword = $('#ConfirmPassword').val();
+
+        if (password !== confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: 'Mật khẩu xác nhận không khớp'
+            });
+            return false;
+        }
+
+    });
+});
+
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('form').on('submit', function(e) {
+            e.preventDefault();
+
+            // Kiểm tra mật khẩu trước khi submit
+            var password = $('#PasswordHash').val();
+            var confirmPassword = $('#ConfirmPassword').val();
+
+            if (password !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: 'Mật khẩu xác nhận không khớp'
+                });
+                return false;
+            }
+
+            // Hiển thị loading khi bắt đầu xử lý
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            var formData = $(this).serialize();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                success: function(result) {
+                // Đóng loading
+                Swal.close();
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: result.message,
+                        confirmButtonText: 'OK'
+                    }).then((swalResult) => {
+                        if (swalResult.isConfirmed) {
+                            if (result.redirectUrl) {
+                                window.location.href = result.redirectUrl;
+                            } else {
+                                window.location.href = '/User/Login';
+                            }
+                        }
+                    });
+                } else {
+                    // Thêm xử lý khi có lỗi (ví dụ: email trùng)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Đăng ký thất bại!',
+                        text: result.message,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+                error: function() {
+                    // Đóng loading khi có lỗi
+                    Swal.close();
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Có lỗi xảy ra trong quá trình xử lý'
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+﻿@model DATN.Application.Dtos.ReadingDtos.ReadingQuestionDto
+
+@{
+    ViewData["Title"] = "Cập nhật thông tin câu hỏi đọc";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Thêm SwitchAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/switchalert2@2.0.0/switchalert2.min.css" rel="stylesheet">
+
+<!-- Thêm SwitchAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/switchalert2@2.0.0/switchalert2.min.js"></script>
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(90deg, #bc4ed8, #4a90e2);
+        --primary-color: #4a90e2;
+        --secondary-color: #bc4ed8;
+    }
+
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 30px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2, h4 {
+        font-weight: bold;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        box-shadow: none;
+        padding: 12px;
+    }
+
+    .row .col-md-6 {
+        margin-bottom: 15px;
+    }
+
+    .table {
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        font-size: 1rem;
+        border-radius: 8px;
+        color: white;
+    }
+
+    .btn-lg {
+        min-width: 180px;
+    }
+
+    .btn-success {
+        background-image: var(--primary-gradient);
+        border: none;
+    }
+
+        .btn-success:hover {
+            filter: brightness(0.95);
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    img {
+        border-radius: 8px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+
+    .d-flex {
+        gap: 20px;
+    }
+</style>
+
+<h2 class="mb-4">Cập nhật câu hỏi đọc</h2>
+<form id="updateForm" class="form-container" enctype="multipart/form-data" method="post" asp-action="UpdateReadingQuestion" asp-controller="ReadingQuestion">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <!-- Nội dung câu hỏi -->
+    <div class="mb-4">
+        <label asp-for="Question" class="form-label">Nội dung câu hỏi</label>
+        <textarea asp-for="Question" class="form-control" rows="4" placeholder="Nhập nội dung câu hỏi..."></textarea>
+    </div>
+
+    <!-- Ảnh minh họa -->
+    <div class="mb-4">
+        <label asp-for="ReadingImageURL" class="form-label">Ảnh minh họa</label><br />
+        @if (!string.IsNullOrEmpty(Model.ReadingImageURL))
+        {
+            <img src="@Model.ReadingImageURL" alt="Ảnh minh họa" width="200" class="mb-3" />
+        }
+        <input type="file" name="Image" id="ReadingImageURL" class="form-control" />
+    </div>
+
+    <!-- Bộ đề và Độ khó -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label class="form-label">Bộ đề</label>
+            <input class="form-control" value="@Model.TestSetName" disabled />
+            <input type="hidden" asp-for="TestSetId" />
+            <input type="hidden" asp-for="TestSetName" />
+
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Độ khó</label>
+            <input class="form-control" value="@Model.RankQuestionName" disabled />
+            <input type="hidden" asp-for="RankQuestionId" />
+   
+            <input type="hidden" asp-for="RankQuestionName" />
+
+        </div>
+    </div>
+
+
+    <!-- Danh sách đáp án -->
+    <h4 class="mt-4 mb-3">Danh sách đáp án</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Nội dung đáp án</th>
+                    <th>Là đáp án đúng?</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.ReadingAnswers.Count; i++)
+                {
+                    <tr>
+                        <td class="text-center">@(@i + 1)</td>
+                        <td>
+                            <input type="hidden" name="ReadingAnswers[@i].Id" value="@Model.ReadingAnswers[i].Id" />
+                            <input type="text" name="ReadingAnswers[@i].Content" value="@Model.ReadingAnswers[i].Content" class="form-control" />
+                        </td>
+                        <td class="text-center">
+                            <input type="radio" name="CorrectAnswerIndex" value="@i" @(Model.ReadingAnswers[i].IsCorrect ? "checked" : "") />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Trạng thái công khai -->
+    <div class="mb-4">
+        <label class="form-label">Trạng thái công khai</label>
+        <select asp-for="IsPublic" class="form-control">
+            <option value="true" selected="@(Model.IsPublic ? "selected" : null)">Công khai</option>
+            <option value="false" selected="@(Model.IsPublic ? null : "selected")">Riêng tư</option>
+        </select>
+    </div>
+
+    <!-- Ngày tạo và Ngày cập nhật -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label class="form-label">Ngày tạo</label>
+            <input class="form-control" value="@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")" disabled />
+            <input type="hidden" name="CreatedDate" value="@Model.CreatedDate.ToString("yyyy-MM-ddTHH:mm")" />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Ngày cập nhật</label>
+            <input class="form-control" value="@Model.UpdatedDate.ToString("dd/MM/yyyy HH:mm")" disabled />
+            <input type="hidden" name="UpdatedDate" value="@Model.UpdatedDate.ToString("yyyy-MM-ddTHH:mm")" />
+        </div>
+    </div>
+
+    <!-- Nút Lưu và Quay lại -->
+    <div class="d-flex justify-content-between mt-4">
+        <button type="submit" class="btn btn-success btn-lg">💾 Lưu thay đổi</button>
+        <a asp-controller="Admin" asp-action="ManageReadingQuestion" class="btn btn-secondary btn-lg">← Quay lại</a>
+    </div>
+</form>
+
+<!-- Thêm JavaScript cho Validation và Hiển thị ảnh mới -->
+<script>
+    document.getElementById('ReadingImageURL').addEventListener('change', function (event) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            document.querySelector('img').src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+
+    $(document).ready(function () {
+        $('#updateForm').submit(function (event) {
+            if ($('textarea[name="Question"]').val().trim() === '') {
+                alert('Nội dung câu hỏi không được để trống!');
+                event.preventDefault();
+            }
+
+            if ($('input[name="CorrectAnswerIndex"]:checked').length === 0) {
+                alert('Vui lòng chọn đáp án đúng!');
+                event.preventDefault();
+            }
+        });
+    });
+</script>

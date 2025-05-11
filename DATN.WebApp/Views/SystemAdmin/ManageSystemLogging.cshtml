@@ -1,0 +1,54 @@
+﻿@using DATN.Application.Dtos.SystemLoggingDtos
+@model List<SystemLoggingDto>
+
+@{
+    ViewData["Title"] = "Nhật ký hệ thống";
+    Layout = "~/Views/Shared/_SystemAdminLayout.cshtml";
+}
+
+<div class="container-fluid p-3">
+    <div class="d-flex justify-content-center align-items-center">
+        <h1 class="h3 mb-4 text-primary fw-bold">Nhật ký hệ thống</h1>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered w-100">
+                <thead class="table-dark text-white text-center">
+                    <tr>
+                        <th>STT</th>
+                        <th>Người dùng</th>
+                        <th>IP</th>
+                        <th>Hành động</th>
+                        <th>Chi tiết</th>
+                        <th>Ngày tạo</th>
+                        <th>Ngày cập nhật</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        var log = Model[i];
+                        <tr>
+                            <td class="text-center fw-bold">@(@i + 1)</td>
+                            <td>@(string.IsNullOrWhiteSpace(log.UserName) ? "Khách" : log.UserName)</td>
+                            <td class="text-center">@log.IPAddress</td>
+                            <td>@log.ActionName</td>
+                            <td>@log.Details</td>
+                            <td class="text-center">@log.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-center">
+                                @(log.UpdatedDate.HasValue ? log.UpdatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "-")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">Không có nhật ký nào được ghi nhận.</p>
+    }
+</div>
+

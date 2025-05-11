@@ -1,0 +1,274 @@
+﻿@using DATN.Application.Dtos.ReadingDtos
+@model List<ReadingQuestionDto>
+
+@{
+    ViewData["Title"] = "Quản lý câu hỏi đọc";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .table th, .table td {
+        vertical-align: middle !important;
+    }
+
+        .table td ul {
+            padding-left: 1.2rem;
+            margin: 0;
+        }
+
+    .correct-answer {
+        color: red;
+        font-weight: 600;
+    }
+
+    .img-thumbnail-custom {
+        max-width: 100px;
+        max-height: 80px;
+        border-radius: 0.5rem;
+        object-fit: cover;
+    }
+
+    .text-muted-small {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .table thead th {
+        white-space: nowrap;
+    }
+
+    /* --- Thêm màu chủ đạo theo logo --- */
+
+    .header-gradient {
+        background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: bold;
+        font-size: 1.25rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+        border: none;
+    }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+    .btn-warning {
+        background-color: #f0ad4e;
+        border: none;
+    }
+
+    .btn-danger {
+        background-color: #d9534f;
+        border: none;
+    }
+
+    .table thead {
+        background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+        color: white;
+    }
+</style>
+
+<div class="container-fluid p-4 bg-white rounded shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="header-gradient">
+            📚 Quản lý Câu hỏi Đọc hiểu
+        </div>
+        <a href="@Url.Action("AddReadingQuestion", "ReadingQuestion")" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus-circle me-2"></i> Thêm Câu hỏi
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th class="text-start">Nội dung câu hỏi</th>
+                        <th>Ảnh</th>
+                        <th>Bộ đề</th>
+                        <th>Độ khó</th>
+                        <th class="text-start">Đáp án</th>
+                        <th>Ngày tạo</th>
+                        <th>Ngày cập nhật</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var q in Model)
+                    {
+                        <tr>
+                            <td>@q.Id</td>
+                            <td class="text-start">@Html.Raw(q.Question)</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(q.ReadingImageURL))
+                                {
+                                    <img src="@q.ReadingImageURL" class="img-thumbnail-custom" alt="Ảnh" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted-small">Không có</span>
+                                }
+                            </td>
+                            <td>@q.TestSetName</td>
+                            <td>@q.RankQuestionName</td>
+                            <td class="text-start">
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var a in q.ReadingAnswers)
+                                    {
+                                        <li class="@(a.IsCorrect ? "correct-answer" : "")">@a.Content</li>
+                                    }
+                                </ul>
+                            </td>
+                            <td><span class="text-muted-small">@q.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span></td>
+                            <td><span class="text-muted-small">@q.UpdatedDate.ToString("dd/MM/yyyy HH:mm")</span></td>
+                            <td>
+                                <span class="text-muted-small">@(q.IsPublic ? "Công khai" : "Ẩn")</span>
+                                <button class="btn btn-sm @(q.IsPublic ? "btn-danger" : "btn-success") btn-toggle-public"
+                                        data-question-id="@q.Id"
+                                        data-status="@q.IsPublic.ToString().ToLower()">
+                                    <i class="fas @(q.IsPublic ? "fa-lock" : "fa-unlock")"></i> @(q.IsPublic ? "Ẩn" : "Công khai")
+                                </button>
+                            </td>
+
+                            <td>
+                                <div class="d-flex justify-content-center flex-wrap gap-2">
+                                    <form asp-action="UpdateReadingQuestion" asp-controller="ReadingQuestion" method="get">
+                                        <input type="hidden" name="Id" value="@q.Id" />
+                                        <input type="hidden" name="Question" value="@q.Question" />
+                                        <input type="hidden" name="ReadingImageURL" value="@q.ReadingImageURL" />
+                                        <input type="hidden" name="TestSetId" value="@q.TestSetId" />
+                                        <input type="hidden" name="TestSetName" value="@q.TestSetName" />
+                                        <input type="hidden" name="RankQuestionId" value="@q.RankQuestionId" />
+                                        <input type="hidden" name="RankQuestionName" value="@q.RankQuestionName" />
+                                        <input type="hidden" name="CreatedDate" value="@q.CreatedDate.ToString("o")" />
+                                        <input type="hidden" name="UpdatedDate" value="@q.UpdatedDate.ToString("o")" />
+                                        @for (int i = 0; i < q.ReadingAnswers.Count; i++)
+                                        {
+                                            <input type="hidden" name="ReadingAnswers[@i].Id" value="@q.ReadingAnswers[i].Id" />
+                                            <input type="hidden" name="ReadingAnswers[@i].Content" value="@q.ReadingAnswers[i].Content" />
+                                            <input type="hidden" name="ReadingAnswers[@i].IsCorrect" value="@q.ReadingAnswers[i].IsCorrect.ToString().ToLower()" />
+                                        }
+                                        <button type="submit" class="btn btn-warning btn-sm rounded-pill">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </button>
+                                    </form>
+
+                                    <button type="button" class="btn btn-danger btn-sm rounded-pill" onclick="deleteReadingQuestion(@q.Id)">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </button>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            Không có câu hỏi nào trong hệ thống.
+        </div>
+    }
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".btn-toggle-status").forEach(button => {
+                button.addEventListener("click", function () {
+                    let user = JSON.parse(this.getAttribute("data-user"));
+                    let buttonElement = this;
+
+                    Swal.fire({
+                        title: "Xác nhận",
+                        text: "Bạn có chắc chắn muốn thay đổi trạng thái của câu hỏi này?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Đồng ý",
+                        cancelButtonText: "Hủy"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            fetch("@Url.Action("UpdateStatusReadingQuestion", "ReadingQuestion")", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify(user)
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire({
+                                            title: "Thành công!",
+                                            text: data.message,
+                                            icon: "success"
+                                        }).then(() => {
+                                            location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire("Lỗi!", data.message || "Có lỗi xảy ra.", "error");
+                                    }
+                                })
+                                .catch(error => Swal.fire("Lỗi!", "Có lỗi xảy ra.", "error"));
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function deleteReadingQuestion(id) {
+            Swal.fire({
+                title: 'Xác nhận xóa câu hỏi đọc?',
+                text: "Bạn sẽ không thể khôi phục câu hỏi này!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/ReadingQuestion/Delete/${id}`, {
+                        method: 'POST'
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Đã xóa!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Lỗi!', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            Swal.fire('Lỗi!', 'Không thể kết nối máy chủ.', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+
+}
