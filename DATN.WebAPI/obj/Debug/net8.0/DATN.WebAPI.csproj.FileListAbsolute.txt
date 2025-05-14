@@ -273,3 +273,4 @@ D:\DATN2025\DATN\DATN.WebAPI\bin\Debug\net8.0\MailKit.dll
 D:\DATN2025\DATN\DATN.WebAPI\bin\Debug\net8.0\MimeKit.dll
 D:\DATN2025\DATN\DATN.WebAPI\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
 D:\DATN2025\DATN\DATN.WebAPI\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+D:\DATN2025\DATN\DATN.WebAPI\obj\Debug\net8.0\DATN.WebAPI.sourcelink.json

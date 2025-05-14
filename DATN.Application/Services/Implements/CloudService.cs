@@ -7,6 +7,7 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
+
 public class CloudService : ICloudService
 {
     private readonly Cloudinary _cloudinary;
@@ -69,6 +70,51 @@ public class CloudService : ICloudService
         }
 
         return null; // Nếu không tìm thấy tài nguyên
+    }
+
+
+    // Upload file âm thanh (mp3, wav, m4a,...)
+    public async Task<string> UploadAudioAsync(IFormFile audioFile)
+    {
+        if (audioFile == null || audioFile.Length == 0)
+            return null;
+
+        var uploadParams = new RawUploadParams
+        {
+            File = new FileDescription(audioFile.FileName, audioFile.OpenReadStream())
+            // KHÔNG gán ResourceType ở đây vì nó chỉ đọc được
+        };
+
+        var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+        return uploadResult?.SecureUrl?.ToString();
+    }
+
+
+
+    // Download file âm thanh bằng publicId
+    public async Task<byte[]> DownloadAudioAsync(string publicId)
+    {
+        if (string.IsNullOrEmpty(publicId))
+            return null;
+
+        var resourceParams = new GetResourceParams(publicId)
+        {
+            ResourceType = ResourceType.Video // ✅ Dùng enum đúng kiểu
+        };
+
+        var resource = await _cloudinary.GetResourceAsync(resourceParams);
+
+        if (resource.StatusCode == HttpStatusCode.OK)
+        {
+            var audioUrl = resource.SecureUrl.ToString();
+
+            using (var client = new HttpClient())
+            {
+                return await client.GetByteArrayAsync(audioUrl);
+            }
+        }
+
+        return null;
     }
 
 }

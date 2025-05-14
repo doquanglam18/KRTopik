@@ -15,6 +15,7 @@ namespace DATN.Domain.Entities
 
         public string ListeningSoundURL { get; set; }
 
+        public string? ListeningScript { get; set; }
         public TestSet TestSet { get; set; }
 
         public bool IsPublic { get; set; }

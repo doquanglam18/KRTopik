@@ -11,6 +11,10 @@ namespace DATN.Application.Services.Interfaces
     {
         Task<string> UploadImageAsync(IFormFile imageFile); // Phương thức tải ảnh lên Cloud
         Task<byte[]> DownloadImageAsync(string publicId); // Phương thức tải ảnh từ Cloud
+
+        Task<string> UploadAudioAsync(IFormFile audioFile);
+        Task<byte[]> DownloadAudioAsync(string publicId);
+
     }
 
 }

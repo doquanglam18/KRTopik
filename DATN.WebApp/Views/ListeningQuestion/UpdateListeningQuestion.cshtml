@@ -1,0 +1,241 @@
+﻿@model DATN.Application.Dtos.ListeningDtos.ListeningQuestionDto
+
+@{
+    ViewData["Title"] = "Cập nhật câu hỏi nghe";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(90deg, #bc4ed8, #4a90e2);
+    }
+
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 30px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2, h4 {
+        font-weight: bold;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 12px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 1rem;
+        color: white;
+    }
+
+    .btn-success {
+        background-image: var(--primary-gradient);
+        border: none;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .audio-preview {
+        margin-top: 10px;
+    }
+</style>
+
+<h2 class="mb-4">Cập nhật câu hỏi nghe</h2>
+
+<form id="updateListeningForm" class="form-container" enctype="multipart/form-data" method="post" asp-action="UpdateListeningQuestion" asp-controller="ListeningQuestion">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <!-- Câu hỏi -->
+    <div class="mb-4">
+        <label asp-for="Question" class="form-label">Nội dung câu hỏi</label>
+        <textarea asp-for="Question" class="form-control" rows="3" placeholder="Nhập nội dung câu hỏi..."></textarea>
+    </div>
+
+    <!-- Transcript -->
+    <div class="mb-4">
+        <label asp-for="ListeningScript" class="form-label">Transcript (nếu có)</label>
+        <textarea asp-for="ListeningScript" class="form-control" rows="3" placeholder="Nhập transcript..."></textarea>
+    </div>
+
+    <!-- Âm thanh -->
+    <div class="mb-4">
+        <label asp-for="Sound" class="form-label">Tệp âm thanh</label><br />
+        @if (!string.IsNullOrEmpty(Model.ListeningSoundURL))
+        {
+            <audio controls class="audio-preview">
+                <source src="@Model.ListeningSoundURL" type="audio/mpeg"/>
+                Trình duyệt không hỗ trợ phát âm thanh.
+            </audio>
+        }
+        <input type="file" name="Sound" class="form-control mt-2" />
+    </div>
+
+    <!-- Giữ lại URL hiện tại -->
+    <input type="hidden" asp-for="ListeningSoundURL" />
+
+    <!-- Bộ đề và độ khó -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label class="form-label">Bộ đề</label>
+            <input class="form-control" value="@Model.TestSetName" disabled />
+            <input type="hidden" asp-for="TestSetId" />
+            <input type="hidden" asp-for="TestSetName" />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Mức độ</label>
+            <input class="form-control" value="@Model.RankQuestionName" disabled />
+            <input type="hidden" asp-for="RankQuestionId" />
+            <input type="hidden" asp-for="RankQuestionName" />
+        </div>
+    </div>
+
+    <!-- Danh sách đáp án -->
+    <h4 class="mt-4 mb-3">Danh sách đáp án</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Nội dung đáp án</th>
+                    <th>Là đáp án đúng?</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.ListeningAnswers.Count; i++)
+                {
+                    <tr>
+                        <td class="text-center">@(@i + 1)</td>
+                        <td>
+                            <input type="hidden" name="ListeningAnswers[@i].Id" value="@Model.ListeningAnswers[i].Id" />
+
+                            <label class="form-label">Văn bản</label>
+                            <input type="text" name="ListeningAnswers[@i].Content" value="@Model.ListeningAnswers[i].Content" class="form-control mb-2" />
+
+                            <label class="form-label">Hoặc ảnh (nếu có)</label>
+                            <input type="file" name="ListeningAnswers[@i].Image" class="form-control" />
+
+                            @* Preview ảnh nếu có URL trong model (cần bạn mở rộng DTO để chứa URL nếu cần) *@
+                            @* <img src="@Model.ListeningAnswers[i].ImageUrl" width="100" class="mt-2" /> *@
+                        </td>
+                        <td class="text-center">
+                            <input type="radio" name="CorrectAnswerIndex" value="@i" @(Model.ListeningAnswers[i].IsCorrect ? "checked" : "") />
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Trạng thái công khai -->
+    <div class="mb-4">
+        <label class="form-label">Trạng thái công khai</label>
+        <select asp-for="IsPublic" class="form-control">
+            <option value="true" selected="@(Model.IsPublic ? "selected" : null)">Công khai</option>
+            <option value="false" selected="@(Model.IsPublic ? null : "selected")">Riêng tư</option>
+        </select>
+    </div>
+
+    <!-- Ngày tạo và cập nhật -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label class="form-label">Ngày tạo</label>
+            <input class="form-control" value="@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")" disabled />
+            <input type="hidden" name="CreatedDate" value="@Model.CreatedDate.ToString("yyyy-MM-ddTHH:mm")" />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Ngày cập nhật</label>
+            <input class="form-control" value="@Model.UpdatedDate.ToString("dd/MM/yyyy HH:mm")" disabled />
+            <input type="hidden" name="UpdatedDate" value="@Model.UpdatedDate.ToString("yyyy-MM-ddTHH:mm")" />
+        </div>
+    </div>
+
+    <!-- Nút -->
+    <div class="d-flex justify-content-between mt-4">
+        <button type="submit" class="btn btn-success">💾 Lưu thay đổi</button>
+        <a asp-controller="Admin" asp-action="ManageListeningQuestion" class="btn btn-secondary">← Quay lại</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#updateListeningForm').submit(function (event) {
+                event.preventDefault();
+
+                if ($('textarea[name="Question"]').val().trim() === '') {
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Nội dung câu hỏi không được để trống!' });
+                    return;
+                }
+
+                const currentAudioUrl = '@Model.ListeningSoundURL'.trim();
+                const audioFile = $('input[name="Sound"]')[0].files[0];
+
+                if (!currentAudioUrl && !audioFile) {
+                    Swal.fire({ icon: 'error', title: 'Thiếu âm thanh', text: 'Vui lòng chọn tệp âm thanh!' });
+                    return;
+                }
+
+
+                let missingAnswers = [];
+                for (let i = 0; i < 4; i++) {
+                    if ($(`input[name="ListeningAnswers[${i}].Content"]`).val().trim() === '') {
+                        missingAnswers.push(`Đáp án ${i + 1}`);
+                    }
+                }
+
+                if (missingAnswers.length > 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thiếu đáp án',
+                        text: `Vui lòng nhập đầy đủ ${missingAnswers.join(", ")}.`
+                    });
+                    return;
+                }
+
+                if ($('input[name="CorrectAnswerIndex"]:checked').length === 0) {
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Vui lòng chọn đáp án đúng!' });
+                    return;
+                }
+
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: $(this).attr("action"),
+                    method: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res && res.success) {
+                            Swal.fire({ icon: 'success', title: 'Thành công', text: res.message })
+                                .then(() => window.location.href = res.redirectUrl);
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Thất bại', text: res.message || 'Có lỗi xảy ra.' });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Đã xảy ra lỗi khi gửi yêu cầu!' });
+                    }
+                });
+            });
+        });
+    </script>
+}

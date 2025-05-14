@@ -1,0 +1,268 @@
+﻿@using DATN.Application.Dtos.ListeningDtos
+@using DATN.Application.Dtos.BaseDtos
+@model PageResultDto<ListeningQuestionDto>
+
+
+@{
+    ViewData["Title"] = "Quản lý câu hỏi nghe";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .table th, .table td {
+        vertical-align: middle !important;
+    }
+
+    .correct-answer {
+        color: red;
+        font-weight: 600;
+    }
+
+    .audio-control {
+        width: 150px;
+    }
+
+    .text-muted-small {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .header-gradient {
+        background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: bold;
+        font-size: 1.25rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+        border: none;
+    }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+    .btn-warning {
+        background-color: #f0ad4e;
+        border: none;
+    }
+
+    .btn-danger {
+        background-color: #d9534f;
+        border: none;
+    }
+
+    .table thead {
+        background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+        color: white;
+    }
+</style>
+
+<div class="container-fluid p-4 bg-white rounded shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="header-gradient">
+            🎧 Quản lý Câu hỏi Nghe
+        </div>
+        <a href="@Url.Action("AddListeningQuestion", "ListeningQuestion")" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus-circle me-2"></i> Thêm Câu hỏi
+        </a>
+    </div>
+
+    @if (Model.Items != null && Model.Items.Any())
+    {
+
+
+
+       <form method="get" asp-action="ManageListeningQuestion" asp-controller="Admin" class="mb-3 d-flex justify-content-end">
+            <label for="pageSize" class="me-2 mt-1">Hiển thị:</label>
+            <select name="pageSize" id="pageSize" onchange="this.form.submit()" class="form-select w-auto">
+                @{
+                    var selected5 = Model.PageSize == 5 ? "selected" : "";
+                    var selected10 = Model.PageSize == 10 ? "selected" : "";
+                    var selected20 = Model.PageSize == 20 ? "selected" : "";
+                    var selected50 = Model.PageSize == 50 ? "selected" : "";
+                }
+                <option value="5" selected5>5</option>
+                <option value="10" selected10>10</option>
+                <option value="20" selected20>20</option>
+                <option value="50" selected50>50</option>
+            </select>
+            <input type="hidden" name="page" value="@Model.Page" />
+        </form>
+
+
+
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th class="text-start">Nội dung câu hỏi</th>
+                        <th>Âm thanh</th>
+                        <th>Kịch bản nghe</th>
+                        <th>Bộ đề</th>
+                        <th>Độ khó</th>
+                        <th class="text-start">Đáp án</th>
+                        <th>Ngày tạo</th>
+                        <th>Ngày cập nhật</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var q in Model.Items)
+
+                    {
+                        <tr>
+                            <td>@q.Id</td>
+                            <td class="text-start">@Html.Raw(q.Question)</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(q.ListeningSoundURL))
+                                {
+                                    <audio class="audio-control" controls>
+                                        <source src="@q.ListeningSoundURL" />
+                                        Trình duyệt không hỗ trợ phát âm thanh.
+                                    </audio>
+                                }
+                                else
+                                {
+                                    <span class="text-muted-small">Không có</span>
+                                }
+                            </td>
+                            <td class="text-start">@Html.Raw(q.ListeningScript)</td>
+                            <td>@q.TestSetName</td>
+                            <td>@q.RankQuestionName</td>
+                            <td class="text-start">
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var a in q.ListeningAnswers)
+                                    {
+                                        <li class="@(a.IsCorrect ? "correct-answer" : "")">
+                                            @if (Uri.IsWellFormedUriString(a.Content, UriKind.Absolute))
+                                            {
+                                                <img src="@a.Content" alt="Đáp án ảnh" style="max-width: 100px; max-height: 100px;" />
+                                            }
+                                            else
+                                            {
+                                                @a.Content
+                                            }
+                                        </li>
+                                    }
+
+                                </ul>
+                            </td>
+                            <td><span class="text-muted-small">@q.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span></td>
+                            <td><span class="text-muted-small">@q.UpdatedDate.ToString("dd/MM/yyyy HH:mm")</span></td>
+                            <td>
+                                <span class="text-muted-small">@(q.IsPublic ? "Công khai" : "Ẩn")</span>
+                                <button class="btn btn-sm @(q.IsPublic ? "btn-danger" : "btn-success") btn-toggle-public"
+                                        data-question-id="@q.Id"
+                                        data-status="@q.IsPublic.ToString().ToLower()">
+                                    <i class="fas @(q.IsPublic ? "fa-lock" : "fa-unlock")"></i> @(q.IsPublic ? "Ẩn" : "Công khai")
+                                </button>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center flex-wrap gap-2">
+                                    <form asp-action="UpdateListeningQuestion" asp-controller="ListeningQuestion" method="get">
+                                        <input type="hidden" name="Id" value="@q.Id" />
+                                        <input type="hidden" name="Question" value="@q.Question" />
+                                        <input type="hidden" name="ListeningSoundURL" value="@q.ListeningSoundURL" />
+                                        <input type="hidden" name="ListeningScript" value="@q.ListeningScript" />
+                                        <input type="hidden" name="TestSetId" value="@q.TestSetId" />
+                                        <input type="hidden" name="TestSetName" value="@q.TestSetName" />
+                                        <input type="hidden" name="RankQuestionId" value="@q.RankQuestionId" />
+                                        <input type="hidden" name="RankQuestionName" value="@q.RankQuestionName" />
+                                        <input type="hidden" name="CreatedDate" value="@q.CreatedDate.ToString("o")" />
+                                        <input type="hidden" name="UpdatedDate" value="@q.UpdatedDate.ToString("o")" />
+                                        @for (int i = 0; i < q.ListeningAnswers.Count; i++)
+                                        {
+                                            <input type="hidden" name="ListeningAnswers[@i].Id" value="@q.ListeningAnswers[i].Id" />
+                                            <input type="hidden" name="ListeningAnswers[@i].Content" value="@q.ListeningAnswers[i].Content" />
+                                            <input type="hidden" name="ListeningAnswers[@i].IsCorrect" value="@q.ListeningAnswers[i].IsCorrect.ToString().ToLower()" />
+                                        }
+                                        <button type="submit" class="btn btn-warning btn-sm rounded-pill">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </button>
+                                    </form>
+
+                                    <button type="button" class="btn btn-danger btn-sm rounded-pill" onclick="deleteListeningQuestion(@q.Id)">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (Model.TotalPage > 1)
+            {
+                <nav class="d-flex justify-content-center mt-4">
+                    <ul class="pagination">
+                        @for (int i = 1; i <= Model.TotalPage; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("ManageListeningQuestion", "Admin", new { page = i, pageSize = Model.PageSize })">@i</a>
+                            </li>
+                        }
+                    </ul>
+
+                </nav>
+            }
+
+
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            Không có câu hỏi nghe nào trong hệ thống.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function deleteListeningQuestion(id) {
+            Swal.fire({
+                title: 'Xác nhận xóa câu hỏi nghe?',
+                text: "Bạn sẽ không thể khôi phục câu hỏi này!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/ListeningQuestion/Delete/${id}`, {
+                        method: 'POST'
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Đã xóa!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Lỗi!', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            Swal.fire('Lỗi!', 'Không thể kết nối máy chủ.', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+}

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DATN.Infrastructure.Migrations
 {
     [DbContext(typeof(DATNContext))]
-    [Migration("20250511021720_init110520250917")]
-    partial class init110520250917
+    [Migration("20250512085313_120520251542")]
+    partial class _120520251542
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -117,7 +117,7 @@ namespace DATN.Infrastructure.Migrations
                             Id = 1,
                             Content = "윤석열 대통령 탄핵소추안 가결 이후 헌법재판소 인근에서 연일 집회가 열리고 있으나, 정문 앞은 집시법에 따라 집회가 금지되어 고요한 분위기를 유지하고 있다.",
                             CreateadBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 220, DateTimeKind.Local).AddTicks(9729),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 608, DateTimeKind.Local).AddTicks(7886),
                             IsActive = false,
                             Title = "헌재 앞 '尹 파면' 집회, 왜 정문은 조용한가?",
                             TitleVietSub = "Tại sao trước cổng Tòa án Hiến pháp lại yên tĩnh trong khi có cuộc biểu tình yêu cầu phế truất Tổng thống Yoon Suk-yeol?",
@@ -131,7 +131,7 @@ namespace DATN.Infrastructure.Migrations
                             BlogImageUrl = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1746903231/aaaaaaaasdadsadsadasdsadsa_wqkrqq.jpg",
                             Content = "국민의힘은 10일 실시된 전 당원 ARS 투표에서 후보 재선출 건이 부결됐다고 이날 11시 밝혔다. r당은 이날 후보 지위를 박탈당한 김문수 후보 대신 한덕수 후보로 당 대선 후보를 재선출하기 위한 당원 투표를 진행했다. 신동욱 국민의힘 수석대변인은 정확한 수치는 밝히지 않고 ‘근소한’ 차이로 부결됐다고만 설명했다.\r\n\r\n투표 부결에 따라 김 후보는 국민의힘 대선 후보 지위를 회복하게 됐다. 이날 새벽 대선 후보 자리를 박탈당한 지 22시간 만이다. 국민의힘은 11일 김 후보의 후보 등록 절차를 밟을 예정이다. 김 후보는 이를 사필귀정이라고 표현했다. 그는 “모든 것은 제자리로 돌아갈 것”이라며 “즉시 선대위를 출범시키고 빅텐트를 세워 반(反) 이재명(더불어민주당 대선 후보) 전선을 구축하겠다”고 했다.\r\n\r\n국민의힘 대선 후보로 추대된 예정이었던 한덕수 후보 측은 “국민과 당원의 뜻을 겸허하게 수용하겠다”며 “김문수 후보자와 국민의힘이 이번 대선에서 승리를 거두기를 진심으로 희망한다”고 했다. 그는 후보 등록 마감일(11일)까지 후보 단일화가 되지 않으면 대선에 출마하지 않겠다고 공언한만큼 불출마 수순을 밟을 것으로 보인다.\r\n\r\n국민의힘 지도부는 이날 새벽 1시께 비상대책위원회를 열고 김문수 후보의 당 대선 후보 지위를 박탈했다. 이어 이날 새벽 3~4시 후보 등록 절차를 다시 밟았는데, 무소속으로 있던 한덕수 후보만 입당해 입후보했다. 공식 선거 운동 개시(12일)를 이틀 앞두고 원내 2당이 자당 후보를 강판한 헌정사상 초유의 일이었다. 그러나 당원 투표에서 후보 재선출이 부결되면서 이 같은 시도는 무산됐다.\r\n\r\n후보 교체를 주도한 권영세 국민의힘 비상대책위원장은 사의를 표했다. 김 후보의 후보 등록 절차가 끝나는 대로 자리에서 물러날 예정이다. 그는 “경쟁력 있는 후보를 세우기 위한 충정으로 당원들의 뜻에 따라 내린 결단이었지만 결과적으로 당원 동지 동의를 얻지 못했다”며 “단일화를 이뤄내지 못한 것은 너무나 안타깝지만 이 또한 저의 부족함 때문이라고 생각한다”고 했다. 권성동 원내대표가 비대위원장 권한대행을 맡긴 하지만 당무우선권(대선후보가 당무 전반에 대한 우선적 권한을 행사한다는 국민의힘 당헌)을 앞세운 김 후보가 당권을 장악할 것으로 보인다.\r\n\r\n다만 대선이 한 달도 안 남은 상황에서 김 후보는 내홍을 수습해야 하는 과제를 안게 됐다. 후보 단일화 과정에서 국민의힘 주류 친윤(친윤석열) 지도부는 김 후보에게 ‘알량한 대선 후보 자리’, ‘한심하다’ 등 극언을 삼가치 않았다. 김 후보도 후보 자리를 뺏긴 후 ‘정치 쿠데타’라며 적개감을 드러냈다. 한동훈 전 당 대표나 안철수 의원 등 국민의힘 반윤(反윤석열) 인사들도 친윤계를 강하게 비판하며 김 후보에게 힘을 실었다. 이 같은 갈등은 대선은 물론 대선 이후 국민의힘 차기 지도부 선거에서도 이어질 것으로 예상된다.",
                             CreateadBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 220, DateTimeKind.Local).AddTicks(9748),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 608, DateTimeKind.Local).AddTicks(7897),
                             IsActive = false,
                             Title = "국힘 대선후보, 다시 김문수로…하루도 안돼 끝난 후보교체 촌극(종합)",
                             TitleVietSub = "Ứng cử viên tổng thống của Đảng Quyền lực Nhân dân, trở lại với Kim Moon-soo… Trò hề thay đổi ứng cử viên kết thúc trong chưa đầy một ngày (toàn diện)",
@@ -145,7 +145,7 @@ namespace DATN.Infrastructure.Migrations
                             BlogImageUrl = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1746903467/newCoin_idcxma.jpg",
                             Content = "가상화폐가 상승세를 지속하는 가운데 시가총액 2위 이더리움의 급등세가 예사롭지 않다.\r\n\r\n9일(현지시간) 미국 가상화폐 거래소 코인베이스에 따르면 미 동부 시간 이날 오후 2시4분(서부 오전 11시 4분) 이더리움 1개당 가격은 24시간 전보다 15.08% 급등한 2347달러에 거래됐다.\r\n\r\n이는 같은 시간 2.27% 오른 가상화폐 대장주 비트코인이나 한국인의 매매가 가장 많은 것으로 알려져 있는 엑스알피(리플)의 5.94%보다 상승률은 크게 앞선다.\r\n\r\n솔라나와 도지코인도 각각 8.22%와 8.47% 올랐지만, 이더리움의 상승률에 미치지 못한다.\r\n\r\n이더리움은 전날에도 10% 넘게 치솟으며 2000달러선을 회복했다.\r\n\r\n일주일 전 1800달러대였던 것에 비해 30% 이상 뛰었다. 블룸버그 통신은 “이는 저금리와 투기적 과열로 코로나19 기간 당시 가상화폐 붐이 일었던 2021년 이후 가장 큰 주간 상승폭”이라고 분석했다.\r\n\r\n이더리움의 급등세는 글로벌 무역 긴장 완화와 네트워크 업그레이드에 대한 낙관론 때문으로 보인다. 미국과 영국 간 새로운 무역 협정 체결 이후 가상자산 전반에 따른 투자 심리가 개선되고 있기 때문이다.\r\n\r\n이더리움의 지속적인 기술 업그레이드에 대한 투자자들의 관심이 집중된 점도 가격을 끌어올리고 있다.\r\n\r\n이더리움은 최근 ‘펙트라(Pectra)’라는 업그레이드를 단행했다. 이번 업그레이드는 거래 수수료 인하와 네트워크 효율성 향상에 중점을 두고 있어 향후 거래 활성화에 대한 기대감이 나오고 있다. 가상화폐 분석업체 BRN의 수석 리서치 애널리스트 발랑탱 푸르니에는 “모멘텀이 강해 상승세가 지속될 가능성이 있다”며 “이번 가격 상승과 향후 정책적 지원은 (가상화폐에 대한) 새로운 투자자 유입으로 이어질 것”이라고 내다봤다.",
                             CreateadBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 220, DateTimeKind.Local).AddTicks(9750),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 608, DateTimeKind.Local).AddTicks(7900),
                             IsActive = false,
                             Title = "“일주일간 30% 이상 뛰었다”…급등세 예사롭지 않은 이 가상화폐",
                             TitleVietSub = "“Nó đã tăng hơn 30% trong một tuần”… Tiền điện tử này đang trải qua một đợt tăng giá phi thường",
@@ -159,7 +159,7 @@ namespace DATN.Infrastructure.Migrations
                             BlogImageUrl = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1746903794/TauSaoKim_f5tsfr.jpg",
                             Content = "1972년 지구 궤도를 벗어나는 데 실패한 옛 소련의 금성 탐사선 코스모스 482호가 53년간의 긴 우주 여정을 지구에서 마무리했다. 우려했던 지상 추락 피해는 없었다.\r\n\r\n러시아 연방우주공사(로스코스모스)는 코스모스 482호가 10일 오전 9시24분(한국시각 오후 3시24분) 인도양 상공 대기권에 진입해 자카르타 서쪽 해상에 떨어졌다고 발표했다. 이는 우주 물체 추적 기관들이 예상한 것과 같은 시간대다. 유럽우주국(ESA)은 코스모스 482호가 대기권 재진입 직전에 독일 상공에서 마지막으로 포착됐다고 밝혔다.\r\n\r\n원통 모양의 코스모스 482호는 무게 495kg, 지름 1m다. 이 탐사선엔 금성의 뜨거운 온도와 기압, 마찰열로부터 우주선을 보호해주는 방열판 등이 장착돼 있다. 그러나 실제로 우주선 본체가 다 타지 않은 채 떨어졌는지는 알려지지 않았다.",
                             CreateadBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 220, DateTimeKind.Local).AddTicks(9752),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 608, DateTimeKind.Local).AddTicks(7901),
                             IsActive = false,
                             Title = "옛 소련 금성 탐사선, 인도양에 추락",
                             TitleVietSub = "Tàu thăm dò sao Kim của Liên Xô cũ rơi xuống Ấn Độ Dương",
@@ -198,6 +198,296 @@ namespace DATN.Infrastructure.Migrations
                     b.HasIndex("ListeningQuestionId");
 
                     b.ToTable("ListeningAnswer", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023773/C%C3%A2u_1_%C3%BD_1_luh7aq.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(7996),
+                            IsCorrect = true,
+                            ListeningQuestionId = 1,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747039219/C%C3%A2u_1_%C3%BD_2_o6ifse.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8017),
+                            IsCorrect = false,
+                            ListeningQuestionId = 1,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747039219/C%C3%A2u_1_%C3%BD_3_vcw8yi.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8018),
+                            IsCorrect = false,
+                            ListeningQuestionId = 1,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023774/C%C3%A2u_1_%C3%BD_4_s0ryfi.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8019),
+                            IsCorrect = false,
+                            ListeningQuestionId = 1,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023774/C%C3%A2u_2_%C3%BD_1_msuecz.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8021),
+                            IsCorrect = false,
+                            ListeningQuestionId = 2,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023773/C%C3%A2u_2_%C3%BD_2_qgct0r.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8022),
+                            IsCorrect = false,
+                            ListeningQuestionId = 2,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023774/C%C3%A2u_2_%C3%BD_3_bngzlb.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8023),
+                            IsCorrect = true,
+                            ListeningQuestionId = 2,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023774/C%C3%A2u_2_%C3%BD_4_ewkro4.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8024),
+                            IsCorrect = false,
+                            ListeningQuestionId = 2,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023774/C%C3%A2u_3_%C3%BD_1_v8melr.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8025),
+                            IsCorrect = false,
+                            ListeningQuestionId = 3,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023774/C%C3%A2u_3_%C3%BD_2_jngpdj.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8027),
+                            IsCorrect = false,
+                            ListeningQuestionId = 3,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023774/C%C3%A2u_3_%C3%BD_3_mr5euu.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8028),
+                            IsCorrect = false,
+                            ListeningQuestionId = 3,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Content = "https://res.cloudinary.com/dmsi8fr0l/image/upload/v1747023774/C%C3%A2u_3_%C3%BD_4_z6zjwj.png",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8029),
+                            IsCorrect = true,
+                            ListeningQuestionId = 3,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Content = "장소를 다시 말해 주세요",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8031),
+                            IsCorrect = false,
+                            ListeningQuestionId = 4,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Content = "다음 모임은 안 갈 거예요",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8041),
+                            IsCorrect = false,
+                            ListeningQuestionId = 4,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Content = "이번 주에 만나면 좋겠어요",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8042),
+                            IsCorrect = false,
+                            ListeningQuestionId = 4,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Content = "정문 옆에 있는 식당이에요",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8044),
+                            IsCorrect = true,
+                            ListeningQuestionId = 4,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Content = "아침 일찍 기차를 탔어",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8046),
+                            IsCorrect = false,
+                            ListeningQuestionId = 5,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Content = "표가 없어서 아직 못 갔어",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8048),
+                            IsCorrect = false,
+                            ListeningQuestionId = 5,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Content = "표가 있는지 한번 알아볼게",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8049),
+                            IsCorrect = true,
+                            ListeningQuestionId = 5,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Content = "금요일 오후 표는 취소하자",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8050),
+                            IsCorrect = false,
+                            ListeningQuestionId = 5,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Content = "발표는 늘 어렵지요",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8051),
+                            IsCorrect = false,
+                            ListeningQuestionId = 6,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Content = "계획부터 세워 보세요",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8053),
+                            IsCorrect = false,
+                            ListeningQuestionId = 6,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Content = "외국어 공부를 좀 할까 해요",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8054),
+                            IsCorrect = true,
+                            ListeningQuestionId = 6,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Content = "학기가 시작되면 많이 바빠요",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8055),
+                            IsCorrect = false,
+                            ListeningQuestionId = 6,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Content = "응.시골에서 산 적이 있어",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8056),
+                            IsCorrect = false,
+                            ListeningQuestionId = 7,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Content = "아니.너무 지루해서 졸았어",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8061),
+                            IsCorrect = false,
+                            ListeningQuestionId = 7,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Content = "아니.드라마 볼 시간이 없었어",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8078),
+                            IsCorrect = false,
+                            ListeningQuestionId = 7,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Content = "응.두 사람 보면서 한참 웃었어.",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8080),
+                            IsCorrect = true,
+                            ListeningQuestionId = 7,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Content = "만족도가 높은 편입니다",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8081),
+                            IsCorrect = false,
+                            ListeningQuestionId = 8,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Content = "조사 결과가 나왔습니다",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8082),
+                            IsCorrect = false,
+                            ListeningQuestionId = 8,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Content = "프로그램이 적은 것 같습니다",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8084),
+                            IsCorrect = false,
+                            ListeningQuestionId = 8,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Content = "질문을 다시 정리해 보겠습니다",
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 609, DateTimeKind.Local).AddTicks(8085),
+                            IsCorrect = true,
+                            ListeningQuestionId = 8,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("DATN.Domain.Entities.ListeningQuestion", b =>
@@ -220,9 +510,13 @@ namespace DATN.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("ListeningScript")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ListeningSoundURL")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Question")
                         .IsRequired()
@@ -247,6 +541,104 @@ namespace DATN.Infrastructure.Migrations
                     b.HasIndex("TestSetId");
 
                     b.ToTable("ListeningQuestion", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(5788),
+                            IsPublic = true,
+                            ListeningScript = "여자: 무엇을 도와 드릴까요?<br>남자: 이 지갑,누가 잃어버린 것 같아요.이 앞에 있었어요.<br>여자: 네,이쪽으로 주세요.",
+                            ListeningSoundURL = "https://res.cloudinary.com/dmsi8fr0l/video/upload/v1747038713/C1NgheDe61_pkin3e.mp3",
+                            Question = "다음을 듣고 알맞은 그림을 고르십시오.",
+                            RankQuestionId = 13,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(5804),
+                            IsPublic = true,
+                            ListeningScript = "남자:수미야,괜찮아?많이 아프겠다.<br>여자:응,다리가 아파서 못 일어나겠어.<br>남자:그래?내가 도와줄 테니까 천천히 일어나 봐",
+                            ListeningSoundURL = "https://res.cloudinary.com/dmsi8fr0l/video/upload/v1747038714/C2NgheDe61_rtmjmt.mp3",
+                            Question = "다음을 듣고 알맞은 그림을 고르십시오.",
+                            RankQuestionId = 13,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(5806),
+                            IsPublic = true,
+                            ListeningScript = "남자:직장인들은 점심시간을 어떻게 보낼까요?직장인의 점심시간은 한 시간이 70%였고,한 시간 삼십 분은 20%,한 시간 미만은 10%였습니다.식사 후 활동은 ‘동료와 차 마시기’가 가장 많았으며, ‘산책하기’, ‘낮잠 자기’가 뒤를 이었습니다.",
+                            ListeningSoundURL = "https://res.cloudinary.com/dmsi8fr0l/video/upload/v1747038712/C3NgheDe61_n7u6p3.mp3",
+                            Question = "다음을 듣고 알맞은 그림을 고르십시오.",
+                            RankQuestionId = 13,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(5808),
+                            IsPublic = true,
+                            ListeningScript = "여자: 민수 씨,이번 주 모임 장소가 바뀌었대요.<br>남자: 그래요?어디로 바뀌었어요?<br>여자: ____________________________________________________",
+                            ListeningSoundURL = "https://res.cloudinary.com/dmsi8fr0l/video/upload/v1747038711/C4NgheDe61_tt1xxh.mp3",
+                            Question = "다음 대화를 잘 듣고 이어질 수 있는 말을 고르십시오.",
+                            RankQuestionId = 14,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(5809),
+                            IsPublic = true,
+                            ListeningScript = "남자: 기차표 알아봤는데 금요일 오후 표는 없는 것 같아.<br>여자: 그럼 토요일 아침은 어때?<br>남자: ____________________________________________________",
+                            ListeningSoundURL = "https://res.cloudinary.com/dmsi8fr0l/video/upload/v1747038713/C5NgheDe61_doyq1d.mp3",
+                            Question = "다음 대화를 잘 듣고 이어질 수 있는 말을 고르십시오.",
+                            RankQuestionId = 14,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(5811),
+                            IsPublic = true,
+                            ListeningScript = "여자:내일 발표만 끝나면 이제 이번 학기도 끝나네요.<br>남자:그러게요.수미 씨,방학 계획은 세웠어요?<br>여자: ____________________________________________________",
+                            ListeningSoundURL = "https://res.cloudinary.com/dmsi8fr0l/video/upload/v1747038712/C6NgheDe60_qjhl1h.mp3",
+                            Question = "다음 대화를 잘 듣고 이어질 수 있는 말을 고르십시오.",
+                            RankQuestionId = 14,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(5813),
+                            IsPublic = true,
+                            ListeningScript = "남자:이번에 새로 시작한 드라마 말이야.진짜 재미있더라.<br>여자: 아,그 시골에서 할머니랑 사는 아이 이야기?<br>남자: ____________________________________________________",
+                            ListeningSoundURL = "https://res.cloudinary.com/dmsi8fr0l/video/upload/v1747038714/C7NgheDe60_r1ao0k.mp3",
+                            Question = "다음 대화를 잘 듣고 이어질 수 있는 말을 고르십시오.",
+                            RankQuestionId = 14,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(5815),
+                            IsPublic = true,
+                            ListeningScript = "여자: 팀장님,프로그램 만족도 설문 조사를 만들어 봤는데요.확인해 주시겠어요?<br>남자:어디 봅시다.음,질문 수가 좀 많은 것 같네요.<br>여자: ____________________________________________________",
+                            ListeningSoundURL = "https://res.cloudinary.com/dmsi8fr0l/video/upload/v1747038714/C8NgheDe60_o19qff.mp3",
+                            Question = "다음 대화를 잘 듣고 이어질 수 있는 말을 고르십시오.",
+                            RankQuestionId = 14,
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("DATN.Domain.Entities.RankQuestion", b =>
@@ -280,7 +672,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Câu hỏi về ngữ pháp",
                             RankQuestionName = "Đọc Topik II 1 - 4",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -288,7 +680,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Xem tranh quảng cáo và chọn đáp án đúng",
                             RankQuestionName = "Đọc Topik II 5 - 8",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -296,7 +688,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Xem biểu đồ, đọc bài để chọn đáp án đúng",
                             RankQuestionName = "Đọc Topik II 9 - 12",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -304,7 +696,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Sắp xếp thứ tự câu cho đúng",
                             RankQuestionName = "Đọc Topik II 13 - 15",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -312,7 +704,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Chọn từ thích hợp để điền vào chỗ trống",
                             RankQuestionName = "Đọc Topik II 16 - 20",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -320,7 +712,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 6,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Đọc và chọn đáp án đúng",
                             RankQuestionName = "Đọc Topik II 21 - 24",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -328,7 +720,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 7,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Đọc đề mục tin tức và chọn đáp án giải thích đúng nhất",
                             RankQuestionName = "Đọc Topik II 25 - 27",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -336,7 +728,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 8,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Chọn câu phù hợp vào điền vào chỗ trống",
                             RankQuestionName = "Đọc Topik II 28 - 31",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -344,7 +736,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 9,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Điền nội dung đúng với đọan văn",
                             RankQuestionName = "Đọc Topik II 32 - 34",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -352,7 +744,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 10,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Chọn đáp án là nội dung chính của đoạn văn",
                             RankQuestionName = "Đọc Topik II 35 - 38",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -360,7 +752,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 11,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Chọn vị trí phù hợp để điền câu có sẵn vào",
                             RankQuestionName = "Đọc Topik II 39 - 41",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -368,7 +760,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 12,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Đọc đoạn văn dài và chọn đáp án phù hợp",
                             RankQuestionName = "Đọc Topik II 42 - 50",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -376,7 +768,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 13,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Nghe và chọn tranh đúng",
                             RankQuestionName = "Nghe Topik II 1 - 3",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -384,7 +776,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 14,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Chọn câu tiếp nối cho đoạn hội thoại",
                             RankQuestionName = "Nghe Topik II 4 - 8",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -392,7 +784,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 15,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Nghe và chọn hành động người nữ hoặc nam sẽ làm tiếp theo",
                             RankQuestionName = "Nghe Topik II 9 - 12",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -400,7 +792,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 16,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Nghe và chọn đáp án đúng",
                             RankQuestionName = "Nghe Topik II 13 - 16",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -408,7 +800,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 17,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Nghe và chọn suy nghĩ trọng tâm của nhân vật",
                             RankQuestionName = "Nghe Topik II 17 - 20",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -416,7 +808,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 18,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Nghe đoạn văn và chọn đáp án đúng (Gồm những đoạn văn dài và khó mức 1)",
                             RankQuestionName = "Nghe Topik II 21 - 30",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -424,7 +816,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 19,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Nghe đoạn văn và chọn đáp án đúng (Gồm những đoạn văn dài và khó mức 2)",
                             RankQuestionName = "Nghe Topik II 31 - 50",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -432,7 +824,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 20,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Nội dung nghe đề Topik I",
                             RankQuestionName = "Nghe Topik I",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -440,7 +832,7 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 21,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 221, DateTimeKind.Utc).AddTicks(4225),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 609, DateTimeKind.Utc).AddTicks(1993),
                             Note = "Nội dung đọc đề Topik I",
                             RankQuestionName = "Đọc Topik I",
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -521,7 +913,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 1,
                             Content = "등산하고 싶다",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6015),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2082),
                             IsCorrect = false,
                             ReadingQuestionId = 1,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -530,7 +922,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 2,
                             Content = "등산해도 된다 ",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6024),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2095),
                             IsCorrect = false,
                             ReadingQuestionId = 1,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -539,7 +931,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 3,
                             Content = "등산할 것 같다",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6025),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2096),
                             IsCorrect = false,
                             ReadingQuestionId = 1,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -548,7 +940,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 4,
                             Content = "등산한 적이 있다",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6026),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2097),
                             IsCorrect = true,
                             ReadingQuestionId = 1,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -557,7 +949,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 5,
                             Content = "이사한 지",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6027),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2098),
                             IsCorrect = false,
                             ReadingQuestionId = 2,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -566,7 +958,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 6,
                             Content = "이사하거든",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6029),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2099),
                             IsCorrect = false,
                             ReadingQuestionId = 2,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -575,7 +967,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 7,
                             Content = "이사하려면 ",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6030),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2101),
                             IsCorrect = false,
                             ReadingQuestionId = 2,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -584,7 +976,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 8,
                             Content = "이사하고 나서 ",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6031),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2102),
                             IsCorrect = true,
                             ReadingQuestionId = 2,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -593,7 +985,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 9,
                             Content = "돕기 위해서",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6033),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2103),
                             IsCorrect = true,
                             ReadingQuestionId = 3,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -602,7 +994,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 10,
                             Content = "돕는 대신에",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6034),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2104),
                             IsCorrect = false,
                             ReadingQuestionId = 3,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -611,7 +1003,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 11,
                             Content = "돕기 무섭게",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6035),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2105),
                             IsCorrect = false,
                             ReadingQuestionId = 3,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -620,7 +1012,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 12,
                             Content = "돕는 바람에 ",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6036),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2107),
                             IsCorrect = false,
                             ReadingQuestionId = 3,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -629,7 +1021,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 13,
                             Content = "본 척했다",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6048),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2108),
                             IsCorrect = false,
                             ReadingQuestionId = 4,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -638,7 +1030,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 14,
                             Content = "보기 나름이다",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6053),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2109),
                             IsCorrect = false,
                             ReadingQuestionId = 4,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -647,7 +1039,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 15,
                             Content = "보기 나름이다",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6054),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2110),
                             IsCorrect = false,
                             ReadingQuestionId = 4,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -656,7 +1048,7 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 16,
                             Content = "본 거나 마찬가지이다",
-                            CreatedDate = new DateTime(2025, 5, 11, 9, 17, 18, 223, DateTimeKind.Local).AddTicks(6055),
+                            CreatedDate = new DateTime(2025, 5, 12, 15, 53, 12, 611, DateTimeKind.Local).AddTicks(2111),
                             IsCorrect = true,
                             ReadingQuestionId = 4,
                             UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -714,45 +1106,45 @@ namespace DATN.Infrastructure.Migrations
                         {
                             Id = 1,
                             CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(3396),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 610, DateTimeKind.Utc).AddTicks(9619),
                             IsPublic = true,
                             Question = "(   )에 들어갈 가장 알맞은 것을 고르십시오. <br>나는 오래전에 설악산을 (       ).",
                             RankQuestionId = 1,
                             UpdatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
-                            UpdatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(3397)
+                            UpdatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 610, DateTimeKind.Utc).AddTicks(9620)
                         },
                         new
                         {
                             Id = 2,
                             CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(3400),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 610, DateTimeKind.Utc).AddTicks(9623),
                             IsPublic = true,
                             Question = "(   )에 들어갈 가장 알맞은 것을 고르십시오. <br>새집으로 (       ) 가구를 새로 샀다.",
                             RankQuestionId = 1,
                             UpdatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
-                            UpdatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(3400)
+                            UpdatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 610, DateTimeKind.Utc).AddTicks(9624)
                         },
                         new
                         {
                             Id = 3,
                             CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(3402),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 610, DateTimeKind.Utc).AddTicks(9626),
                             IsPublic = true,
                             Question = "다음 밑줄 친 부분과 의미가 비슷한 것을 고르십시오.<br>어려운 이웃을 <u>돕고자</u> 매년 봉사 활동에 참여하고 있다.",
                             RankQuestionId = 1,
                             UpdatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
-                            UpdatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(3403)
+                            UpdatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 610, DateTimeKind.Utc).AddTicks(9627)
                         },
                         new
                         {
                             Id = 4,
                             CreatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(3405),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 610, DateTimeKind.Utc).AddTicks(9629),
                             IsPublic = true,
                             Question = "다음 밑줄 친 부분과 의미가 비슷한 것을 고르십시오.<br>지난 3년 동안 영화를 한 편 봤으니 거의 안 본 <u>셈이다</u>.",
                             RankQuestionId = 1,
                             UpdatedBy = new Guid("5c0c563b-80d4-4485-9854-f6af58422601"),
-                            UpdatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(3406)
+                            UpdatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 610, DateTimeKind.Utc).AddTicks(9629)
                         });
                 });
 
@@ -782,23 +1174,23 @@ namespace DATN.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(7136),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 611, DateTimeKind.Utc).AddTicks(3056),
                             RoleName = "SystemAdmin",
-                            UpdatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(7136)
+                            UpdatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 611, DateTimeKind.Utc).AddTicks(3056)
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(7138),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 611, DateTimeKind.Utc).AddTicks(3058),
                             RoleName = "Admin",
-                            UpdatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(7138)
+                            UpdatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 611, DateTimeKind.Utc).AddTicks(3058)
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(7139),
+                            CreatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 611, DateTimeKind.Utc).AddTicks(3059),
                             RoleName = "User",
-                            UpdatedDate = new DateTime(2025, 5, 11, 2, 17, 18, 223, DateTimeKind.Utc).AddTicks(7139)
+                            UpdatedDate = new DateTime(2025, 5, 12, 8, 53, 12, 611, DateTimeKind.Utc).AddTicks(3060)
                         });
                 });
 
@@ -958,7 +1350,7 @@ namespace DATN.Infrastructure.Migrations
                             FullName = "Đỗ Quang Lâm",
                             IsActive = true,
                             NumberOfContributions = 5,
-                            PasswordHash = "$2a$11$P/afycnQ9TduW0ReJ5LxOuFoKmwnq9q33F4.2jJEap810Hgb73y/.",
+                            PasswordHash = "$2a$11$96G46ptujEMmOdswLzfBZOTc8Fft24v00HFipE5R0zPadf1TxGZXK",
                             RoleId = 2,
                             UpdatedDate = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -971,7 +1363,7 @@ namespace DATN.Infrastructure.Migrations
                             FullName = "Trần Thị B",
                             IsActive = true,
                             NumberOfContributions = 0,
-                            PasswordHash = "$2a$11$P/afycnQ9TduW0ReJ5LxOuFoKmwnq9q33F4.2jJEap810Hgb73y/.",
+                            PasswordHash = "$2a$11$96G46ptujEMmOdswLzfBZOTc8Fft24v00HFipE5R0zPadf1TxGZXK",
                             RoleId = 3,
                             UpdatedDate = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -984,7 +1376,7 @@ namespace DATN.Infrastructure.Migrations
                             FullName = "System Admin",
                             IsActive = true,
                             NumberOfContributions = 12,
-                            PasswordHash = "$2a$11$PPoitAMotTCkeGexewWRPOIdtghJc5jr8rb2FUWaqxNqEyDlEJ6YK",
+                            PasswordHash = "$2a$11$npVGtYG.l6RPnJfJkpxWeeBp/qGZRT9KH3HX3ykioclFgUlWmHgM2",
                             RoleId = 1,
                             UpdatedDate = new DateTime(2024, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });

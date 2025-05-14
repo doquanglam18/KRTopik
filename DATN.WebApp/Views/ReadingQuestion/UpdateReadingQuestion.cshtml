@@ -5,11 +5,8 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<!-- Thêm SwitchAlert2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/switchalert2@2.0.0/switchalert2.min.css" rel="stylesheet">
-
-<!-- Thêm SwitchAlert2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/switchalert2@2.0.0/switchalert2.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
     :root {
@@ -77,6 +74,7 @@
     img {
         border-radius: 8px;
         box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
     }
 
     .mt-4 {
@@ -89,6 +87,10 @@
 </style>
 
 <h2 class="mb-4">Cập nhật câu hỏi đọc</h2>
+
+<!-- Nút test alert -->
+<button type="button" class="btn btn-info mb-3" onclick="testAlert()">Test SweetAlert2</button>
+
 <form id="updateForm" class="form-container" enctype="multipart/form-data" method="post" asp-action="UpdateReadingQuestion" asp-controller="ReadingQuestion">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
@@ -104,7 +106,11 @@
         <label asp-for="ReadingImageURL" class="form-label">Ảnh minh họa</label><br />
         @if (!string.IsNullOrEmpty(Model.ReadingImageURL))
         {
-            <img src="@Model.ReadingImageURL" alt="Ảnh minh họa" width="200" class="mb-3" />
+            <img id="previewImage" src="@Model.ReadingImageURL" alt="Ảnh minh họa" width="200" class="mb-3" />
+        }
+        else
+        {
+            <img id="previewImage" src="#" alt="Preview ảnh" width="200" style="display:none;" />
         }
         <input type="file" name="Image" id="ReadingImageURL" class="form-control" />
     </div>
@@ -116,18 +122,14 @@
             <input class="form-control" value="@Model.TestSetName" disabled />
             <input type="hidden" asp-for="TestSetId" />
             <input type="hidden" asp-for="TestSetName" />
-
         </div>
         <div class="col-md-6">
             <label class="form-label">Độ khó</label>
             <input class="form-control" value="@Model.RankQuestionName" disabled />
             <input type="hidden" asp-for="RankQuestionId" />
-   
             <input type="hidden" asp-for="RankQuestionName" />
-
         </div>
     </div>
-
 
     <!-- Danh sách đáp án -->
     <h4 class="mt-4 mb-3">Danh sách đáp án</h4>
@@ -188,27 +190,84 @@
     </div>
 </form>
 
-<!-- Thêm JavaScript cho Validation và Hiển thị ảnh mới -->
-<script>
-    document.getElementById('ReadingImageURL').addEventListener('change', function (event) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            document.querySelector('img').src = e.target.result;
-        };
-        reader.readAsDataURL(this.files[0]);
-    });
+@section Scripts {
+    <script>
+        function testAlert() {
+            Swal.fire({
+                icon: 'info',
+                title: 'Thông báo',
+                text: 'SweetAlert2 hoạt động OK!'
+            });
+        }
 
-    $(document).ready(function () {
-        $('#updateForm').submit(function (event) {
-            if ($('textarea[name="Question"]').val().trim() === '') {
-                alert('Nội dung câu hỏi không được để trống!');
-                event.preventDefault();
-            }
-
-            if ($('input[name="CorrectAnswerIndex"]:checked').length === 0) {
-                alert('Vui lòng chọn đáp án đúng!');
-                event.preventDefault();
+        document.getElementById('ReadingImageURL').addEventListener('change', function () {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.getElementById('previewImage');
+                img.src = e.target.result;
+                img.style.display = 'block';
+            };
+            if (this.files[0]) {
+                reader.readAsDataURL(this.files[0]);
             }
         });
-    });
-</script>
+
+        $(document).ready(function () {
+            $('#updateForm').submit(function (event) {
+                event.preventDefault();
+
+                if ($('textarea[name="Question"]').val().trim() === '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Nội dung câu hỏi không được để trống!'
+                    });
+                    return;
+                }
+
+                if ($('input[name="CorrectAnswerIndex"]:checked').length === 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Vui lòng chọn đáp án đúng!'
+                    });
+                    return;
+                }
+
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: $(this).attr("action"),
+                    method: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res && res.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công',
+                                text: res.message
+                            }).then(() => {
+                                window.location.href = res.redirectUrl;
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Thất bại',
+                                text: res.message || 'Có lỗi xảy ra.'
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: 'Đã xảy ra lỗi khi gửi yêu cầu!'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,4 +1,6 @@
-﻿using DATN.Application.Dtos.ReadingDtos;
+﻿using DATN.Application.Dtos.BaseDtos;
+using DATN.Application.Dtos.ListeningDtos;
+using DATN.Application.Dtos.ReadingDtos;
 using DATN.Application.Dtos.UserDtos;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
@@ -36,5 +38,36 @@ namespace DATN.WebApp.Controllers
 
             return View(readingQuestions);
         }
+
+        public async Task<IActionResult> ManageListeningQuestion(int page = 1, int pageSize = 5)
+        {
+            var token = HttpContext.Session.GetString("JWTToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync($"{apiUrl}/listeningquestion/forpagging/{page}/{pageSize}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadFromJsonAsync<PageResultDto<ListeningQuestionDto>>();
+                return View(data);
+            }
+
+            return View(new PageResultDto<ListeningQuestionDto>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalItem = 0,
+                Items = new List<ListeningQuestionDto>()
+            });
+        }
+
+
+
     }
 }

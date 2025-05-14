@@ -9,5 +9,7 @@ namespace DATN.Infrastructure.Repository.Interfaces
 {
     public interface IListeningQuestionRepository : IGenericRepository<ListeningQuestion>
     {
+        Task<ListeningQuestion> GetByIdWithAnswersAsync(int id);
+        IQueryable<ListeningQuestion> GetAllForPaging();
     }
 }

@@ -26,6 +26,10 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = D:\DATN2025\DATN\DATN.WebApp
 build_property._RazorSourceGeneratorDebug = 
 
+[D:/DATN2025/DATN/DATN.WebApp/Views/Admin/ManageListeningQuestion.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlTGlzdGVuaW5nUXVlc3Rpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DATN2025/DATN/DATN.WebApp/Views/Admin/ManageReadingQuestion.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlUmVhZGluZ1F1ZXN0aW9uLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -44,6 +48,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/DATN2025/DATN/DATN.WebApp/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/ListeningQuestion/AddListeningQuestion.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGVuaW5nUXVlc3Rpb25cQWRkTGlzdGVuaW5nUXVlc3Rpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/ListeningQuestion/UpdateListeningQuestion.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGVuaW5nUXVlc3Rpb25cVXBkYXRlTGlzdGVuaW5nUXVlc3Rpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DATN2025/DATN/DATN.WebApp/Views/ReadingQuestion/AddReadingQuestion.cshtml]

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DATN.Application.Dtos.ListeningDtos;
 using DATN.Application.Dtos.RankQuestionDtos;
 using DATN.Application.Dtos.ReadingDtos;
 using DATN.Application.Dtos.RoleDtos;
@@ -39,6 +40,29 @@ namespace DATN.Application.AutoMapper
                 .ForMember(dest => dest.Id, opt => opt.Ignore()) // Nếu bạn không muốn ghi đè Id
                 .ForMember(dest => dest.ReadingAnswers, opt => opt.Ignore()) // Tuỳ bạn xử lý riêng
                 .ForMember(dest => dest.IsPublic, opt => opt.MapFrom(src => src.IsPublic)); // Ánh xạ IsPublic
+            CreateMap<ReadingQuestionCreateDto, ReadingQuestion>()
+                .ForMember(dest => dest.ReadingAnswers, opt => opt.MapFrom(src => src.ReadingAnswers));
+
+            CreateMap<ReadingAnswerCreateDto, ReadingAnswer>();
+
+
+            //Map ListeningQuestion
+            CreateMap<ListeningQuestion, ListeningQuestionDto>()
+                .ForMember(lq => lq.TestSetName, l => l.MapFrom(lq => lq.TestSet.TestName))
+                .ForMember(lq => lq.RankQuestionName, l => l.MapFrom(lq => lq.RankQuestion.RankQuestionName))
+                .ForMember(lq => lq.ListeningAnswers, l => l.MapFrom(lq => lq.ListeningAnswers));
+
+            CreateMap<ListeningAnswer, ListeningAnswerDto>().ReverseMap();
+
+            CreateMap<ListeningQuestionDto, ListeningQuestion>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()) // Nếu bạn không muốn ghi đè Id
+                .ForMember(dest => dest.ListeningAnswers, opt => opt.Ignore()) // Tuỳ bạn xử lý riêng
+                .ForMember(dest => dest.IsPublic, opt => opt.MapFrom(src => src.IsPublic)); // Ánh xạ IsPublic
+            CreateMap<ListeningQuestionCreateDto, ListeningQuestion>()
+              .ForMember(dest => dest.ListeningAnswers, opt => opt.MapFrom(src => src.ListeningAnswers));
+
+            CreateMap<ListeningAnswerCreateDto, ListeningAnswer>();
+
 
 
 
@@ -46,10 +70,7 @@ namespace DATN.Application.AutoMapper
             CreateMap<RankQuestion, RankQuestionDto>()
                 .ReverseMap();
 
-            CreateMap<ReadingQuestionCreateDto, ReadingQuestion>()
-            .ForMember(dest => dest.ReadingAnswers, opt => opt.MapFrom(src => src.ReadingAnswers));
-
-            CreateMap<ReadingAnswerCreateDto, ReadingAnswer>();
+         
 
 
             CreateMap<Role, RoleDto>().ReverseMap();

@@ -282,3 +282,4 @@ D:\DATN2025\DATN\DATN.WebApp\bin\Debug\net8.0\Microsoft.AspNetCore.Components.We
 D:\DATN2025\DATN\DATN.WebApp\bin\Debug\net8.0\Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore.dll
 D:\DATN2025\DATN\DATN.WebApp\bin\Debug\net8.0\Microsoft.AspNetCore.Metadata.dll
 D:\DATN2025\DATN\DATN.WebApp\bin\Debug\net8.0\Microsoft.JSInterop.dll
+D:\DATN2025\DATN\DATN.WebApp\obj\Debug\net8.0\DATN.WebApp.sourcelink.json
