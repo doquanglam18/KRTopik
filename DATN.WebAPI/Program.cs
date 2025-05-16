@@ -43,6 +43,7 @@ builder.Services.AddTransient<IReadingQuestionService, ReadingQuestionService>()
 builder.Services.AddTransient<IRankQuestionService, RankQuestionService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IListeningQuestionService, ListeningQuestionService>();
+builder.Services.AddTransient<ITestSetService, TestSetService>();
 
 var jwtSetting = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.UTF8.GetBytes(jwtSetting["Key"] ?? throw new InvalidOperationException("Jwt key is missing"));

@@ -30,4 +30,8 @@
     <ProjectReference Include="..\DATN.Infrastructure\DATN.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\UserProgressDtos\" />
+  </ItemGroup>
+
 </Project>

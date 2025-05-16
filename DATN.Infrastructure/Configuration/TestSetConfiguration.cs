@@ -24,14 +24,36 @@ namespace DATN.Infrastructure.Configuration
             new TestSet
                 {
                     Id = 1,
-                    TestName = "Đề 1 Đọc Topik II 1 - 4",
+                    TestName = "Đề 1: Đọc Topik II 1 - 4",
                     CreatedDate = new DateTime(2024, 4, 30),
                     UpdatedDate = new DateTime(2024, 4, 30),
                     CreatedBy = Guid.Parse("5c0c563b-80d4-4485-9854-f6af58422601"),
                     UpdatedBy = Guid.Parse("5c0c563b-80d4-4485-9854-f6af58422601"),
                     IsDelele = false,
                     RankQuestionId = 1
-                }
+                },
+            new TestSet
+            {
+                Id = 2,
+                TestName = "Đề 2: Nghe Topik II 1 - 3",
+                CreatedDate = new DateTime(2024, 4, 30),
+                UpdatedDate = new DateTime(2024, 4, 30),
+                CreatedBy = Guid.Parse("5c0c563b-80d4-4485-9854-f6af58422601"),
+                UpdatedBy = Guid.Parse("5c0c563b-80d4-4485-9854-f6af58422601"),
+                IsDelele = false,
+                RankQuestionId = 13
+            },
+            new TestSet
+            {
+                Id = 3,
+                TestName = "Đề 3: Nghe Topik II 4 - 8",
+                CreatedDate = new DateTime(2024, 4, 30),
+                UpdatedDate = new DateTime(2024, 4, 30),
+                CreatedBy = Guid.Parse("5c0c563b-80d4-4485-9854-f6af58422601"),
+                UpdatedBy = Guid.Parse("5c0c563b-80d4-4485-9854-f6af58422601"),
+                IsDelele = false,
+                RankQuestionId = 14
+            }
             );
 
         }

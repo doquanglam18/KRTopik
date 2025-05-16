@@ -113,9 +113,6 @@ namespace DATN.Application.Services.Implements
             return user;
         }
 
-
-
-
         public async Task<Result> UpdateUserAsync(User user)
         {
             try

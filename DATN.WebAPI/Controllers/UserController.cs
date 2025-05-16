@@ -245,6 +245,19 @@ namespace DATN.WebAPI.Controllers
             }
         }
 
+        [HttpGet("getById/{id}")]
+        public async Task<IActionResult> GetUserById(Guid id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound(new { success = false, message = "Người dùng không tồn tại!" });
+            }
+
+            var userDto = _mapper.Map<UserOwnerDto>(user);
+            return Ok(new { success = true, data = userDto });
+        }
+
 
 
 

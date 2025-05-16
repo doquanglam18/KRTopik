@@ -1,0 +1,144 @@
+﻿@using DATN.Application.Dtos.TestSetDtos
+@model TestSetDetailsDto
+
+@{
+    ViewData["Title"] = "Chi tiết bộ đề thi";
+    var avgRating = (Model.Comments != null && Model.Comments.Any())
+        ? Model.Comments.Average(c => c.Rating)
+        : 0;
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h2 class="text-center text-primary mb-4">@Model.TestName</h2>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            @{
+                                var userInfo = ViewData["UserInfo"] as DATN.Application.Dtos.UserDtos.UserOwnerDto;
+                            }
+
+                            @if (userInfo != null)
+                            {
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="@userInfo.AvatarImageUrl" alt="Avatar" class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;" />
+                                    <div>
+                                        <p class="mb-0"><strong>Người tạo:</strong> @userInfo.FullName</p>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <p><strong>Người tạo:</strong> Không xác định</p>
+                            }
+
+                            <p><i class="bi bi-music-note-list"></i> <strong>Câu nghe:</strong> @Model.CountListeningQuestion</p>
+                            <p><i class="bi bi-book"></i> <strong>Câu đọc:</strong> @Model.CountReadingQuestion</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><i class="bi bi-people"></i> <strong>Số người đã làm:</strong> @Model.CountUserDo</p>
+                            <p><i class="bi bi-bar-chart-steps"></i> <strong>Trình độ:</strong> @Model.RankQuestionName</p>
+                            <p>
+                                <i class="bi bi-star-half"></i> <strong>Đánh giá trung bình:</strong>
+                                <span class="text-warning">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= Math.Floor(avgRating))
+                                        {
+                                            <i class="bi bi-star-fill"></i>
+                                        }
+                                        else if (i - avgRating < 1)
+                                        {
+                                            <i class="bi bi-star-half"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star"></i>
+                                        }
+                                    }
+                                </span>
+                                <span class="text-muted">(@avgRating.ToString("0.0")/5)</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <a asp-controller="TestSet" asp-action="DoTestSet" asp-route-id="@Model.Id" class="btn btn-lg btn-success shadow">
+                            <i class="bi bi-pencil-square me-2"></i> Làm bài ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <h4 class="mb-4"><i class="bi bi-chat-left-text"></i> Bình luận từ người dùng</h4>
+
+                @if (Model.Comments != null && Model.Comments.Any())
+                {
+                    foreach (var comment in Model.Comments)
+                    {
+                        <div class="card mb-3 border-0 shadow-sm">
+                            <div class="card-body d-flex">
+                                <img src="@comment.UserAvatar" class="rounded-circle border me-4" width="64" height="64" alt="Avatar" style="object-fit: cover;" />
+                                <div>
+                                    <h5 class="mb-1">@comment.UserName</h5>
+                                    <div class="text-warning mb-2">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= comment.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <p class="mb-1">@comment.Content</p>
+                                    <small class="text-muted">Đăng lúc: @comment.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">Chưa có bình luận nào.</p>
+                }
+                <hr class="my-5" />
+
+                <h4 class="mb-3"><i class="bi bi-pencil-square"></i> Viết bình luận của bạn</h4>
+
+                <form asp-controller="TestSet" asp-action="PostComment" method="post">
+                    <input type="hidden" name="TestSetId" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label for="Content" class="form-label">Nội dung</label>
+                        <textarea name="Content" class="form-control" rows="4" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Đánh giá</label>
+                        <div>
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="Rating" id="rating_@i" value="@i" @(i == 5 ? "checked" : "") />
+                                    <label class="form-check-label" for="rating_@i">@i <i class="bi bi-star-fill text-warning"></i></label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Gửi bình luận
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

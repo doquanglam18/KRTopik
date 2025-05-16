@@ -1,0 +1,139 @@
+﻿
+@using DATN.Application.Dtos.RankQuestionDtos
+@using DATN.Application.Dtos.TestSetDtos
+@using DATN.Application.Dtos.BaseDtos
+
+@model PageResultDto<TestSetForUserDto>
+@{
+    ViewData["Title"] = "Danh sách đề";
+    var rankQuestions = ViewData["RankQuestions"] as IEnumerable<RankQuestionDto>;
+    int selectedRankId = Context.Request.Query["rankQuesTionId"].ToString() != "" ? int.Parse(Context.Request.Query["rankQuesTionId"]) : 0;
+    int pageSize = Model.PageSize;
+
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+}
+
+<div class="container mt-4">
+    <h2>Danh sách đề</h2>
+
+    <form id="filterForm" class="row g-3 mb-3">
+        <div class="col-md-4">
+            <label for="rankSelect" class="form-label">Chọn cấp độ</label>
+            <select id="rankSelect" name="rankQuesTionId" class="form-select">
+                <option value="">-- Tất cả --</option>
+                @foreach (var rank in rankQuestions)
+                {
+                    <option value="@rank.Id" selected="@(rank.Id == selectedRankId ? "selected" : null)">
+                        @rank.RankQuestionName
+                    </option>
+
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label for="pageSize" class="form-label">Số đề/trang</label>
+           <select id="pageSize" name="pageSize" class="form-select">
+                @foreach (var size in new int[] { 5, 10, 20 })
+                {
+                    if (size == pageSize)
+                    {
+                        <option value="@size" selected>@size</option>
+                    }
+                    else
+                    {
+                        <option value="@size">@size</option>
+                    }
+                }
+
+
+            </select>
+
+        </div>
+
+        <div class="col-md-2 align-self-end">
+            <button type="submit" class="btn btn-primary">Lọc</button>
+        </div>
+    </form>
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="alert alert-warning">Không có đề nào!</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Tên đề</th>
+                        <th>Số câu hỏi</th>
+                        <th>Số bình luận</th>
+                        <th>Thuộc cấp độ</th>
+                        <th>Thao tác</th> @* Thêm cột thao tác *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Items.Count; i++)
+                    {
+                        var item = Model.Items[i];
+                        <tr>
+                            <td>@((Model.Page - 1) * Model.PageSize + i + 1)</td>
+                            <td>@item.TestName</td>
+                            <td>@item.QuestionsCount</td>
+                            <td>@item.CommentCount</td>
+                            <td>@item.RankQuestionName</td>
+                            <td>
+                                <a asp-controller="TestSet" asp-action="Details" asp-route-id="@item.Id" method ="GET" class="btn btn-info btn-sm">
+                                    Xem chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= Model.TotalPage; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link" href="javascript:void(0);" onclick="goToPage(@i)">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Form submission
+        document.getElementById('filterForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const rankId = document.getElementById('rankSelect').value;
+            const pageSize = document.getElementById('pageSize').value;
+
+            const url = `?rankQuesTionId=${rankId}&page=1&pageSize=${pageSize}`;
+
+            window.location.href = url;
+        });
+
+        function goToPage(page) {
+            const rankId = document.getElementById('rankSelect').value;
+            const pageSize = document.getElementById('pageSize').value;
+            const url = `?rankQuesTionId=${rankId}&page=${page}&pageSize=${pageSize}`;
+
+            window.location.href = url;
+        }
+    </script>
+}

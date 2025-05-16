@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 
@@ -116,5 +118,36 @@ public class CloudService : ICloudService
 
         return null;
     }
+
+
+    public async Task<double?> GetAudioDurationViaApiAsync(string publicId)
+    {
+        var cloudName = "your_cloud_name";
+        var apiKey = "your_api_key";
+        var apiSecret = "your_api_secret";
+
+        var url = $"https://api.cloudinary.com/v1_1/{cloudName}/resources/video/upload/{publicId}";
+
+        using (var client = new HttpClient())
+        {
+            var authToken = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{apiKey}:{apiSecret}"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonString = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(jsonString);
+                if (doc.RootElement.TryGetProperty("duration", out var durationProp))
+                {
+                    return durationProp.GetDouble();
+                }
+            }
+        }
+        return null;
+    }
+
+
+
 
 }

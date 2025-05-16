@@ -90,6 +90,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3lzdGVtQWRtaW5cTWFuYWdlU3lzdGVtTG9nZ2luZy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/DATN2025/DATN/DATN.WebApp/Views/TestSet/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVzdFNldFxEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/TestSet/DoTestSet.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVzdFNldFxEb1Rlc3RTZXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/TestSet/ListTestSetForUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVzdFNldFxMaXN0VGVzdFNldEZvclVzZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DATN2025/DATN/DATN.WebApp/Views/User/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

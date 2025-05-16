@@ -36,7 +36,8 @@ namespace DATN.Infrastructure.Configuration
                     CreatedDate = DateTime.UtcNow,
                     UpdatedDate = DateTime.UtcNow,
                     RankQuestionId = 1,
-                    IsPublic = true
+                    IsPublic = true,
+                    TestSetId = 1
                 },
                 new ReadingQuestion
                 {
@@ -49,7 +50,8 @@ namespace DATN.Infrastructure.Configuration
                     CreatedDate = DateTime.UtcNow,
                     UpdatedDate = DateTime.UtcNow,
                     RankQuestionId = 1,
-                    IsPublic = true
+                    IsPublic = true,
+                    TestSetId = 1
                 },
                 new ReadingQuestion
                 {
@@ -61,7 +63,8 @@ namespace DATN.Infrastructure.Configuration
                     CreatedDate = DateTime.UtcNow,
                     UpdatedDate = DateTime.UtcNow,
                     RankQuestionId = 1,
-                    IsPublic = true
+                    IsPublic = true,
+                    TestSetId = 1
                 },
 
                 new ReadingQuestion
@@ -74,7 +77,8 @@ namespace DATN.Infrastructure.Configuration
                     CreatedDate = DateTime.UtcNow,
                     UpdatedDate = DateTime.UtcNow,
                     RankQuestionId = 1,
-                    IsPublic = true
+                    IsPublic = true,
+                    TestSetId = 1
                 }
             );
         }

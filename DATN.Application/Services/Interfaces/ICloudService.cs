@@ -15,6 +15,7 @@ namespace DATN.Application.Services.Interfaces
         Task<string> UploadAudioAsync(IFormFile audioFile);
         Task<byte[]> DownloadAudioAsync(string publicId);
 
+        Task<double?> GetAudioDurationViaApiAsync(string publicId);
     }
 
 }
