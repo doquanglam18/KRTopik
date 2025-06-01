@@ -154,6 +154,26 @@ namespace DATN.WebAPI.Controllers
         }
 
 
+        [HttpGet("forAddTest/{rankQuestionId}/{page}/{pageSize}")]
+        public async Task<IActionResult> GetReadingQuestionForAddTest([FromRoute] int rankQuestionId, [FromRoute] int page, [FromRoute] int pageSize)
+        {
+            var readingQuestions = await _readingQuestionService.GetReadingByRankID(rankQuestionId, page, pageSize);
+            return Ok(readingQuestions);
+        }
+
+        [HttpGet("forAddTest2/{rankQuestionId}")]
+        public async Task<IActionResult> GetReadingQuestionForAddTest2([FromRoute] int rankQuestionId)
+        {
+            var readingQuestions = await _readingQuestionService.GetReadingByRankIDNoPagging(rankQuestionId);
+
+            if (readingQuestions == null || !readingQuestions.Any())
+            {
+                return NotFound(new { message = "Không tìm thấy câu hỏi đọc nào với rankQuestionId đã cho." });
+            }
+
+            return Ok(readingQuestions);
+        }
+
 
     }
 }

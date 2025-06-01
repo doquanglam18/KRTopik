@@ -3,45 +3,201 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section class="hero-wrap hero-wrap-2" style="background-image: url('@Url.Content("~/themelef/images/bg_2.jpg")');">
-    <div class="overlay"></div>
+<!-- Hero Section -->
+<section class="hero-wrap hero-wrap-2" style="background-image: url('@Url.Content("~/themelef/images/logokr.png")'); background-position: center center;">
+    <div class="overlay" style="background-color: rgba(0, 0, 0, 0.6);"></div>
     <div class="container">
         <div class="row no-gutters slider-text align-items-end justify-content-center">
             <div class="col-md-9 ftco-animate pb-5 text-center">
                 <p class="breadcrumbs">
-                    <span class="mr-2"><a href="/">Trang chủ / 홈 <i class="fa fa-chevron-right"></i></a></span>
-                    <span>Giới thiệu / 소개 <i class="fa fa-chevron-right"></i></span>
+                    <span class="mr-2">
+                        <a href="/" class="text-white">
+                            <i class="fas fa-home mr-1"></i> Trang chủ / 홈 <i class="fas fa-chevron-right ml-1"></i>
+                        </a>
+                    </span>
+                    <span class="text-white">
+                        <i class="fas fa-info-circle mr-1"></i> Giới thiệu / 소개
+                    </span>
                 </p>
-                <h1 class="mb-0 bread">Giới thiệu / 소개</h1>
+                <h1 class="mb-0 bread text-white font-weight-bold">Giới thiệu / 소개</h1>
             </div>
         </div>
     </div>
 </section>
 
-<section class="ftco-section">
+<!-- Main Content Section -->
+<section class="ftco-section bg-light py-5">
     <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h2>Chào mừng đến với KRTopik / KRTopik에 오신 것을 환영합니다</h2>
-                <p>
-                    KRTopik là nền tảng luyện thi TOPIK tiếng Hàn theo từng dạng câu hỏi công khai.<br />
-                    KRTopik은 한국어 TOPIK 시험을 유형별로 연습할 수 있는 플랫폼입니다.
-                </p>
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-md-12">
+                <div class="card shadow-sm border-0 rounded-lg">
+                    <div class="card-body p-5">
+                        <!-- Welcome Section -->
+                        <div class="text-center mb-5">
+                            <h2 class="display-4 font-weight-bold text-primary mb-3">
+                                <i class="fas fa-handshake mr-2"></i>Chào mừng đến với KRTopik
+                            </h2>
+                            <h4 class="text-dark">
+                                <i class="fas fa-flag mr-2"></i>KRTopik에 오신 것을 환영합니다
+                            </h4>
+                            <div class="divider bg-gradient-primary mx-auto my-4" style="width: 80px; height: 3px;"></div>
+                        </div>
 
-                <h3>Sứ mệnh của chúng tôi / 우리의 사명</h3>
-                <p>
-                    Giúp người học nâng cao kỹ năng tiếng Hàn và đạt kết quả cao trong kỳ thi TOPIK.<br />
-                    한국어 학습자가 TOPIK 시험에서 좋은 성적을 거둘 수 있도록 돕는 것이 우리의 목표입니다.
-                </p>
+                        <p class="lead text-center mb-5" style="font-family: 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;">
+                            <i class="fas fa-quote-left text-secondary mr-2"></i>
+                            KRTopik là nền tảng luyện thi TOPIK tiếng Hàn theo từng dạng câu hỏi công khai.
+                            <br class="d-none d-md-block" />
+                            KRTopik은 한국어 TOPIK 시험을 유형별로 연습할 수 있는 플랫폼입니다.
+                            <i class="fas fa-quote-right text-secondary ml-2"></i>
+                        </p>
 
-                <h3>Liên hệ với chúng tôi / 연락처</h3>
-                <ul>
-                    <li><strong>Zalo:</strong> <a href="https://chat.zalo.me/">0395862935</a></li>
-                    <li><strong>Facebook:</strong> <a href="https://web.facebook.com/oquanglam.888725?locale=vi_VN">facebook.com/KRTopik</a></li>
-                    <li><strong>Email:</strong> <a href="mailto:dolam180903@gmail.com">KRTopik@krt.com</a></li>
-                    <li><strong>Địa chỉ / 주소:</strong> Ngõ 51, phố Văn Trì, phường Minh Khai, quận Bắc Từ Liêm, Hà Nội</li>
-                </ul>
+
+                        <!-- Mission Section -->
+                        <div class="row align-items-center mb-5">
+                            <div class="col-md-4 text-center mb-4 mb-md-0">
+                                <div class="icon-box bg-primary text-white rounded-circle p-4 shadow">
+                                    <i class="fas fa-bullseye fa-3x"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h3 class="font-weight-bold text-dark mb-3">
+                                    <i class="fas fa-rocket text-primary mr-2"></i>Sứ mệnh của chúng tôi
+                                </h3>
+                                <h4 class="text-dark mb-3">
+                                    <i class="fas fa-flag text-primary mr-2"></i>우리의 사명
+                                </h4>
+                                <p class="text-muted">
+                                    Giúp người học nâng cao kỹ năng tiếng Hàn và đạt kết quả cao trong kỳ thi TOPIK.
+                                    <br class="d-none d-md-block" />
+                                    한국어 학습자가 TOPIK 시험에서 좋은 성적을 거둘 수 있도록 돕는 것이 우리의 목표입니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Contact Section -->
+                        <div class="contact-section mt-5 pt-4">
+                            <h3 class="font-weight-bold text-dark mb-4 text-center">
+                                <i class="fas fa-envelope-open-text text-primary mr-2"></i>Liên hệ với chúng tôi
+                            </h3>
+                            <h4 class="text-dark mb-4 text-center">
+                                <i class="fas fa-address-book text-primary mr-2"></i>연락처
+                            </h4>
+
+                            <div class="row mt-4">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                        <div class="card-body text-center p-4">
+                                            <div class="icon-box bg-primary text-white rounded-circle p-3 d-inline-block mb-3">
+                                                <i class="fas fa-comment-dots fa-2x"></i>
+                                            </div>
+                                            <h5 class="font-weight-bold">Zalo</h5>
+                                            <a href="https://chat.zalo.me/" class="btn btn-outline-primary btn-sm mt-2">
+                                                <i class="fas fa-paper-plane mr-1"></i> 0395862935
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                        <div class="card-body text-center p-4">
+                                            <div class="icon-box bg-primary text-white rounded-circle p-3 d-inline-block mb-3">
+                                                <i class="fab fa-facebook-f fa-2x"></i>
+                                            </div>
+                                            <h5 class="font-weight-bold">Facebook</h5>
+                                            <a href="https://web.facebook.com/oquanglam.888725?locale=vi_VN" class="btn btn-outline-primary btn-sm mt-2">
+                                                <i class="fab fa-facebook-f mr-1"></i> facebook.com/KRTopik
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                        <div class="card-body text-center p-4">
+                                            <div class="icon-box bg-primary text-white rounded-circle p-3 d-inline-block mb-3">
+                                                <i class="fas fa-envelope fa-2x"></i>
+                                            </div>
+                                            <h5 class="font-weight-bold">Email</h5>
+                                            <a href="mailto:dolam180903@gmail.com" class="btn btn-outline-primary btn-sm mt-2">
+                                                <i class="fas fa-envelope mr-1"></i> KRTopik@krt.com
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                        <div class="card-body text-center p-4">
+                                            <div class="icon-box bg-primary text-white rounded-circle p-3 d-inline-block mb-3">
+                                                <i class="fas fa-map-marker-alt fa-2x"></i>
+                                            </div>
+                                            <h5 class="font-weight-bold">Địa chỉ / 주소</h5>
+                                            <p class="text-muted small mt-2">
+                                                Ngõ 51, phố Văn Trì, phường Minh Khai, quận Bắc Từ Liêm, Hà Nội
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Custom CSS -->
+<style>
+    .hero-wrap {
+        background-size: cover;
+        background-attachment: fixed;
+        min-height: 400px;
+    }
+
+    .icon-box {
+        transition: all 0.3s ease;
+    }
+
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        transition: all 0.3s ease;
+    }
+
+    .divider {
+        background: linear-gradient(90deg, #007bff, #00bfff);
+    }
+
+    .breadcrumbs a {
+        transition: color 0.3s ease;
+    }
+
+        .breadcrumbs a:hover {
+            color: #ffffff !important;
+            text-decoration: none;
+        }
+
+    .card {
+        transition: all 0.3s ease;
+        border-radius: 10px !important;
+    }
+
+    .btn-outline-primary {
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white !important;
+        }
+
+    .lead {
+        font-size: 1.25rem;
+        line-height: 1.8;
+    }
+</style>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

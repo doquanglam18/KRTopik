@@ -1,0 +1,174 @@
+﻿@using DATN.Application.Dtos.SystemLoggingDtos.Chart
+@model AccessStatsViewModel
+
+@{
+    ViewData["Title"] = "Thống kê dữ liệu";
+    Layout = "~/Views/Shared/_SystemAdminLayout.cshtml";
+}
+
+<!-- Debug Information -->
+<div class="alert alert-info">
+    <p>Debug Info:</p>
+    <p>Stats Count: @Model.Stats.Count()</p>
+    <p>Chart Data Count: @Model.ChartData.Count()</p>
+    <p>From Date: @Model.FromDate</p>
+    <p>To Date: @Model.ToDate</p>
+    <p>Action: @Model.ActionName</p>
+    <p>IP: @Model.IP</p>
+    <p>UserId: @Model.UserId</p>
+</div>
+
+<h2>Thống kê truy cập hệ thống</h2>
+
+<form asp-action="AccessStats" method="get" class="row g-3 mb-4">
+    <div class="col-md-2">
+        <label for="fromDate" class="form-label">Từ ngày</label>
+        <input type="date" class="form-control" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-2">
+        <label for="toDate" class="form-label">Đến ngày</label>
+        <input type="date" class="form-control" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-2">
+        <label for="action" class="form-label">Hành động</label>
+        <input type="text" class="form-control" name="action" value="@Model.ActionName" placeholder="Nhập hành động..." />
+    </div>
+    <div class="col-md-2">
+        <label for="ip" class="form-label">IP</label>
+        <input type="text" class="form-control" name="ip" value="@Model.IP" />
+    </div>
+    <div class="col-md-2">
+        <label for="userId" class="form-label">User ID</label>
+        <input type="text" class="form-control" name="userId" value="@Model.UserId?.ToString()" />
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Lọc</button>
+    </div>
+</form>
+
+@if (Model.Stats.Any())
+{
+    <div class="mb-3">
+        <a asp-action="ExportExcel" asp-route-fromDate="@Model.FromDate" asp-route-toDate="@Model.ToDate"
+           asp-route-action="@Model.ActionName" asp-route-ip="@Model.IP" asp-route-userId="@Model.UserId"
+           class="btn btn-success me-2">Xuất Excel</a>
+
+        <a asp-action="ExportPdf" asp-route-fromDate="@Model.FromDate" asp-route-toDate="@Model.ToDate"
+           asp-route-action="@Model.ActionName" asp-route-ip="@Model.IP" asp-route-userId="@Model.UserId"
+           class="btn btn-danger">Xuất PDF</a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Hành động</th>
+                <th>Địa chỉ IP</th>
+                <th>User ID</th>
+                <th>Số lần thực hiện</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Stats)
+            {
+                <tr>
+                    <td>@item.ActionName</td>
+                    <td>@item.IPAddress</td>
+                    <td>@item.UserId</td>
+                    <td>@item.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+    <h4>Biểu đồ thống kê</h4>
+    <div id="chartContainer" style="position: relative; height:400px; width:100%">
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- Đảm bảo Chart.js được load -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing chart...');
+            
+            const chartData = @Html.Raw(Json.Serialize(Model.ChartData));
+            console.log('Raw Chart Data:', chartData);
+            
+            if (!chartData || chartData.length === 0) {
+                console.log('No chart data available');
+                document.getElementById('chartContainer').innerHTML = '<p class="text-muted">Không có dữ liệu để hiển thị biểu đồ.</p>';
+                return;
+            }
+
+            try {
+                const ctx = document.getElementById('chart').getContext('2d');
+                console.log('Canvas context obtained');
+
+                // Log the first item to see its structure
+                console.log('First chart item:', chartData[0]);
+
+                const labels = chartData.map(item => {
+                    const date = new Date(item.date);
+                    console.log('Processing date:', item.date, '->', date);
+                    return date.toLocaleDateString('vi-VN');
+                });
+                
+                const values = chartData.map(item => {
+                    console.log('Processing value:', item.accessCount);
+                    return item.accessCount;
+                });
+
+                console.log('Processed Labels:', labels);
+                console.log('Processed Values:', values);
+
+                const chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Số lần truy cập',
+                            data: values,
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stepSize: 1,
+                                title: {
+                                    display: true,
+                                    text: 'Số lần truy cập'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Ngày'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                console.log('Chart created successfully');
+            } catch (error) {
+                console.error('Error creating chart:', error);
+                document.getElementById('chartContainer').innerHTML = 
+                    '<p class="text-danger">Có lỗi xảy ra khi tạo biểu đồ: ' + error.message + '</p>';
+            }
+        });
+    </script>
+}
+else
+{
+    <p class="text-muted">Không có dữ liệu thống kê phù hợp.</p>
+}
+
+

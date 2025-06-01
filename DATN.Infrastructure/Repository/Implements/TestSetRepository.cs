@@ -25,7 +25,8 @@ namespace DATN.Infrastructure.Repository.Implements
                 .Include(rq => rq.UserProgress)
                 .Include(rq => rq.ListeningQuestions)
                     .ThenInclude(rq => rq.ListeningAnswers)
-                .Include(rq => rq.Comments);
+                .Include(rq => rq.Comments)
+                    .ThenInclude(rq => rq.User);
         }
 
         public override async Task<TestSet> GetByIdAsync(int id)
@@ -38,6 +39,7 @@ namespace DATN.Infrastructure.Repository.Implements
                 .Include(rq => rq.ListeningQuestions)
                     .ThenInclude(rq => rq.ListeningAnswers)
                 .Include(rq => rq.Comments)
+                    .ThenInclude(rq => rq.User)
                 .FirstOrDefaultAsync(rq => rq.Id == id);
         }
 

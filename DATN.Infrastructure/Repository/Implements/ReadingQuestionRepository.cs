@@ -40,6 +40,10 @@ namespace DATN.Infrastructure.Repository.Implements
                 .FirstOrDefaultAsync(q => q.Id == id);
         }
 
+        public IQueryable<ReadingQuestion> GetAllForPaging()
+        {
+            return _context.Set<ReadingQuestion>();
+        }
 
     }
 }

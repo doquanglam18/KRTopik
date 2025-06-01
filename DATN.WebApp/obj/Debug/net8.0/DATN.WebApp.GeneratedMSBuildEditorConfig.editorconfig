@@ -26,6 +26,10 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = D:\DATN2025\DATN\DATN.WebApp
 build_property._RazorSourceGeneratorDebug = 
 
+[D:/DATN2025/DATN/DATN.WebApp/Views/Admin/ManageKoreaBlog.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlS29yZWFCbG9nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DATN2025/DATN/DATN.WebApp/Views/Admin/ManageListeningQuestion.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlTGlzdGVuaW5nUXVlc3Rpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -48,6 +52,18 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/DATN2025/DATN/DATN.WebApp/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/KoreaBlog/CreateKoreaBlog.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS29yZWFCbG9nXENyZWF0ZUtvcmVhQmxvZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/KoreaBlog/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS29yZWFCbG9nXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/KoreaBlog/ListKoreaBlogForUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS29yZWFCbG9nXExpc3RLb3JlYUJsb2dGb3JVc2VyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DATN2025/DATN/DATN.WebApp/Views/ListeningQuestion/AddListeningQuestion.cshtml]
@@ -82,12 +98,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/DATN2025/DATN/DATN.WebApp/Views/SystemAdmin/AccessStats.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3lzdGVtQWRtaW5cQWNjZXNzU3RhdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DATN2025/DATN/DATN.WebApp/Views/SystemAdmin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3lzdGVtQWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DATN2025/DATN/DATN.WebApp/Views/SystemAdmin/ManageSystemLogging.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3lzdGVtQWRtaW5cTWFuYWdlU3lzdGVtTG9nZ2luZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/TestSet/CreateTestSetByAdmin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVzdFNldFxDcmVhdGVUZXN0U2V0QnlBZG1pbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DATN2025/DATN/DATN.WebApp/Views/TestSet/Details.cshtml]
@@ -102,12 +126,32 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVzdFNldFxMaXN0VGVzdFNldEZvclVzZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/DATN2025/DATN/DATN.WebApp/Views/TestSet/Result.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVzdFNldFxSZXN1bHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/TestSet/TestSetDetailsForAdmin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVzdFNldFxUZXN0U2V0RGV0YWlsc0ZvckFkbWluLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/User/ForgotPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DATN2025/DATN/DATN.WebApp/Views/User/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/DATN2025/DATN/DATN.WebApp/Views/User/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DATN2025/DATN/DATN.WebApp/Views/User/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/User/ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxSZXNldFBhc3N3b3JkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DATN2025/DATN/DATN.WebApp/Views/_ViewImports.cshtml]

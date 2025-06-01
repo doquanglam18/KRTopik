@@ -1,4 +1,6 @@
-﻿using DATN.Domain.Entities;
+﻿using DATN.Application.Dtos.BaseDtos;
+using DATN.Application.Dtos.KoreaBlogDtos;
+using DATN.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +16,8 @@ namespace DATN.Application.Services.Interfaces
         Task<Result> DeleteKoreaBlogAsync(int id);
         Task<Result> UpdateKoreaBlogAsync(KoreaBlog koreaBlog);
         Task<KoreaBlog> GetKoreaBlogByIdAsync(int id);
+        Task<PageResultDto<KoreaBlogForList>> GetAllKoreaBlogPagingAsync(int page, int pageSize);
+        Task<PageResultDto<KoreaBlogForList>> GetAllKoreaBlogForSearchPagingAsync(string searchName, int page, int pageSize);
+        Task<PageResultDto<KoreaBlogForList>> GetAllKoreaBlogPagingAsyncForAdmin(int page, int pageSize);
     }
 }

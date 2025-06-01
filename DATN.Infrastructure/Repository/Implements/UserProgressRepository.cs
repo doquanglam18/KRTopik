@@ -13,6 +13,12 @@ namespace DATN.Infrastructure.Repository.Implements
     {
         public UserProgressRepository(DATNContext context) : base(context)
         {
+
+        }
+
+        public IQueryable<UserProgress> GetAllForPaging()
+        {
+            return _context.Set<UserProgress>();
         }
     }
 }

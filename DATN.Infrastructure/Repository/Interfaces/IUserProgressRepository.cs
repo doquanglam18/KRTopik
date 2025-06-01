@@ -11,5 +11,6 @@ namespace DATN.Infrastructure.Repository.Interfaces
 {
     public interface IUserProgressRepository : IGenericRepository<UserProgress>
     {
+        IQueryable<UserProgress> GetAllForPaging();
     }
 }

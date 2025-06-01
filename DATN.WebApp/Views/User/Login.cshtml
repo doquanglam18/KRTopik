@@ -186,7 +186,7 @@
         }
     </style>
 </head>
-<body style="background-image: url('/themelef/images/logokr.png') !important;">
+<body style="background-image: url('/themelef/images/logokrnotext.png') !important;">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
@@ -216,8 +216,8 @@
                             <span asp-validation-for="PasswordHash" class="text-danger"></span>
                         </div>
 
-                        <a href="#" class="forgot-password">
-                            <i class="fas fa-key mr-1"></i>Quên mật khẩu?
+                        <a asp-controller="User" asp-action="ForgotPassword" class="forgot-password">
+                            <i  class="fas fa-key mr-1"></i>Quên mật khẩu?
                         </a>
 
                         <div class="form-group">

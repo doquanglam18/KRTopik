@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using NuGet.Protocol.Plugins;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -19,10 +20,12 @@ namespace DATN.WebApp.Controllers
 
         private readonly HttpClient _httpClient;
         private const string apiUrl = "https://localhost:7208/api/user";
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(HttpClient httpClient )
+        public UserController(HttpClient httpClient, ILogger<UserController> logger)
         {
             _httpClient = httpClient;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -127,11 +130,42 @@ namespace DATN.WebApp.Controllers
 
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LogOut()
+        public async Task<IActionResult> LogOut()
         {
-            // Xóa session hoặc xác thực
+            var logData = new Dictionary<string, string>
+            {
+                { "actionVName", "Logout" },
+                { "details", "Người dùng đã đăng xuất khỏi hệ thống" }
+            };
+
+            // Lấy token từ session thay vì header
+            var token = HttpContext.Session.GetString("JWTToken");
+            _logger.LogInformation("Token from session: {Token}", token);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+            else
+            {
+                _logger.LogWarning("Không tìm thấy token trong session");
+            }
+
+            var response = await _httpClient.PostAsJsonAsync("https://localhost:7208/api/systemlogging/loggingaction", logData);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Ghi log thất bại khi đăng xuất: {StatusCode}, Error: {Error}", response.StatusCode, errorContent);
+            }
+            else
+            {
+                _logger.LogInformation("Ghi log đăng xuất thành công");
+            }
+
             HttpContext.Session.Clear();
 
             return Json(new
@@ -144,5 +178,90 @@ namespace DATN.WebApp.Controllers
 
 
 
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{apiUrl}/forgotpassword", dto);
+            var result = await response.Content.ReadFromJsonAsync<Result>();
+            if (!response.IsSuccessStatusCode)
+            {
+                return Json(new { success = false, message = result?.Message ?? "Không thể gửi email." });
+            }
+            return Json(new { success = true, message = "Vui lòng kiểm tra email để đặt lại mật khẩu." });
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token)
+        {
+            ViewBag.Token = token;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{apiUrl}/resetpassword", dto);
+            var result = await response.Content.ReadFromJsonAsync<Result>();
+            if (!response.IsSuccessStatusCode)
+            {
+                return Json(new { success = false, message = result?.Message ?? "Không thể đặt lại mật khẩu." });
+            }
+            return Json(new { success = true, message = "Đặt lại mật khẩu thành công!" });
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var token = HttpContext.Session.GetString("JWTToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            try
+            {
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await _httpClient.GetAsync($"{apiUrl}/getProfileUser");
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonResponse = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
+                    
+                    if (jsonResponse != null && 
+                        jsonResponse.ContainsKey("success") && 
+                        Convert.ToBoolean(jsonResponse["success"]) && 
+                        jsonResponse.ContainsKey("data"))
+                    {
+                        var userData = JsonConvert.DeserializeObject<UserDetailForUserDto>(jsonResponse["data"].ToString());
+                        return View(userData);
+                    }
+                }
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    HttpContext.Session.Remove("JWTToken");
+                    return RedirectToAction("Login", "User");
+                }
+
+                TempData["Error"] = "Không thể tải thông tin cá nhân. Vui lòng thử lại sau.";
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi tải thông tin cá nhân");
+                TempData["Error"] = "Đã xảy ra lỗi khi tải thông tin cá nhân.";
+                return RedirectToAction("Index", "Home");
+            }
+        }
     }
 }

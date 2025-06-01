@@ -90,10 +90,10 @@
                     <tr>
                         <th>ID</th>
                         <th class="text-start">Nội dung câu hỏi</th>
-                        <th>Ảnh</th>
+@*                         <th>Ảnh</th> *@
                         <th>Bộ đề</th>
                         <th>Độ khó</th>
-                        <th class="text-start">Đáp án</th>
+@*                         <th class="text-start">Đáp án</th> *@
                         <th>Ngày tạo</th>
                         <th>Ngày cập nhật</th>
                         <th>Trạng thái</th>
@@ -106,7 +106,7 @@
                         <tr>
                             <td>@q.Id</td>
                             <td class="text-start">@Html.Raw(q.Question)</td>
-                            <td>
+@*                             <td>
                                 @if (!string.IsNullOrEmpty(q.ReadingImageURL))
                                 {
                                     <img src="@q.ReadingImageURL" class="img-thumbnail-custom" alt="Ảnh" />
@@ -115,26 +115,25 @@
                                 {
                                     <span class="text-muted-small">Không có</span>
                                 }
-                            </td>
+                            </td> *@
                             <td>@q.TestSetName</td>
                             <td>@q.RankQuestionName</td>
-                            <td class="text-start">
+   @*                          <td class="text-start">
                                 <ul class="list-unstyled mb-0">
                                     @foreach (var a in q.ReadingAnswers)
                                     {
                                         <li class="@(a.IsCorrect ? "correct-answer" : "")">@a.Content</li>
                                     }
                                 </ul>
-                            </td>
+                            </td> *@
                             <td><span class="text-muted-small">@q.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span></td>
                             <td><span class="text-muted-small">@q.UpdatedDate.ToString("dd/MM/yyyy HH:mm")</span></td>
                             <td>
-                                <span class="text-muted-small">@(q.IsPublic ? "Công khai" : "Ẩn")</span>
-                                <button class="btn btn-sm @(q.IsPublic ? "btn-danger" : "btn-success") btn-toggle-public"
-                                        data-question-id="@q.Id"
-                                        data-status="@q.IsPublic.ToString().ToLower()">
-                                    <i class="fas @(q.IsPublic ? "fa-lock" : "fa-unlock")"></i> @(q.IsPublic ? "Ẩn" : "Công khai")
-                                </button>
+                                <span class="badge rounded-pill px-3 py-2 text-white"
+                                      style="cursor: pointer; background-color:@(q.IsPublic ? "#28a745" : "#dc3545")"
+                                      onclick="toggleStatus(@q.Id)">
+                                    @(q.IsPublic ? "Công khai" : "Ẩn")
+                                </span>
                             </td>
 
                             <td>

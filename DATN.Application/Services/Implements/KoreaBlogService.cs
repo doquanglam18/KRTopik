@@ -1,4 +1,8 @@
-﻿using DATN.Application.Services.Interfaces;
+﻿using AutoMapper;
+using DATN.Application.Dtos.BaseDtos;
+using DATN.Application.Dtos.KoreaBlogDtos;
+using DATN.Application.Dtos.TestSetDtos;
+using DATN.Application.Services.Interfaces;
 using DATN.Domain.Entities;
 using DATN.Infrastructure.Repository.Interfaces;
 using DATN.Infrastructure.UnitOfWork;
@@ -14,9 +18,11 @@ namespace DATN.Application.Services.Implements
     public class KoreaBlogService : IKoreaBlogService
     {
         protected readonly IUnitOfWork _unitOfWork;
-        public KoreaBlogService(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public KoreaBlogService(IMapper mapper ,IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<Result> AddKoreaBlogAsync(KoreaBlog koreaBlog)
@@ -130,6 +136,62 @@ namespace DATN.Application.Services.Implements
             {
                 return Result.Failure("Đã xảy ra lỗi trong quá trình cập nhật blog: " + ex.Message);
             }
+        }
+
+
+        public async Task<PageResultDto<KoreaBlogForList>> GetAllKoreaBlogPagingAsync(int page, int pageSize)
+        {
+            var query = _unitOfWork.KoreaBlogRepository.GetAllForPaging()
+              .Include(rq => rq.RatingBlogs)
+                .Where(rq => rq.IsActive == true);
+            var totalItem = query.Count();
+
+            var koreaBlogs = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            return new PageResultDto<KoreaBlogForList>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalItem = totalItem,
+                Items = _mapper.Map<List<KoreaBlogForList>>(koreaBlogs)
+            };
+        }
+
+        public async Task<PageResultDto<KoreaBlogForList>> GetAllKoreaBlogPagingAsyncForAdmin(int page, int pageSize)
+        {
+            var query = _unitOfWork.KoreaBlogRepository.GetAllForPaging()
+              .Include(rq => rq.RatingBlogs);
+            var totalItem = query.Count();
+
+            var koreaBlogs = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            return new PageResultDto<KoreaBlogForList>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalItem = totalItem,
+                Items = _mapper.Map<List<KoreaBlogForList>>(koreaBlogs)
+            };
+        }
+
+
+        public async Task<PageResultDto<KoreaBlogForList>> GetAllKoreaBlogForSearchPagingAsync(string searchName,int page, int pageSize)
+        {
+            var query = _unitOfWork.KoreaBlogRepository.GetAllForPaging()
+              .Include(rq => rq.RatingBlogs)
+                .Where(rq => rq.IsActive == true)
+                .Where(rq => rq.TitleVietSub.Contains(searchName.ToLower()) || rq.Title.Contains(searchName.ToLower()));
+            var totalItem = query.Count();
+
+            var koreaBlogs = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            return new PageResultDto<KoreaBlogForList>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalItem = totalItem,
+                Items = _mapper.Map<List<KoreaBlogForList>>(koreaBlogs)
+            };
         }
 
 

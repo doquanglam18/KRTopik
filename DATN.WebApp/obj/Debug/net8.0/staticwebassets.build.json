@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "rhTvcxAyHlC/A6plk3yCIuSs2wXeoKUNo0ZiQ6BFhBA=",
+  "Hash": "/Hd5jVx7wU4ciq+Sn3kW2JE+JLCG5R7rv28f1+S/PEA=",
   "Source": "DATN.WebApp",
   "BasePath": "_content/DATN.WebApp",
   "Mode": "Default",
@@ -37257,6 +37257,25 @@
       "OriginalItemSpec": "wwwroot\\themelef\\images\\logokr.png"
     },
     {
+      "Identity": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\themelef\\images\\logokrnotext.png",
+      "SourceId": "DATN.WebApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\",
+      "BasePath": "_content/DATN.WebApp",
+      "RelativePath": "themelef/images/logokrnotext.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\themelef\\images\\logokrnotext.png"
+    },
+    {
       "Identity": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\themelef\\images\\newskorea.png",
       "SourceId": "DATN.WebApp",
       "SourceType": "Discovered",
@@ -37274,6 +37293,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\themelef\\images\\newskorea.png"
+    },
+    {
+      "Identity": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\themelef\\images\\newslogo.png",
+      "SourceId": "DATN.WebApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\",
+      "BasePath": "_content/DATN.WebApp",
+      "RelativePath": "themelef/images/newslogo.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\themelef\\images\\newslogo.png"
     },
     {
       "Identity": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\themelef\\images\\person_1.jpg",

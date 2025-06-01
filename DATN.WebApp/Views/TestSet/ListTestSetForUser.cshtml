@@ -1,5 +1,4 @@
-﻿
-@using DATN.Application.Dtos.RankQuestionDtos
+﻿@using DATN.Application.Dtos.RankQuestionDtos
 @using DATN.Application.Dtos.TestSetDtos
 @using DATN.Application.Dtos.BaseDtos
 
@@ -9,131 +8,478 @@
     var rankQuestions = ViewData["RankQuestions"] as IEnumerable<RankQuestionDto>;
     int selectedRankId = Context.Request.Query["rankQuesTionId"].ToString() != "" ? int.Parse(Context.Request.Query["rankQuesTionId"]) : 0;
     int pageSize = Model.PageSize;
-
 }
 
 @section Styles {
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .test-section {
+            padding: 60px 0;
+            background: #f8f9fa;
+            margin-top: 50px;
+        }
+
+        .filter-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 40px;
+            border: none;
+        }
+
+        .filter-title {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-select, .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-select:focus, .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: white;
+        }
+
+        .btn-filter {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            color: white;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: all 0.4s ease;
+            overflow: hidden;
+            position: relative;
+            height: 100%;
+        }
+
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .test-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-body {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-title {
+            color: #333;
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .stat-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .stat-icon.questions {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-icon.comments {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-icon.level {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-text {
+            flex: 1;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: #333;
+            font-weight: 700;
+        }
+
+        .btn-details {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 25px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: auto;
+            align-self: flex-start;
+            text-decoration: none;
+        }
+
+        .btn-details:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            color: #666;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .empty-text {
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .pagination {
+            margin-top: 50px;
+        }
+
+        .page-link {
+            border: none;
+            padding: 12px 18px;
+            margin: 0 4px;
+            border-radius: 12px;
+            color: #666;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-link:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .page-item.active .page-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-animation .test-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .stagger-animation .test-card:nth-child(1) { animation-delay: 0.1s; }
+        .stagger-animation .test-card:nth-child(2) { animation-delay: 0.2s; }
+        .stagger-animation .test-card:nth-child(3) { animation-delay: 0.3s; }
+        .stagger-animation .test-card:nth-child(4) { animation-delay: 0.4s; }
+        .stagger-animation .test-card:nth-child(5) { animation-delay: 0.5s; }
+        .stagger-animation .test-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .filter-card {
+                padding: 20px;
+            }
+            
+            .test-card:hover {
+                transform: none;
+            }
+        }
+    </style>
 }
 
-<div class="container mt-4">
-    <h2>Danh sách đề</h2>
+<section class="test-section">
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="card filter-card fade-in">
+            <h4 class="filter-title">
+                <i class="fas fa-filter"></i>
+                Bộ lọc tìm kiếm
+            </h4>
+            
+            <form id="filterForm" class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <label for="rankSelect" class="form-label fw-semibold">
+                        <i class="fas fa-layer-group me-2"></i>Chọn cấp độ
+                    </label>
+                    <select id="rankSelect" name="rankQuesTionId" class="form-select">
+                        <option value="">🎯 Tất cả cấp độ</option>
+                        @foreach (var rank in rankQuestions)
+                        {
+                            <option value="@rank.Id" selected="@(rank.Id == selectedRankId ? "selected" : null)">
+                                📚 @rank.RankQuestionName
+                            </option>
+                        }
+                    </select>
+                </div>
 
-    <form id="filterForm" class="row g-3 mb-3">
-        <div class="col-md-4">
-            <label for="rankSelect" class="form-label">Chọn cấp độ</label>
-            <select id="rankSelect" name="rankQuesTionId" class="form-select">
-                <option value="">-- Tất cả --</option>
-                @foreach (var rank in rankQuestions)
+                <div class="col-lg-3 col-md-6">
+                    <label for="pageSize" class="form-label fw-semibold">
+                        <i class="fas fa-list me-2"></i>Số đề/trang
+                    </label>
+                    <select id="pageSize" name="pageSize" class="form-select">
+                        @foreach (var size in new int[] { 5, 10, 20 })
+                        {
+                            if (size == pageSize)
+                            {
+                                <option value="@size" selected>@size đề</option>
+                            }
+                            else
+                            {
+                                <option value="@size">@size đề</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-3 col-md-12 d-flex align-items-end">
+                    <button type="submit" class="btn btn-filter w-100">
+                        <i class="fas fa-search me-2"></i>
+                        Áp dụng bộ lọc
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        @if (Model.Items.Count == 0)
+        {
+            <div class="empty-state fade-in">
+                <div class="empty-icon">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h3 class="empty-title">Không tìm thấy đề thi nào</h3>
+                <p class="empty-text">Thử thay đổi bộ lọc để tìm thấy đề thi phù hợp với bạn</p>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 stagger-animation">
+                @for (int i = 0; i < Model.Items.Count; i++)
                 {
-                    <option value="@rank.Id" selected="@(rank.Id == selectedRankId ? "selected" : null)">
-                        @rank.RankQuestionName
-                    </option>
-
-                }
-            </select>
-        </div>
-
-        <div class="col-md-2">
-            <label for="pageSize" class="form-label">Số đề/trang</label>
-           <select id="pageSize" name="pageSize" class="form-select">
-                @foreach (var size in new int[] { 5, 10, 20 })
-                {
-                    if (size == pageSize)
-                    {
-                        <option value="@size" selected>@size</option>
-                    }
-                    else
-                    {
-                        <option value="@size">@size</option>
-                    }
-                }
-
-
-            </select>
-
-        </div>
-
-        <div class="col-md-2 align-self-end">
-            <button type="submit" class="btn btn-primary">Lọc</button>
-        </div>
-    </form>
-
-    @if (Model.Items.Count == 0)
-    {
-        <div class="alert alert-warning">Không có đề nào!</div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Tên đề</th>
-                        <th>Số câu hỏi</th>
-                        <th>Số bình luận</th>
-                        <th>Thuộc cấp độ</th>
-                        <th>Thao tác</th> @* Thêm cột thao tác *@
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (int i = 0; i < Model.Items.Count; i++)
-                    {
-                        var item = Model.Items[i];
-                        <tr>
-                            <td>@((Model.Page - 1) * Model.PageSize + i + 1)</td>
-                            <td>@item.TestName</td>
-                            <td>@item.QuestionsCount</td>
-                            <td>@item.CommentCount</td>
-                            <td>@item.RankQuestionName</td>
-                            <td>
-                                <a asp-controller="TestSet" asp-action="Details" asp-route-id="@item.Id" method ="GET" class="btn btn-info btn-sm">
+                    var item = Model.Items[i];
+                    <div class="col">
+                        <div class="card test-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">@item.TestName</h5>
+                                
+                                <div class="stat-item">
+                                    <div class="stat-icon questions">
+                                        <i class="fas fa-question-circle"></i>
+                                    </div>
+                                    <span class="stat-text">Số câu hỏi:</span>
+                                    <span class="stat-value">@item.QuestionsCount</span>
+                                </div>
+                                
+                                <div class="stat-item">
+                                    <div class="stat-icon comments">
+                                        <i class="fas fa-comments"></i>
+                                    </div>
+                                    <span class="stat-text">Bình luận:</span>
+                                    <span class="stat-value">@item.CommentCount</span>
+                                </div>
+                                
+                                <div class="stat-item">
+                                    <div class="stat-icon level">
+                                        <i class="fas fa-trophy"></i>
+                                    </div>
+                                    <span class="stat-text">Cấp độ:</span>
+                                    <span class="stat-value">@item.RankQuestionName</span>
+                                </div>
+                                
+                                <a asp-controller="TestSet" asp-action="Details" asp-route-id="@item.Id" class="btn btn-details">
+                                    <i class="fas fa-eye me-2"></i>
                                     Xem chi tiết
                                 </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-
-            </table>
-        </div>
-
-        <!-- Pagination -->
-        <nav>
-            <ul class="pagination">
-                @for (int i = 1; i <= Model.TotalPage; i++)
-                {
-                    <li class="page-item @(i == Model.Page ? "active" : "")">
-                        <a class="page-link" href="javascript:void(0);" onclick="goToPage(@i)">@i</a>
-                    </li>
+                            </div>
+                        </div>
+                    </div>
                 }
-            </ul>
-        </nav>
-    }
-</div>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPage > 1)
+            {
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        @for (int i = 1; i <= Model.TotalPage; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="javascript:void(0);" onclick="goToPage(@i)">@i</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        }
+    </div>
+</section>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Form submission
+        // Form submission with loading animation
         document.getElementById('filterForm').addEventListener('submit', function (e) {
             e.preventDefault();
+            
+            // Show loading
+            Swal.fire({
+                title: 'Đang tìm kiếm...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
             const rankId = document.getElementById('rankSelect').value;
             const pageSize = document.getElementById('pageSize').value;
-
             const url = `?rankQuesTionId=${rankId}&page=1&pageSize=${pageSize}`;
-
-            window.location.href = url;
+            
+            // Simulate loading time for better UX
+            setTimeout(() => {
+                window.location.href = url;
+            }, 500);
         });
 
         function goToPage(page) {
+            // Show loading
+            Swal.fire({
+                title: 'Đang tải trang...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
             const rankId = document.getElementById('rankSelect').value;
             const pageSize = document.getElementById('pageSize').value;
             const url = `?rankQuesTionId=${rankId}&page=${page}&pageSize=${pageSize}`;
-
-            window.location.href = url;
+            
+            setTimeout(() => {
+                window.location.href = url;
+            }, 300);
         }
+
+        // Add smooth scroll behavior
+        document.documentElement.style.scrollBehavior = 'smooth';
+        
+        // Initialize animations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add stagger animation to cards
+            const cards = document.querySelectorAll('.test-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.animationDelay = `${index * 0.1}s`;
+                }, 100);
+            });
+        });
+
+        // Add loading states to buttons
+        document.querySelectorAll('.btn-details').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const icon = this.querySelector('i');
+                const originalClass = icon.className;
+                icon.className = 'fas fa-spinner fa-spin me-2';
+                
+                setTimeout(() => {
+                    icon.className = originalClass;
+                }, 2000);
+            });
+        });
     </script>
 }

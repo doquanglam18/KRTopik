@@ -1,0 +1,864 @@
+@using DATN.Application.Dtos.BaseDtos
+@using DATN.Application.Dtos.TestSetDtos.ForAdmin
+@using System.Dynamic
+@using DATN.Application.Dtos.ListeningDtos.ForAddTestSet
+@using DATN.Application.Dtos.ReadingDtos.ForAddTestSet
+@using DATN.WebApp.Controllers
+
+@model TestSetDetailsForAdmin
+@{
+    ViewData["Title"] = "Chỉnh sửa đề thi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    bool isListeningTest = Model.ListeningQuestions != null && Model.ListeningQuestions.Any();
+    
+    // Xử lý dữ liệu câu hỏi
+    PageResultDto<ReadingQsDto> readingQuestions = null;
+    PageResultDto<ListeningQsDto> listeningQuestions = null;
+    
+    if (ViewData["Question"] != null)
+    {
+        // Thử cast sang cả hai loại
+        readingQuestions = ViewData["Question"] as PageResultDto<ReadingQsDto>;
+        listeningQuestions = ViewData["Question"] as PageResultDto<ListeningQsDto>;
+    }
+}
+
+<style>
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .badge {
+        font-size: 0.85em;
+        padding: 0.5em 0.8em;
+    }
+
+    .selected-question-tag {
+        background-color: #e3f2fd;
+        border: 1px solid #90caf9;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #1976d2;
+    }
+
+        .selected-question-tag .remove-question {
+            cursor: pointer;
+            color: #f44336;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+            .selected-question-tag .remove-question:hover {
+                color: #d32f2f;
+            }
+
+    .pagination .page-link {
+        color: #667eea;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+        padding: 0.75rem 1rem;
+    }
+
+        .list-group-item:first-child {
+            border-top: none;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+    .table-success {
+        background-color: rgba(40, 167, 69, 0.1) !important;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .sticky-top {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .question-content {
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        border-left: 4px solid #667eea;
+    }
+
+    .answers-container {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .list-group-item {
+        border: 1px solid #e9ecef;
+        margin-bottom: 4px;
+        border-radius: 4px !important;
+    }
+
+    .list-group-item-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        border-color: rgba(40, 167, 69, 0.2);
+    }
+
+    .audio-container {
+        background-color: #fff;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #e9ecef;
+    }
+
+    .image-container {
+        background-color: #fff;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #e9ecef;
+        text-align: center;
+    }
+
+    .table td {
+        vertical-align: top;
+        padding: 12px;
+    }
+</style>
+
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.js"></script>
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">@Model.TestName</h2>
+            <p class="text-muted mb-0">
+                <i class="fas fa-layer-group me-2"></i>@Model.RankQuestionName
+                <span class="mx-2">|</span>
+                <i class="fas fa-users me-2"></i>@Model.CountUserDoTest người đã làm
+                <span class="mx-2">|</span>
+                <i class="fas fa-calendar me-2"></i>@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+            </p>
+        </div>
+        <button class="btn btn-secondary" onclick="history.back()">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </button>
+    </div>
+
+    <!-- Thông tin đề thi hiện tại -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Đề thi hiện tại</h5>
+            <div class="row">
+                @if (Model.ListeningQuestions != null && Model.ListeningQuestions.Any())
+                {
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-info">
+                                    <i class="fas fa-headphones me-2"></i>Listening (@Model.ListeningQuestions.Count câu)
+                                </h6>
+                                <div class="list-group list-group-flush">
+                                    @foreach (var question in Model.ListeningQuestions)
+                                    {
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span class="text-truncate" style="max-width: 80%;">@Html.Raw(@question.Question)</span>
+                                            <span class="badge bg-info rounded-pill">@question.Id</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Model.ReadingQuestions != null && Model.ReadingQuestions.Any())
+                {
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-primary">
+                                    <i class="fas fa-book-reader me-2"></i>Reading (@Model.ReadingQuestions.Count câu)
+                                </h6>
+                                <div class="list-group list-group-flush">
+                                    @foreach (var question in Model.ReadingQuestions)
+                                    {
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span class="text-truncate" style="max-width: 80%;">@Html.Raw(@question.Question)</span>
+                                            <span class="badge bg-primary rounded-pill">@question.Id</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách câu hỏi có thể thêm -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Chọn câu hỏi để thêm vào đề thi</h5>
+            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                <table class="table table-hover" id="questionsTable">
+                    <thead class="table-light sticky-top bg-light">
+                        <tr>
+                            <th style="width: 50px;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAll">
+                                </div>
+                            </th>
+                            <th style="width: 80px;">ID</th>
+                            <th style="width: 40%;">Câu hỏi</th>
+                            <th style="width: 30%;">Đáp án</th>
+                            <th style="width: 150px;">Loại</th>
+                            <th style="width: 100px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                                @* Logic mới: Hiển thị danh sách Reading nếu có dữ liệu *@
+                                @if (readingQuestions?.Items != null)
+                                {
+                                    foreach (var question in readingQuestions.Items)
+                                    {
+                                        var isSelected = Model.ReadingQuestions?.Any(q => q.Id == question.Id) ?? false;
+                                <tr data-question-id="@question.Id" class="@(isSelected ? "table-success" : "")">
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input question-checkbox" type="checkbox"
+                                                   value="@question.Id" @(isSelected ? "checked" : "")>
+                                        </div>
+                                    </td>
+                                    <td>@question.Id</td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <div class="question-content mb-2">
+                                                <strong>Câu hỏi:</strong>
+                                                <div class="mb-2">@Html.Raw(question.Question)</div>
+                                                        @if (!string.IsNullOrEmpty(question.ReadingImageURL))
+                                                        {
+                                                    <div class="image-container mb-2">
+                                                        <img src="@question.ReadingImageURL" class="img-fluid rounded" style="max-height: 150px;" 
+                                                             onclick="showFullImage(this.src)" 
+                                                             style="cursor: pointer;" />
+                                                    </div>
+                                                        }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="answers-container">
+                                                    @if (question.ReadingAnswers != null)
+                                                    {
+                                                <div class="list-group">
+                                                            @foreach (var answer in question.ReadingAnswers)
+                                                            {
+                                                        <div class="list-group-item p-2 @(answer.IsCorrect ? "list-group-item-success" : "")">
+                                                            <div class="d-flex align-items-center">
+                                                                <span class="badge @(answer.IsCorrect ? "bg-success" : "bg-secondary") me-2">
+                                                                            @(answer.IsCorrect ? "✓" : "○")
+                                                                </span>
+                                                                <div class="flex-grow-1">@Html.Raw(answer.Content)</div>
+                                                            </div>
+                                                        </div>
+                                                            }
+                                                </div>
+                                                    }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">Reading</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary view-details" data-question-id="@question.Id">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                    }
+                                }
+                                @* Logic mới: Hiển thị danh sách Listening nếu có dữ liệu *@
+                                @if (listeningQuestions?.Items != null)
+                                {
+                                    foreach (var question in listeningQuestions.Items)
+                                    {
+                                        var isSelected = Model.ListeningQuestions?.Any(q => q.Id == question.Id) ?? false;
+                                <tr data-question-id="@question.Id" class="@(isSelected ? "table-success" : "")">
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input question-checkbox" type="checkbox"
+                                                   value="@question.Id" @(isSelected ? "checked" : "")>
+                                        </div>
+                                    </td>
+                                    <td>@question.Id</td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <div class="question-content mb-2">
+                                                <strong>Câu hỏi:</strong>
+                                                <div class="mb-2">@Html.Raw(question.Question)</div>
+                                                        @if (!string.IsNullOrEmpty(question.ListeningSoundURL))
+                                                        {
+                                                    <div class="audio-container mb-2">
+                                                        <audio controls class="w-100" style="max-width: 300px;">
+                                                            <source src="@question.ListeningSoundURL" type="audio/mpeg">
+                                                            Trình duyệt của bạn không hỗ trợ audio.
+                                                        </audio>
+                                                    </div>
+                                                        }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="answers-container">
+                                                    @if (question.ListeningAnswers != null)
+                                                    {
+                                                <div class="list-group">
+                                                            @foreach (var answer in question.ListeningAnswers)
+                                                            {
+                                                        <div class="list-group-item p-2 @(answer.IsCorrect ? "list-group-item-success" : "")">
+                                                            <div class="d-flex align-items-center">
+                                                                <span class="badge @(answer.IsCorrect ? "bg-success" : "bg-secondary") me-2">
+                                                                            @(answer.IsCorrect ? "✓" : "○")
+                                                                </span>
+                                                                <div class="flex-grow-1">@Html.Raw(answer.Content)</div>
+                                                            </div>
+                                                        </div>
+                                                            }
+                                                </div>
+                                                    }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">Listening</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary view-details" data-question-id="@question.Id">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang -->
+            @if (readingQuestions != null)
+            {
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <span class="text-muted">Hiển thị @(((readingQuestions.Page - 1) * readingQuestions.PageSize) + 1) đến @(Math.Min(readingQuestions.Page * readingQuestions.PageSize, readingQuestions.TotalItem)) của @readingQuestions.TotalItem câu hỏi</span>
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            @for (int i = 1; i <= Math.Ceiling((double)readingQuestions.TotalItem / readingQuestions.PageSize); i++)
+                            {
+                                <li class="page-item @(i == readingQuestions.Page ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("TestSetDetailsForAdmin", new { testSetId = Model.Id, page = i, pageSize = readingQuestions.PageSize })">@i</a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            }
+            else if (listeningQuestions != null)
+            {
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <span class="text-muted">Hiển thị @(((listeningQuestions.Page - 1) * listeningQuestions.PageSize) + 1) đến @(Math.Min(listeningQuestions.Page * listeningQuestions.PageSize, listeningQuestions.TotalItem)) của @listeningQuestions.TotalItem câu hỏi</span>
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            @for (int i = 1; i <= Math.Ceiling((double)listeningQuestions.TotalItem / listeningQuestions.PageSize); i++)
+                            {
+                                <li class="page-item @(i == listeningQuestions.Page ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("TestSetDetailsForAdmin", new { testSetId = Model.Id, page = i, pageSize = listeningQuestions.PageSize })">@i</a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Câu hỏi đã chọn</h5>
+                <button class="btn btn-danger" id="clearSelection">
+                    <i class="fas fa-trash-alt me-2"></i>Xóa tất cả
+                </button>
+            </div>
+            <div class="selected-questions mt-3">
+                <div id="selectedQuestionsList" class="d-flex flex-wrap gap-2">
+                    <!-- Các câu hỏi đã chọn sẽ được hiển thị ở đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <button class="btn btn-primary btn-lg" id="saveChanges">
+            <i class="fas fa-save me-2"></i>Lưu thay đổi
+        </button>
+    </div>
+</div>
+
+<!-- Modal xem chi tiết câu hỏi -->
+<div class="modal fade" id="questionDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết câu hỏi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="questionDetailsContent">
+                    <!-- Nội dung chi tiết câu hỏi sẽ được hiển thị ở đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log('Document ready - jQuery version:', $.fn.jquery);
+            
+            let selectedQuestions = new Set();
+
+            // Hàm kiểm tra và xử lý URL Cloudinary
+            function isCloudinaryUrl(url) {
+                return url && (url.includes('cloudinary.com') || url.includes('res.cloudinary.com'));
+            }
+
+            // Hàm render nội dung câu hỏi hoặc đáp án
+            function renderContent(content) {
+                if (!content) return '';
+
+                // Trim content before processing
+                const trimmedContent = content.trim();
+                
+                // Kiểm tra nếu là file âm thanh Cloudinary
+                if (trimmedContent.match(/^https?:\/\/res\.cloudinary\.com\/[^\/]+\/raw\/upload\/.+\.(mp3|wav|ogg|m4a)$/i) ||
+                    trimmedContent.match(/^https?:\/\/res\.cloudinary\.com\/[^\/]+\/video\/upload\/.+\.(mp3|wav|ogg|m4a)$/i))
+                 {
+                     return `
+                            <div class="audio-container mb-2">
+                                <audio controls class="w-100" style="max-width: 300px;">
+                                    <source src="${trimmedContent}" type="audio/mpeg">
+                                    Trình duyệt của bạn không hỗ trợ audio.
+                                </audio>
+                            </div>`;
+                 }
+                 // Kiểm tra nếu là file ảnh Cloudinary
+                 else if (trimmedContent.match(/^https?:\/\/res\.cloudinary\.com\/[^\/]+\/image\/upload\/.+\.(jpg|jpeg|png|gif|webp)$/i))
+                 {
+                     return `
+                            <div class="image-container mb-2">
+                                <img src="${trimmedContent}" class="img-fluid rounded" style="max-height: 150px;" 
+                                     onclick="showFullImage(this.src)" 
+                                     style="cursor: pointer;" />
+                            </div>`;
+                 }
+                
+                // Nếu không phải URL media Cloudinary, trả về nội dung gốc
+                return content; 
+            }
+
+            // Hàm hiển thị ảnh full size
+            function showFullImage(src) {
+                Swal.fire({
+                    imageUrl: src,
+                    imageAlt: 'Hình ảnh câu hỏi',
+                    width: 'auto',
+                    padding: '1em',
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    background: '#fff',
+                    backdrop: 'rgba(0,0,0,0.8)'
+                });
+            }
+
+            // Cập nhật hiển thị câu hỏi trong danh sách đã chọn
+            function updateSelectedQuestionsDisplay() {
+                const container = $('#selectedQuestionsList');
+                container.empty();
+
+                selectedQuestions.forEach(questionId => {
+                    const row = $(`tr[data-question-id="${questionId}"]`);
+                    if (row.length === 0) return;
+
+                    // Lấy nội dung text của câu hỏi từ cấu trúc hiện tại
+                    // Sử dụng .text() để chỉ lấy text, tránh các thẻ con có thể có
+                    const questionText = row.find('td:eq(2) .question-content .mb-2').text().trim();
+                    const type = row.find('td:eq(4) .badge').text()?.trim();
+                    
+                    if (!questionText || !type) return;
+
+                    const tag = $(`
+                        <div class="selected-question-tag">
+                            <span>${type} - ${questionText.substring(0, 30)}${questionText.length > 30 ? '...' : ''}</span>
+                            <i class="fas fa-times remove-question" data-question-id="${questionId}"></i>
+                        </div>
+                    `);
+                    container.append(tag);
+                });
+            }
+
+            // Cập nhật xử lý xem chi tiết câu hỏi (đã được sửa để lấy nội dung đúng)
+            $(document).on('click', '.view-details', function() {
+                const questionId = $(this).data('question-id')?.toString();
+                if (!questionId) return;
+
+                const row = $(`tr[data-question-id="${questionId}"]`);
+                if (row.length === 0) return;
+
+                // Lấy nội dung HTML của câu hỏi và đáp án từ bảng
+                // Sử dụng .html() để giữ nguyên cấu trúc media đã render trong bảng
+                const questionContentHtml = row.find('td:eq(2) .question-content .mb-2').html()?.trim();
+                 const answersContainer = row.find('.answers-container');
+                const type = row.find('td:eq(4) .badge').text()?.trim();
+                if (!questionContentHtml || !type) return;
+
+                let answersHtml = '';
+                 answersContainer.find('.list-group-item').each(function() {
+                     // Lấy toàn bộ outerHTML của list-group-item để giữ nguyên cấu trúc
+                     answersHtml += $(this).prop('outerHTML');
+                 });
+
+
+                let content = `
+                    <div class="mb-3">
+                        <h6 class="text-muted">Loại câu hỏi</h6>
+                        <span class="badge ${type === 'Listening' ? 'bg-info' : 'bg-primary'}">${type}</span>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted">Câu hỏi</h6>
+                        <div class="p-3 bg-light rounded">${questionContentHtml}</div>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted">Đáp án</h6>
+                        <div class="list-group">${answersHtml}</div>
+                    </div>`;
+
+                $('#questionDetailsContent').html(content);
+                $('#questionDetailsModal').modal('show');
+            });
+
+            // Thêm styles cho media content
+            $('<style>')
+                .text(`
+                    .image-container img {
+                        transition: transform 0.2s;
+                    }
+                    .image-container img:hover {
+                        transform: scale(1.05);
+                    }
+                    .audio-container audio {
+                        width: 100%;
+                        max-width: 300px;
+                    }
+                    .list-group-item .flex-grow-1 {
+                        overflow: hidden;
+                    }
+                    .list-group-item .flex-grow-1 img {
+                        max-height: 100px;
+                        border-radius: 4px;
+                    }
+                    .list-group-item .flex-grow-1 audio {
+                        max-width: 250px;
+                    }
+                `)
+                .appendTo('head');
+
+            // *** CẬP NHẬT LẠI LOGIC HIỂN THỊ TRONG BẢNG KHI TRANG TẢI ***
+            $('#questionsTable tbody tr').each(function() {
+                const $row = $(this);
+
+                // Xử lý nội dung câu hỏi trong bảng
+                const $questionContentDiv = $row.find('td:eq(2) .question-content .mb-2');
+                // Lấy nội dung text thuần để kiểm tra URL
+                const questionText = $questionContentDiv.text().trim();
+
+                if (questionText && isCloudinaryUrl(questionText)) {
+                    // Nếu nội dung text là URL Cloudinary, render media
+                    $questionContentDiv.html(renderContent(questionText));
+                }
+
+
+                // Xử lý nội dung đáp án trong bảng
+                $row.find('.answers-container .list-group-item .flex-grow-1').each(function() {
+                    const $answerContentDiv = $(this);
+                    // Lấy nội dung text thuần để kiểm tra URL
+                    const answerText = $answerContentDiv.text().trim();
+
+                    if (answerText && isCloudinaryUrl(answerText)) {
+                         // Nếu nội dung text là URL Cloudinary, render media
+                         $answerContentDiv.html(renderContent(answerText));
+                    }
+                    // else: Nếu không phải URL thuần, giữ nguyên nội dung HTML gốc
+                });
+            });
+
+            // Khởi tạo danh sách câu hỏi đã chọn từ model
+            @if (Model.ListeningQuestions != null)
+            {
+                foreach (var question in Model.ListeningQuestions)
+                {
+                    <text>
+                    selectedQuestions.add('@question.Id.ToString()');
+                    </text>
+                }
+            }
+            @if (Model.ReadingQuestions != null)
+            {
+                foreach (var question in Model.ReadingQuestions)
+                {
+                    <text>
+                    selectedQuestions.add('@question.Id.ToString()');
+                    </text>
+                }
+            }
+            updateSelectedQuestionsDisplay();
+
+            // Xử lý chọn tất cả
+            $('#selectAll').change(function () {
+                const isChecked = $(this).prop('checked');
+                $('.question-checkbox').prop('checked', isChecked);
+                updateSelectedQuestions();
+            });
+
+            // Xử lý chọn từng câu hỏi
+            $('.question-checkbox').change(function () {
+                const allChecked = $('.question-checkbox:checked').length === $('.question-checkbox').length;
+                $('#selectAll').prop('checked', allChecked);
+                updateSelectedQuestions();
+            });
+
+            // Cập nhật danh sách câu hỏi đã chọn
+            function updateSelectedQuestions() {
+                selectedQuestions.clear();
+                $('.question-checkbox:checked').each(function () {
+                    const questionId = $(this).val();
+                    if (questionId) {
+                        selectedQuestions.add(questionId.toString());
+                    }
+                });
+                updateSelectedQuestionsDisplay();
+            }
+
+            // Xử lý xóa câu hỏi khỏi danh sách đã chọn
+            $(document).on('click', '.remove-question', function () {
+                const questionId = $(this).data('question-id')?.toString();
+                if (!questionId) return;
+
+                selectedQuestions.delete(questionId);
+                $(`.question-checkbox[value="${questionId}"]`).prop('checked', false);
+                updateSelectedQuestions();
+            });
+
+            // Xử lý xóa tất cả câu hỏi đã chọn
+            $('#clearSelection').click(function () {
+                if (selectedQuestions.size === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Thông báo',
+                        text: 'Không có câu hỏi nào để xóa.'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: "Bạn có chắc chắn muốn xóa tất cả câu hỏi đã chọn?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        selectedQuestions.clear();
+                        $('.question-checkbox, #selectAll').prop('checked', false);
+                        updateSelectedQuestionsDisplay();
+                        Swal.fire('Đã xóa!', 'Tất cả câu hỏi đã được xóa khỏi danh sách.', 'success');
+                    }
+                });
+            });
+
+            // Xử lý lưu thay đổi
+            $('#saveChanges').on('click', function(e) {
+                console.log('Save button clicked');
+                e.preventDefault(); // Prevent default form submission if any
+                
+                // Test if we can access the button
+                console.log('Button exists:', $(this).length > 0);
+                console.log('Selected questions count:', selectedQuestions.size);
+                
+                if (selectedQuestions.size === 0) {
+                    console.log('No questions selected');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Cảnh báo!',
+                        text: 'Vui lòng chọn ít nhất một câu hỏi.'
+                    });
+                    return;
+                }
+
+                console.log('Opening confirmation dialog');
+                Swal.fire({
+                    title: 'Xác nhận lưu?',
+                    text: "Bạn có chắc chắn muốn lưu các thay đổi này?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Lưu',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    console.log('Dialog result:', result);
+                    if (result.isConfirmed) {
+                        const questionIds = Array.from(selectedQuestions).map(id => parseInt(id));
+                        console.log('Question IDs to send:', questionIds);
+                        
+                        if (questionIds.some(isNaN)) {
+                            console.error('Invalid question IDs found');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: 'Có lỗi xảy ra khi xử lý dữ liệu.'
+                            });
+                            return;
+                        }
+
+                        const requestData = {
+                            testSetId: @Model.Id,
+                            questionIds: questionIds,
+                            rankQuestionId: @Model.RankQuestionId
+                        };
+                        console.log('Sending request with data:', requestData);
+
+                        // Test if jQuery.ajax is available
+                        if (typeof $.ajax !== 'function') {
+                            console.error('jQuery.ajax is not available');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: 'Có lỗi xảy ra: jQuery.ajax không khả dụng'
+                            });
+                            return;
+                        }
+
+                        $.ajax({
+                            url: '@Url.Action("UpdateTestSetQuestions", "TestSet")',
+                            type: 'POST',
+                            data: JSON.stringify(requestData),
+                            contentType: 'application/json',
+                            dataType: 'json',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            beforeSend: function(xhr) {
+                                console.log('Request is being sent...');
+                            },
+                            success: function(response) {
+                                console.log('Response received:', response);
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Thành công!',
+                                        text: 'Đã lưu thay đổi thành công.',
+                                        showConfirmButton: true,
+                                        timer: 5000,
+                                    }).then(() => {
+                                        window.location.href = '@Url.Action("ManageTestSet", "Admin")';
+                                    });
+                                } else {
+                                    console.error('Error in response:', response);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Lỗi!',
+                                        text: response.message || 'Có lỗi xảy ra khi lưu thay đổi.'
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('AJAX Error:', {
+                                    status: status,
+                                    error: error,
+                                    response: xhr.responseText
+                                });
+                                let errorMessage = 'Có lỗi xảy ra khi lưu thay đổi.';
+                                try {
+                                    const response = JSON.parse(xhr.responseText);
+                                    if (response.message) {
+                                        errorMessage = response.message;
+                                    }
+                                } catch (e) {
+                                    console.error('Error parsing response:', e);
+                                }
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi!',
+                                    text: errorMessage
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

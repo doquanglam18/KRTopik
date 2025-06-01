@@ -11,8 +11,12 @@ namespace DATN.Application.Services
     {
         public static Guid GetUserId(this ClaimsPrincipal user)
         {
-            var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return string.IsNullOrEmpty(id) ? Guid.Empty : Guid.Parse(id);
+            var idClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (Guid.TryParse(idClaim, out var userId))
+            {
+                return userId;
+            }
+            return Guid.Empty;
         }
 
         public static string ExtractPublicIdFromUrl(string url)

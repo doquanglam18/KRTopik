@@ -1,5 +1,207 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using DATN.Application.Dtos.BaseDtos
+@using DATN.Application.Dtos.TestSetDtos.ForAdmin
+@using DATN.Application.Dtos.RankQuestionDtos
+@model PageResultDto<ListTestSetForAdmin>
+
 @{
+    ViewData["Title"] = "Quản lý Bộ đề";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var rankQuestions = ViewData["RankQuestions"] as IEnumerable<RankQuestionDto>;
+    int selectedRankId = Context.Request.Query["rankQuesTionId"].ToString() != "" ? int.Parse(Context.Request.Query["rankQuesTionId"]) : 0;
+    int pageSize = Model.PageSize;
+}
+
+<style>
+    .table th, .table td {
+        vertical-align: middle !important;
+    }
+
+    .text-muted-small {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .header-gradient {
+        background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: bold;
+        font-size: 1.25rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+        border: none;
+    }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+    .btn-warning {
+        background-color: #f0ad4e;
+        border: none;
+    }
+
+    .btn-danger {
+        background-color: #d9534f;
+        border: none;
+    }
+
+    .table thead {
+        background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+        color: white;
+    }
+</style>
+
+<div class="container-fluid p-4 bg-white rounded shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="header-gradient">
+            📝 Quản lý Bộ đề
+        </div>
+        <a href="@Url.Action("CreateTestSetByAdmin", "TestSet")" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus-circle me-2"></i> Thêm Bộ đề
+        </a>
+    </div>
+
+    <form method="get" asp-action="ManageTestSet" asp-controller="Admin" class="mb-3 d-flex justify-content-end gap-3">
+        <div class="col-md-4">
+            <label for="rankSelect" class="form-label">Chọn cấp độ</label>
+            <select id="rankSelect" name="rankQuestionId" class="form-select" onchange="this.form.submit()">
+                <option value="">-- Tất cả --</option>
+                @foreach (var rank in rankQuestions)
+                {
+                    <option value="@rank.Id" selected="@(rank.Id == selectedRankId ? "selected" : null)">
+                        @rank.RankQuestionName
+                    </option>
+
+                }
+            </select>
+        </div>
+        <div>
+            <label for="pageSize" class="me-2 mt-1">Hiển thị:</label>
+            <select name="pageSize" id="pageSize" onchange="this.form.submit()" class="form-select w-auto">
+                @{
+                    var selected5 = Model.PageSize == 5 ? "selected" : "";
+                    var selected10 = Model.PageSize == 10 ? "selected" : "";
+                    var selected20 = Model.PageSize == 20 ? "selected" : "";
+                    var selected50 = Model.PageSize == 50 ? "selected" : "";
+                }
+                <option value="5" selected5>5</option>
+                <option value="10" selected10>10</option>
+                <option value="20" selected20>20</option>
+                <option value="50" selected50>50</option>
+            </select>
+            <input type="hidden" name="page" value="@Model.Page" />
+        </div>
+    </form>
+
+    @if (Model.Items != null && Model.Items.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên bộ đề</th>
+                        <th>Độ khó</th>
+                        <th>Số câu hỏi</th>
+                        <th>Số bình luận</th>
+                        <th>Số người làm</th>
+                        <th>Ngày tạo</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var testSet in Model.Items)
+                    {
+                        <tr>
+                            <td>@testSet.Id</td>
+                            <td class="text-start">@testSet.TestName</td>
+                            <td>@testSet.RankQuestionName</td>
+                            <td>@testSet.CountQuestions</td>
+                            <td>@testSet.CountComment</td>
+                            <td>@testSet.CountUserDoTest</td>
+                            <td><span class="text-muted-small">@testSet.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span></td>
+                            <td>
+                                <div class="d-flex justify-content-center flex-wrap gap-2">
+                                    <a href="@Url.Action("TestSetDetailsForAdmin", "TestSet", new { testSetId = testSet.Id})"
+                                       class="btn btn-warning btn-sm rounded-pill">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <button type="button" class="btn btn-danger btn-sm rounded-pill" onclick="deleteTestSet(@testSet.Id)">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (Model.TotalPage > 1)
+            {
+                <nav class="d-flex justify-content-center mt-4">
+                    <ul class="pagination">
+                        @for (int i = 1; i <= Model.TotalPage; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("ManageTestSet", "Admin", new { rankQuestionId = ViewData["rankQuestionId"], page = i, pageSize = Model.PageSize })">@i</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            Không có bộ đề nào trong hệ thống.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function deleteTestSet(id) {
+            Swal.fire({
+                title: 'Xác nhận xóa bộ đề?',
+                text: "Bạn sẽ không thể khôi phục bộ đề này!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/TestSet/Delete/${id}`, {
+                        method: 'POST'
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Đã xóa!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Lỗi!', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            Swal.fire('Lỗi!', 'Không thể kết nối máy chủ.', 'error');
+                        });
+                }
+            });
+        }
+    </script>
 }

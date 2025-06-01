@@ -11,7 +11,7 @@ namespace DATN.Domain.Entities
     {
         public Guid UserId { get; set; }
         public int BlogId { get; set; }
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         [Range(1, 5, ErrorMessage = "Rating phải nằm từ 1 đến 5.")]
         public int Rating { get; set; }

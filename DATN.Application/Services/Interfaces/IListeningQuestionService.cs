@@ -1,5 +1,6 @@
 ﻿using DATN.Application.Dtos.BaseDtos;
 using DATN.Application.Dtos.ListeningDtos;
+using DATN.Application.Dtos.ListeningDtos.ForAddTestSet;
 using DATN.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,7 @@ namespace DATN.Application.Services.Interfaces
         Task<Result> UpdateListeningQuestionAsync(ListeningQuestion listeningQuestion);
         Task<Result> DeleteListeningQuestionAsync(int id);
         Task<PageResultDto<ListeningQuestionDto>> GetAllListeningQuestionsPagingAsync(int page, int pageSize);
+        Task<PageResultDto<ListeningQsDto>> GetListeningByRankID(int rankQuestionId, int page, int pageSize);
+        Task<List<ListeningQsDto>> GetListeningByRankIDNoPagging(int rankQuestionId);
     }
 }

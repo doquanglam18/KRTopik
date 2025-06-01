@@ -1,0 +1,263 @@
+﻿@using DATN.Application.Dtos.KoreaBlogDtos
+@using DATN.Application.Dtos.BaseDtos
+@model PageResultDto<KoreaBlogForList>
+@{
+    ViewData["Title"] = "Bài viết tiếng Hàn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int pageSize = Model.PageSize;
+}
+
+<style>
+    .blog-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+
+        .blog-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.12) !important;
+        }
+
+    .blog-image-container {
+        overflow: hidden;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+
+    .blog-image {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.4s ease;
+    }
+
+    .blog-card:hover .blog-image {
+        transform: scale(1.07);
+    }
+
+    .blog-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .blog-excerpt {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-size: 0.95rem;
+    }
+
+    .blog-stats {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .pagination .page-link {
+        color: #495057;
+        border-radius: 8px;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #495057;
+        border-color: #495057;
+        color: white;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .btn-outline-primary {
+        margin-top: auto;
+        align-self: flex-start;
+    }
+</style>
+
+<div class="container mt-5 pt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold mb-0">Tin Tức Hàn Quốc</h1>
+        <a href="@Url.Action("CreateKoreaBlog", "KoreaBlog")" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Đăng bài
+        </a>
+    </div>
+
+
+    <!-- Search and Page Size -->
+    <div class="row mb-4 align-items-end">
+        <div class="col-md-8">
+            <form id="searchForm" method="get" class="input-group">
+                <input type="text" id="searchBlog" name="searchBlog" class="form-control" placeholder="Tìm kiếm bài viết..." value="@Context.Request.Query["searchBlog"]">
+                <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i></button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <label for="pageSize" class="form-label">Số bài/trang</label>
+            <select id="pageSize" name="pageSize" class="form-select">
+                @foreach (var size in new int[] { 5, 10, 20 })
+                {
+                    if (size == pageSize)
+                    {
+                        <option value="@size" selected>@size</option>
+                    }
+                    else
+                    {
+                        <option value="@size">@size</option>
+                    }
+                }
+
+            </select>
+        </div>
+    </div>
+
+    <!-- Blog List -->
+    @if (Model.Items != null && Model.Items.Any())
+    {
+        <div class="row row-cols-1 gy-4">
+            @foreach (var blog in Model.Items)
+            {
+                <div class="col">
+                    <div class="card blog-card shadow-sm">
+                        <div class="row g-0">
+                            <div class="col-md-4 blog-image-container">
+                                <img src="@(string.IsNullOrEmpty(blog.BlogImageUrl) ? "/themelef/images/newslogo.png" : blog.BlogImageUrl)"
+                                     class="img-fluid blog-image h-100"
+                                     alt="@blog.Title"
+                                     onerror="this.onerror=null; this.src='/themelef/images/newslogo.png';">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <h4 class="blog-title mb-0">@blog.Title</h4>
+                                        <div class="blog-stats">
+                                            <span class="badge bg-primary"><i class="bi bi-eye-fill me-1"></i>@blog.View</span>
+                                            <span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>@blog.AvgRating.ToString("0.0")</span>
+                                        </div>
+                                    </div>
+                                    <h6 class="text-muted">@blog.TitleVietSub</h6>
+                                    <p class="blog-excerpt mt-2 mb-3">@(blog.Content.Length > 150 ? blog.Content.Substring(0, 150) + "..." : blog.Content)</p>
+                                    <a href="javascript:void(0);" class="btn btn-outline-primary btn-sm" onclick="viewBlogDetails(@blog.Id)">Đọc tiếp</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                    <a class="page-link" href="javascript:void(0);" onclick="navigateToPage(1)">Đầu</a>
+                </li>
+                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                    <a class="page-link" href="javascript:void(0);" onclick="navigateToPage(@(Model.Page - 1))">Trước</a>
+                </li>
+
+                @{
+                    int startPage = Math.Max(1, Model.Page - 2);
+                    int endPage = Math.Min(Model.TotalPage, startPage + 4);
+
+                    if (endPage - startPage < 4)
+                    {
+                        startPage = Math.Max(1, endPage - 4);
+                    }
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link" href="javascript:void(0);" onclick="navigateToPage(@i)">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.Page == Model.TotalPage ? "disabled" : "")">
+                    <a class="page-link" href="javascript:void(0);" onclick="navigateToPage(@(Model.Page + 1))">Sau</a>
+                </li>
+                <li class="page-item @(Model.Page == Model.TotalPage ? "disabled" : "")">
+                    <a class="page-link" href="javascript:void(0);" onclick="navigateToPage(@Model.TotalPage)">Cuối</a>
+                </li>
+            </ul>
+        </nav>
+
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5 mt-4">
+            <i class="bi bi-info-circle-fill me-2"></i> Không tìm thấy bài viết nào.
+            @if (!string.IsNullOrEmpty(Context.Request.Query["searchBlog"]))
+            {
+                <p class="mt-2">Thử tìm kiếm với từ khóa khác hoặc <a href="@Url.Action("ListKoreaBlogForUser", "KoreaBlog")" class="alert-link">xem tất cả bài viết</a>.</p>
+            }
+        </div>
+    }
+</div>
+
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            // Handle items per page change
+            $('#pageSize').change(function() {
+                navigateToPage(1);
+            });
+            
+            // Handle search form submission
+            $('#searchForm').submit(function(e) {
+                e.preventDefault();
+                navigateToPage(1);
+            });
+        });
+        
+        function navigateToPage(page) {
+            const searchTerm = $('#searchBlog').val();
+            const pageSize = $('#pageSize').val();
+            
+            window.location.href = '@Url.Action("ListKoreaBlogForUser", "KoreaBlog")' + 
+                '?searchBlog=' + encodeURIComponent(searchTerm) +
+                '&page=' + page +
+                '&pageSize=' + pageSize;
+        }
+        
+        function viewBlogDetails(blogId) {
+            // Chuyển hướng đến trang chi tiết blog
+            window.location.href = '@Url.Action("Details", "KoreaBlog")/' + blogId;
+            
+            // Hoặc hiển thị thông tin bằng SweetAlert2 nếu chưa có trang chi tiết
+            /*
+            Swal.fire({
+                title: 'Chi tiết bài viết',
+                text: 'Đang xem bài viết có ID: ' + blogId,
+                icon: 'info',
+                confirmButtonText: 'Đóng'
+            });
+            */
+        }
+        
+        // Xử lý lỗi ảnh
+        document.addEventListener('DOMContentLoaded', function() {
+            const blogImages = document.querySelectorAll('.blog-image');
+            blogImages.forEach(img => {
+                img.addEventListener('error', function() {
+                    console.log('Image error:', this.src);
+                    this.onerror = null;
+                    this.src = '/themelef/images/newslogo.png';
+                });
+            });
+        });
+    </script>
+}

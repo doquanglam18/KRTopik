@@ -8,6 +8,7 @@ namespace DATN.Application.Dtos.ReadingDtos
 {
     public class ReadingQuestionForTestDto
     {
+        public int Id { get; set; }
         public string? Question { get; set; }
         public string? ReadingImageURL { get; set; }
         public List<ReadingAnswerForTestDto> ReadingAnswers { get; set; }

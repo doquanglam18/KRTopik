@@ -1,7 +1,12 @@
 ﻿using DATN.Application.Dtos.BaseDtos;
+using DATN.Application.Dtos.KoreaBlogDtos;
 using DATN.Application.Dtos.ListeningDtos;
+using DATN.Application.Dtos.RankQuestionDtos;
 using DATN.Application.Dtos.ReadingDtos;
+using DATN.Application.Dtos.TestSetDtos;
+using DATN.Application.Dtos.TestSetDtos.ForAdmin;
 using DATN.Application.Dtos.UserDtos;
+using DATN.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 
@@ -16,10 +21,6 @@ namespace DATN.WebApp.Controllers
         public AdminController(HttpClient httpClient)
         {
             _httpClient = httpClient;
-        }
-        public IActionResult ManageTestSet()
-        {
-            return View();
         }
 
         public async Task<IActionResult> ManageReadingQuestion()
@@ -67,6 +68,47 @@ namespace DATN.WebApp.Controllers
             });
         }
 
+        public async Task<IActionResult> ManageTestSet(int? rankQuestionId, int page = 1, int pageSize = 5)
+        {
+            var rankQuestions = await _httpClient.GetFromJsonAsync<IEnumerable<RankQuestionDto>>("https://localhost:7208/api/rankquestion/getall");
+
+            // Lưu vào ViewData
+            ViewData["rankQuestionId"] = rankQuestionId;
+            ViewData["RankQuestions"] = rankQuestions;
+            HttpResponseMessage testSets;
+
+            if (rankQuestionId != null)
+            {
+                testSets = await _httpClient.GetAsync($"{apiUrl}/testset/getByRankadmin/{rankQuestionId}/{page}/{pageSize}");
+            }
+            else
+            {
+                testSets = await _httpClient.GetAsync($"{apiUrl}/testset/forpaggingadmin/{page}/{pageSize}");
+            }
+
+            if (testSets.IsSuccessStatusCode)
+            {
+                var testSetData = await testSets.Content.ReadFromJsonAsync<PageResultDto<ListTestSetForAdmin>>();
+                return View(testSetData);
+            }
+            return View(new PageResultDto<ListTestSetForAdmin> { Items = new List<ListTestSetForAdmin>(), Page = page, PageSize = pageSize, TotalItem = 0 });
+        }
+
+
+        public async Task<IActionResult> ManageKoreaBlog(int page = 1, int pageSize = 5)
+        {
+            HttpResponseMessage koreaBlogs;
+
+            koreaBlogs = await _httpClient.GetAsync($"{apiUrl}/koreablog/forpaggingadmin/{page}/{pageSize}");
+
+            if (koreaBlogs.IsSuccessStatusCode)
+            {
+                var koreaBlogData = await koreaBlogs.Content.ReadFromJsonAsync<PageResultDto<KoreaBlogForList>>();
+                return View(koreaBlogData);
+            }
+            return View(new PageResultDto<KoreaBlogForList> { Items = new List<KoreaBlogForList>(), Page = page, PageSize = pageSize, TotalItem = 0 });
+
+        }
 
 
     }

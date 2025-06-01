@@ -32,6 +32,7 @@ namespace DATN.Infrastructure.Repository.Implements
                 .Include(u => u.SystemLoggings)
                 .Include(u => u.RatingBlogs)
                 .Include(u => u.UserProgresses)
+                    .ThenInclude(up => up.TestSet)
                 .Include(u => u.Comments)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }

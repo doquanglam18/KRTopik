@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using DATN.Application.Dtos.TestSetDtos;
 using DATN.Application.Dtos.BaseDtos;
 using System.Drawing.Printing;
+using DATN.Application.Dtos.TestSetDtos.ForAdmin;
+using DATN.WebAPI.Extensions;
+using System.Security.Claims;
 
 namespace DATN.WebAPI.Controllers
 {
@@ -20,12 +23,14 @@ namespace DATN.WebAPI.Controllers
         private readonly IMapper _mapper;
         private readonly ISystemLoggingService _loggingService;
         private readonly ICloudService _cloudService;
-        public TestSetController(ICloudService cloudService, ITestSetService testSetService, IMapper mapper, ISystemLoggingService systemLoggingService)
+        private readonly IUserProgressService _userProgressService;
+        public TestSetController(ICloudService cloudService, ITestSetService testSetService, IMapper mapper, ISystemLoggingService systemLoggingService, IUserProgressService userProgressService)
         {
             _testSetService = testSetService;
             _mapper = mapper;
             _loggingService = systemLoggingService;
             _cloudService = cloudService;
+            _userProgressService = userProgressService;
         }
 
         [HttpGet("getall")]
@@ -50,6 +55,21 @@ namespace DATN.WebAPI.Controllers
             return Ok(testSets);
         }
 
+
+        [HttpGet("forpaggingadmin/{page}/{pageSize}")]
+        public async Task<ActionResult> GetTestSetForAdminPaged([FromRoute] int page, [FromRoute] int pageSize)
+        {
+            var testSets = await _testSetService.GetAllTestSetForAdminPagingAsync(page, pageSize);
+            return Ok(testSets);
+        }
+
+        [HttpGet("getByRankadmin/{rankId}/{page}/{pageSize}")]
+        public async Task<ActionResult> GetListTestSetForAdminPagedByRank([FromRoute] int page, [FromRoute] int pageSize, [FromRoute] int rankId)
+        {
+            var testSets = await _testSetService.GetAllTestSetForAdminPagingByRankAsync(page, pageSize, rankId);
+            return Ok(testSets);
+        }
+
         [HttpGet("getById/{id}")]
         public async Task<IActionResult> GetTestSetById(int id)
         {
@@ -58,6 +78,17 @@ namespace DATN.WebAPI.Controllers
                 return NotFound("Không tìm thấy bộ đề thi với ID này.");
 
             var question = _mapper.Map<TestSetDetailsDto>(testSet);
+            return Ok(question);
+        }
+
+        [HttpGet("getByIdForAdmin/{id}")]
+        public async Task<IActionResult> GetTestSetForAdminById(int id)
+        {
+            var testSet = await _testSetService.GetTestSetByIdAsync(id);
+            if (testSet == null)
+                return NotFound("Không tìm thấy bộ đề thi với ID này.");
+
+            var question = _mapper.Map<TestSetDetailsForAdmin>(testSet);
             return Ok(question);
         }
 
@@ -73,93 +104,116 @@ namespace DATN.WebAPI.Controllers
         }
 
 
-        [HttpGet("getAudioDuration")]
-        public async Task<IActionResult> GetAudioDuration(string url)
+
+
+        [HttpPost("scoring")]
+        public async Task<IActionResult> ScoringTestSet(SubmitTestDto submitTestDto)
         {
-            if (string.IsNullOrEmpty(url))
-                return BadRequest("URL không hợp lệ.");
+            if (submitTestDto == null)
+                return BadRequest("Dữ liệu không hợp lệ.");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            string publicId = ClaimsPrincipalExtensions.ExtractPublicIdFromUrl(url);
+            // Lấy UserId trực tiếp từ ClaimsPrincipal
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Người dùng chưa đăng nhập.");
+            }
+            var userId = Guid.Parse(userIdClaim.Value);
 
-            var duration = await _cloudService.GetAudioDurationViaApiAsync(publicId);
-            if (duration == null)
-                return BadRequest("Không thể lấy thời gian của audio.");
-
-            return Ok(new { Duration = duration });
-        }
-        /*   [HttpPost("add")]
-           public async Task<IActionResult> CreateListeningQuestion([FromForm] ListeningQuestionCreateDto createDto)
-           {
-               if (createDto.Sound != null)
-               {
-                   var soundUrl = await _cloudService.UploadAudioAsync(createDto.Sound);
-                   if (string.IsNullOrEmpty(soundUrl))
-                       return BadRequest("Tải file nghe thất bại.");
-
-                   createDto.ListeningSoundURL = soundUrl; // Gán URL vào DTO
-               }
-               else
-               {
-                   return BadRequest("Bắt buộc phải có file nghe cho câu hỏi nghe !");
-               }
-
-               // Upload ảnh từng đáp án (nếu có)
-               foreach (var answer in createDto.ListeningAnswers)
-               {
-                   if (answer.Image != null && answer.Image.Length > 0)
-                   {
-                       var imageUrl = await _cloudService.UploadImageAsync(answer.Image);
-                       if (string.IsNullOrEmpty(imageUrl))
-                           return BadRequest("Tải ảnh đáp án thất bại.");
-
-                       answer.Content = imageUrl; // Gán URL ảnh vào Content
-                   }
-               }
-               createDto.CreatedBy = ClaimsPrincipalExtensions.GetUserId(User);
-
-               var listeningQuestion = _mapper.Map<ListeningQuestion>(createDto);
-               var result = await _listeningQuestionService.CreateListeningQuestionAsync(listeningQuestion);
-
-               if (result.IsSuccess)
-                   return Ok(result);
-
-               return BadRequest(result);
-           }*/
+            var result = await _testSetService.ScoringTestSetAsync(submitTestDto);
+           
+            var bestResultUP = await _userProgressService.GetUserProgressBestResultByTestSetIdAsync(submitTestDto.TestSetId, userId);
 
 
-        /*        [HttpDelete("{id}")]
-                public Task<IActionResult> DeleteTestSet(int id)
+            // Lấy thông tin test set để biết tổng số câu hỏi
+            var testSet = await _testSetService.GetTestSetByIdAsync(submitTestDto.TestSetId);
+            if (testSet != null)
+            {
+                var now = DateTime.UtcNow;
+                // Tạo tiến trình mới cho lần làm đề này
+                var userProgress = new UserProgress
                 {
-        *//*            var result = await _listeningQuestionService.DeleteListeningQuestionAsync(id);
-
-                    if (result.IsSuccess)
+                    UserId = userId,
+                    TestSetId = submitTestDto.TestSetId,
+                    TotalQuestions = result.TotalQuestions,
+                    CompletedQuestions = result.CorrectCount,
+                    BestResults = result.CorrectCount,
+                    FirstAttemptAt = submitTestDto.FirstAttemptAt,
+                    LastAttemptAt = submitTestDto.LastAttemptAt,
+                    CompletedAt = submitTestDto.Answers.Count == result.CorrectCount ? submitTestDto.LastAttemptAt : DateTime.MinValue
+                };
+                
+                if(bestResultUP != null)
+                {
+                    if (userProgress.BestResults > bestResultUP.BestResults)
                     {
-                        return Ok(new
-                        {
-                            success = true,
-                            message = result.Message
-                        });
+                        _userProgressService.UpdateAllBestScore(userProgress.BestResults, submitTestDto.TestSetId, userId);
                     }
-
-                    return BadRequest(new
+                    else
                     {
-                        success = false,
-                        message = result.Message
-                    });*//*
-                }*/
+                        userProgress.BestResults = bestResultUP.BestResults;
+                    }
+                }
+                
+                await _userProgressService.CreateUserProgressAsync(userProgress);
+            }
 
-        /*   [HttpPut("update/{id}")]
-           public async Task<IActionResult> UpdateListeningQuestion(int id, [FromForm] ListeningQuestionDto updateDto)
-           {
+            return Ok(result);
+        }
+    
 
-           }
+        [HttpPost("updateQuestions")]
+        public async Task<IActionResult> UpdateTestSetQuestions([FromBody] UpdateTestSetQuestionsRequest request)
+        {
+            try
+            {
+                if (request == null || request.QuestionIds == null)
+                {
+                    return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ." });
+                }
 
-           [HttpGet("forpagging/{page}/{pageSize}")]
-           public async Task<ActionResult> GetListeningQuestionPaged([FromRoute] int page, [FromRoute] int pageSize)
-           {
-               var listeningQuestions = await _listeningQuestionService.GetAllListeningQuestionsPagingAsync(page, pageSize);
-               return Ok(listeningQuestions);
-           }*/
+                // Lấy testset hiện tại
+                var testSet = await _testSetService.GetTestSetByIdAsync(request.TestSetId);
+                if (testSet == null)
+                {
+                    return NotFound(new { success = false, message = "Không tìm thấy đề thi." });
+                }
+
+                // Xác định loại câu hỏi dựa vào RankQuestionId
+                if ((request.RankQuestionId >= 1 && request.RankQuestionId <= 12) || request.RankQuestionId == 21)
+                {
+                    // Xử lý câu hỏi Reading
+                    var result = await _testSetService.UpdateReadingQuestionsAsync(request.TestSetId, request.QuestionIds);
+                    if (!result.IsSuccess)
+                    {
+                        return BadRequest(new { success = false, message = result.Message });
+                    }
+                }
+                else if (request.RankQuestionId >= 13 && request.RankQuestionId <= 20)
+                {
+                    // Xử lý câu hỏi Listening
+                    var result = await _testSetService.UpdateListeningQuestionsAsync(request.TestSetId, request.QuestionIds);
+                    if (!result.IsSuccess)
+                    {
+                        return BadRequest(new { success = false, message = result.Message });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Loại câu hỏi không hợp lệ." });
+                }
+
+                return Ok(new { success = true, message = "Cập nhật câu hỏi thành công." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
 
 
     }

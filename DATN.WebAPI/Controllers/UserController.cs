@@ -259,7 +259,64 @@ namespace DATN.WebAPI.Controllers
         }
 
 
+        [HttpGet("getProfileUser")]
+        public async Task<IActionResult> GetProfileUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { success = false, message = "Bạn cần đăng nhập để truy cập thông tin cá nhân." });
+            }
+
+            var user = await _userService.GetUserByIdAsync(Guid.Parse(userId));
+            if (user == null)
+            {
+                return NotFound(new { success = false, message = "Người dùng không tồn tại!" });
+            }
+
+            var userDto = _mapper.Map<UserDetailForUserDto>(user);
+            return Ok(new { success = true, data = userDto });
+        }
 
 
+        /*    [HttpPost("forgotpassword")]
+            public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+            {
+                var user = (await _userService.GetAllUserAsync()).FirstOrDefault(u => u.Email == dto.Email);
+                if (user == null)
+                    return BadRequest(Result.Failure("Email không tồn tại."));
+
+                // Tạo token và lưu vào DB
+                string token = Guid.NewGuid().ToString();
+                user.ResetPasswordToken = token;
+                user.ResetPasswordTokenExpiry = DateTime.UtcNow.AddMinutes(30);
+                await _userService.UpdateUserAsync(user);
+
+                // Gửi email
+                var resetUrl = $"{Request.Scheme}://{Request.Host}/User/ResetPassword?token={Uri.EscapeDataString(token)}";
+                string body = $@"<p>Bạn vừa yêu cầu đặt lại mật khẩu.</p>
+                         <p>Nhấn <a href='{resetUrl}'>vào đây</a> để đặt lại mật khẩu. Liên kết có hiệu lực trong 30 phút.</p>";
+                await _emailService.SendEmailAsync(user.Email, "Đặt lại mật khẩu", body);
+
+                return Ok(Result.Success("Vui lòng kiểm tra email để đặt lại mật khẩu."));
+            }
+
+            [HttpPost("resetpassword")]
+            public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+            {
+                var user = (await _userService.GetAllUserAsync())
+                    .FirstOrDefault(u => u.ResetPasswordToken == dto.Token && u.ResetPasswordTokenExpiry > DateTime.UtcNow);
+
+                if (user == null)
+                    return BadRequest(Result.Failure("Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn."));
+
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+                user.ResetPasswordToken = null;
+                user.ResetPasswordTokenExpiry = null;
+                await _userService.UpdateUserAsync(user);
+
+                return Ok(Result.Success("Đặt lại mật khẩu thành công!"));
+            }
+    */
     }
 }

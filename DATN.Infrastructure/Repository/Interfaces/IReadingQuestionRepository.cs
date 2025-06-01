@@ -10,6 +10,7 @@ namespace DATN.Infrastructure.Repository.Interfaces
     public interface IReadingQuestionRepository : IGenericRepository<ReadingQuestion>
     {
         Task<ReadingQuestion> GetByIdWithAnswersAsync(int id);
+        IQueryable<ReadingQuestion> GetAllForPaging();
     }
 
 

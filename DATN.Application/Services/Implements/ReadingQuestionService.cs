@@ -1,4 +1,8 @@
-﻿using DATN.Application.Dtos.ReadingDtos;
+﻿using AutoMapper;
+using DATN.Application.Dtos.BaseDtos;
+using DATN.Application.Dtos.ListeningDtos;
+using DATN.Application.Dtos.ReadingDtos;
+using DATN.Application.Dtos.ReadingDtos.ForAddTestSet;
 using DATN.Application.Services.Interfaces;
 using DATN.Domain.Entities;
 using DATN.Infrastructure.UnitOfWork;
@@ -16,9 +20,12 @@ namespace DATN.Application.Services.Implements
     {
 
         private readonly IUnitOfWork _unitOfWork;
-        public ReadingQuestionService(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public ReadingQuestionService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
+
         }
         public async Task<Result> CreateReadingQuestionAsync(ReadingQuestion readingQuestion)
         {
@@ -57,6 +64,41 @@ namespace DATN.Application.Services.Implements
             }
         }
 
+        public async Task<PageResultDto<ReadingQsDto>> GetReadingByRankID(int rankQuestionId, int page, int pageSize)
+        {
+            var query = _unitOfWork.ReadingQuestionRepository.GetAllForPaging()
+              .Include(u => u.RankQuestion)
+              .Include(u => u.ReadingAnswers)
+              .Include(u => u.TestSet)
+              .Where(u => u.RankQuestionId == rankQuestionId);
+            var totalItem = query.Count();
+
+            var readingQuestions = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            return new PageResultDto<ReadingQsDto>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalItem = totalItem,
+                Items = _mapper.Map<List<ReadingQsDto>>(readingQuestions)
+            };
+        }
+
+        public async Task<List<ReadingQsDto>> GetReadingByRankIDNoPagging(int rankQuestionId)
+        {
+            var readingQuestions = await _unitOfWork.ReadingQuestionRepository
+                .GetAll()
+                .Include(u => u.RankQuestion)
+                .Include(u => u.ReadingAnswers)
+                .Include(u => u.TestSet)
+                .Where(u => u.RankQuestionId == rankQuestionId)
+                .Where(u => u.IsPublic == true)
+                .Where(u => u.TestSet == null) 
+                .ToListAsync();
+
+            var readingQuestionsDto = _mapper.Map<List<ReadingQsDto>>(readingQuestions);
+            return readingQuestionsDto;
+        }
 
 
 
@@ -262,5 +304,7 @@ namespace DATN.Application.Services.Implements
                 return Result.Failure($"Đã xảy ra lỗi khi xóa câu hỏi: {ex.Message}");
             }
         }
+
+        
     }
 }

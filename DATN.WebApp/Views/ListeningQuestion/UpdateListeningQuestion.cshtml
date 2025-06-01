@@ -125,14 +125,30 @@
                         <td>
                             <input type="hidden" name="ListeningAnswers[@i].Id" value="@Model.ListeningAnswers[i].Id" />
 
-                            <label class="form-label">Văn bản</label>
-                            <input type="text" name="ListeningAnswers[@i].Content" value="@Model.ListeningAnswers[i].Content" class="form-control mb-2" />
+                            @{
+                                var content = Model.ListeningAnswers[i].Content;
+                                bool isImageUrl = !string.IsNullOrEmpty(content) &&
+                                (content.StartsWith("http://") || content.StartsWith("https://")) &&
+                                (content.Contains("cloudinary") || content.EndsWith(".jpg") || content.EndsWith(".png") || content.EndsWith(".jpeg") || content.EndsWith(".webp"));
+                            }
 
-                            <label class="form-label">Hoặc ảnh (nếu có)</label>
+                            @if (isImageUrl)
+                            {
+                                <div class="mb-2">
+                                    <label class="form-label">Ảnh đáp án</label><br />
+                                    <img src="@content" alt="Image Answer @i" class="img-thumbnail" style="max-width: 150px;" />
+                                </div>
+                                <input type="hidden" name="ListeningAnswers[@i].Content" value="@content" />
+                            }
+                            else
+                            {
+                                <label class="form-label">Văn bản</label>
+                                <input type="text" name="ListeningAnswers[@i].Content" value="@content" class="form-control mb-2" />
+                            }
+
+                            <label class="form-label">Cập nhật ảnh mới (nếu có)</label>
                             <input type="file" name="ListeningAnswers[@i].Image" class="form-control" />
 
-                            @* Preview ảnh nếu có URL trong model (cần bạn mở rộng DTO để chứa URL nếu cần) *@
-                            @* <img src="@Model.ListeningAnswers[i].ImageUrl" width="100" class="mt-2" /> *@
                         </td>
                         <td class="text-center">
                             <input type="radio" name="CorrectAnswerIndex" value="@i" @(Model.ListeningAnswers[i].IsCorrect ? "checked" : "") />

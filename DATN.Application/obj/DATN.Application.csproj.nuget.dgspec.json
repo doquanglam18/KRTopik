@@ -63,6 +63,10 @@
               "target": "Package",
               "version": "[1.27.5, )"
             },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[8.0.5, )"
+            },
             "MailKit": {
               "target": "Package",
               "version": "[4.11.0, )"
@@ -94,6 +98,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[8.0.7, )"
+            },
+            "PDFsharp": {
+              "target": "Package",
+              "version": "[6.2.0, )"
             }
           },
           "imports": [
@@ -168,6 +176,10 @@
               "target": "Package",
               "version": "[1.27.5, )"
             },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[8.0.5, )"
+            },
             "MailKit": {
               "target": "Package",
               "version": "[4.11.0, )"
@@ -199,6 +211,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[8.0.7, )"
+            },
+            "PDFsharp": {
+              "target": "Package",
+              "version": "[6.2.0, )"
             }
           },
           "imports": [
@@ -277,6 +293,10 @@
               "target": "Package",
               "version": "[1.27.5, )"
             },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[8.0.5, )"
+            },
             "MailKit": {
               "target": "Package",
               "version": "[4.11.0, )"
@@ -308,6 +328,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[8.0.7, )"
+            },
+            "PDFsharp": {
+              "target": "Package",
+              "version": "[6.2.0, )"
             }
           },
           "imports": [

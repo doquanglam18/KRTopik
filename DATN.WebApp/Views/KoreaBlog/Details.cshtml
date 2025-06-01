@@ -1,0 +1,432 @@
+﻿@using DATN.Application.Dtos.UserDtos
+@model DATN.Application.Dtos.KoreaBlogDtos.KoreaBlogDetailsDto
+@{
+    ViewData["Title"] = "Chi tiết bài viết";
+    var user = ViewData["UserInfo"] as UserOwnerDto;
+    var avgRating = (Model.RatingBlogs != null && Model.RatingBlogs.Any())
+        ? Model.RatingBlogs.Average(r => r.Rating)
+        : 0;
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.Title - Chi tiết bài viết</title>
+    
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Serif:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #3b7bf1;
+            --secondary-color: #f1c83b;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+            --accent-color: #e74c3c;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 40px;
+        }
+        
+        .blog-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background-color: #fff;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            position: relative;
+        }
+        
+        .blog-header {
+            position: relative;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        .blog-title {
+            font-family: 'Noto Serif', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-gray);
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+        
+        .blog-subtitle {
+            font-size: 1.4rem;
+            color: #666;
+            margin-bottom: 20px;
+            font-style: italic;
+            font-weight: 300;
+        }
+        
+        .blog-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 20px;
+        }
+        
+        .blog-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .blog-image-container {
+            position: relative;
+            margin: 30px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .blog-image {
+            width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+            display: block;
+        }
+        
+        .blog-image-container:hover .blog-image {
+            transform: scale(1.02);
+        }
+        
+        .rating-container {
+            background-color: var(--light-gray);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 30px 0;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .rating-stars {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+        }
+        
+        .content-section {
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .content-title {
+            font-family: 'Noto Serif', serif;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+            display: inline-block;
+        }
+        
+        .content-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            overflow-wrap: break-word;
+        }
+        
+        .user-card {
+            display: flex;
+            align-items: center;
+            background-color: var(--light-gray);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 40px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-right: 20px;
+        }
+        
+        .user-info {
+            flex-grow: 1;
+        }
+        
+        .user-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--dark-gray);
+        }
+        
+        .user-role {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+        
+        .btn-back {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+        
+        .btn-back:hover {
+            background-color: #2a61d4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 123, 241, 0.3);
+        }
+        
+        .btn-back i {
+            margin-right: 8px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .blog-container {
+                padding: 25px;
+                margin: 20px 15px;
+            }
+            
+            .blog-title {
+                font-size: 1.8rem;
+            }
+            
+            .blog-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .content-body {
+                font-size: 1rem;
+            }
+            
+            .blog-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+        
+        /* Animation */
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animated {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2a61d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container blog-container animated">
+        <div class="blog-header">
+            <h1 class="blog-title">@Model.Title</h1>
+            <h2 class="blog-subtitle">@Model.TitleVietSub</h2>
+            
+            <div class="blog-meta">
+                <div class="blog-meta-item">
+                    <i class="bi bi-eye-fill"></i>
+                    <span>@Model.View.ToString("N0") lượt xem</span>
+                </div>
+                <div class="blog-meta-item">
+                    <i class="bi bi-calendar-event"></i>
+                    <span>@Model.CreatedDate.ToString("dd/MM/yyyy")</span>
+                </div>
+                <div class="blog-meta-item">
+                    <i class="bi bi-circle-fill me-1" style="color: @(Model.IsActive ? "#28a745" : "#dc3545"); font-size: 10px;"></i>
+                    <span class="status-badge @(Model.IsActive ? "status-active" : "status-inactive")">
+                        @(Model.IsActive ? "Đang hoạt động" : "Ngừng hoạt động")
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.BlogImageUrl))
+        {
+            <div class="blog-image-container">
+                <img src="@Model.BlogImageUrl" alt="Ảnh minh họa: @Model.Title" class="blog-image" />
+            </div>
+        }
+
+        <div class="rating-container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-2"><i class="bi bi-star-fill me-2" style="color: var(--secondary-color)"></i>Đánh giá trung bình</h5>
+                    <div class="rating-stars">
+                        @{
+                            var fullStars = Math.Floor(avgRating);
+                            var halfStar = avgRating - fullStars >= 0.5;
+                            
+                            for (int i = 0; i < fullStars; i++)
+                            {
+                                <i class="bi bi-star-fill"></i>
+                            }
+                            
+                            if (halfStar)
+                            {
+                                <i class="bi bi-star-half"></i>
+                            }
+                            
+                            for (int i = 0; i < 5 - fullStars - (halfStar ? 1 : 0); i++)
+                            {
+                                <i class="bi bi-star"></i>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="text-end">
+                    <span class="fs-2 fw-bold">@avgRating.ToString("0.0")</span>
+                    <div class="text-muted">(@(Model.RatingBlogs?.Count ?? 0) đánh giá)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h3 class="content-title">Nội dung gốc</h3>
+            <div class="content-body">
+                @Html.Raw(Model.Content)
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h3 class="content-title">Nội dung dịch</h3>
+            <div class="content-body">
+                @Html.Raw(Model.VietSubContent)
+            </div>
+        </div>
+
+        @if (user != null)
+        {
+            <div class="user-card">
+                <img src="@(string.IsNullOrEmpty(user.AvatarImageUrl) ? "/images/default-avatar.png" : user.AvatarImageUrl)" 
+                     alt="Avatar - @user.FullName" class="user-avatar" />
+                <div class="user-info">
+                    <div class="user-name">@user.FullName</div>
+                    <div class="user-role">Tác giả bài viết</div>
+                </div>
+            </div>
+        }
+
+        <button class="btn btn-back" onclick="confirmGoBack()">
+            <i class="bi bi-arrow-left"></i> Quay lại
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmGoBack() {
+            Swal.fire({
+                title: 'Quay lại trang trước?',
+                text: 'Bạn có chắc muốn rời khỏi trang chi tiết này?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy',
+                confirmButtonColor: '#3b7bf1',
+                cancelButtonColor: '#6c757d',
+                customClass: {
+                    popup: 'swal-custom-popup',
+                    title: 'swal-title',
+                    content: 'swal-content',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.history.back();
+                }
+            });
+        }
+        
+        // Animate elements when they come into view
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simple image lazy loading
+            const blogImage = document.querySelector('.blog-image');
+            if (blogImage) {
+                const dataSrc = blogImage.getAttribute('src');
+                if (dataSrc) {
+                    const img = new Image();
+                    img.onload = function() {
+                        blogImage.src = dataSrc;
+                        blogImage.classList.add('loaded');
+                    };
+                    img.src = dataSrc;
+                }
+            }
+            
+            // Add smooth transitions for content
+            const contentSections = document.querySelectorAll('.content-section');
+            contentSections.forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                section.style.transitionDelay = (0.2 + index * 0.1) + 's';
+                
+                setTimeout(() => {
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

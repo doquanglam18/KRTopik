@@ -1,0 +1,401 @@
+﻿@using DATN.Application.Dtos.KoreaBlogDtos
+
+@model KoreaBlogCreateDto
+@{
+    ViewData["Title"] = "Đăng bài viết mới";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #f8961e;
+            --info-color: #4895ef;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            font-family: 'Inter', sans-serif;
+            color: #2b2d42;
+        }
+
+        .form-section {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 850px;
+            margin: 3rem auto;
+            box-shadow: 0 10px 30px rgba(67, 97, 238, 0.1);
+            border: 1px solid rgba(67, 97, 238, 0.1);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .form-section:hover {
+            box-shadow: 0 14px 40px rgba(67, 97, 238, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .form-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .form-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .form-control,
+        .form-select,
+        textarea {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+            outline: none;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .preview-img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 1rem;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #eee;
+        }
+
+        .btn-submit {
+            border-radius: 50px;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid #e0e0e0;
+            color: #495057;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            border-color: #d0d0d0;
+            color: #2b2d42;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* Floating labels effect */
+        .form-floating label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        /* File input custom style */
+        .form-control[type="file"] {
+            padding: 0.5rem;
+        }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .form-section {
+                padding: 1.5rem;
+                margin: 1.5rem;
+            }
+            
+            .form-title {
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .action-buttons {
+                gap: 1rem;
+            }
+            
+            .btn-submit {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animation for form elements */
+        .form-group {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        @@keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Delay animations for each form group */
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-section">
+            <h2 class="form-title"><i class="fas fa-pen-fancy me-2"></i>Đăng bài viết tiếng Hàn</h2>
+
+            <form asp-action="CreateKoreaBlog" asp-controller="KoreaBlog" method="post" enctype="multipart/form-data" id="createForm" novalidate>
+                <div class="mb-4 form-group">
+                    <label class="form-label" for="Title"><i class="fas fa-heading"></i>Tiêu đề bài viết</label>
+                    <input asp-for="Title" id="Title" class="form-control" placeholder="Nhập tiêu đề bài viết (tiếng Hàn)" required />
+                    <span class="text-danger" asp-validation-for="Title"></span>
+                </div>
+
+                <div class="mb-4 form-group">
+                    <label class="form-label" for="TitleVietSub"><i class="fas fa-language"></i>Tiêu đề tiếng Việt</label>
+                    <input asp-for="TitleVietSub" id="TitleVietSub" class="form-control" placeholder="Nhập tiêu đề tiếng Việt" required />
+                    <span class="text-danger" asp-validation-for="TitleVietSub"></span>
+                </div>
+
+                <div class="mb-4 form-group">
+                    <label class="form-label" for="Image"><i class="fas fa-image"></i>Ảnh minh họa</label>
+                    <input asp-for="Image" id="Image" type="file" accept="image/*" class="form-control" onchange="previewImage(this)" />
+                    <small class="text-muted">Chọn ảnh có tỷ lệ 16:9 để hiển thị tốt nhất</small>
+                    <img id="preview" class="preview-img mt-3" alt="Xem trước ảnh" />
+                </div>
+
+                <div class="mb-4 form-group">
+                    <label class="form-label" for="Content"><i class="fas fa-font"></i>Nội dung gốc (tiếng Hàn)</label>
+                    <textarea asp-for="Content" id="Content" rows="6" class="form-control" placeholder="Nhập nội dung tiếng Hàn..." required></textarea>
+                    <span class="text-danger" asp-validation-for="Content"></span>
+                </div>
+
+                <div class="mb-4 form-group">
+                    <label class="form-label" for="VietSubContent"><i class="fas fa-font"></i>Nội dung tiếng Việt</label>
+                    <textarea asp-for="VietSubContent" id="VietSubContent" rows="6" class="form-control" placeholder="Nhập nội dung tiếng Việt..." required></textarea>
+                    <span class="text-danger" asp-validation-for="VietSubContent"></span>
+                </div>
+
+                <input type="hidden" asp-for="CreatedDate" value="@DateTime.Now" />
+                <input type="hidden" asp-for="CreateadBy" value="@Guid.NewGuid()" />
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary btn-submit">
+                        <i class="fas fa-upload"></i> Đăng bài
+                    </button>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary btn-submit">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SweetAlert2 for beautiful alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Image preview function
+        function previewImage(input) {
+            const preview = document.getElementById('preview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+            document.getElementById("createForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const form = this;
+                const formData = new FormData(form);
+
+                Swal.fire({
+                    title: 'Xác nhận đăng bài',
+                    text: "Bạn có chắc muốn đăng bài viết này không?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fas fa-check"></i> Đăng bài',
+                    cancelButtonText: '<i class="fas fa-times"></i> Hủy',
+                    confirmButtonColor: '#4361ee',
+                    cancelButtonColor: '#6c757d',
+                    backdrop: `
+                        rgba(67, 97, 238, 0.1)
+                        url("/images/nyan-cat.gif")
+                        left top
+                        no-repeat
+                    `,
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Đang xử lý...',
+                            html: 'Bài viết của bạn đang được đăng lên',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading()
+                            }
+                        });
+
+                        // Gửi form qua Ajax
+                        fetch(form.action, {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: 'Thành công!',
+                                        text: data.message,
+                                        icon: 'success',
+                                        confirmButtonText: 'OK'
+                                    }).then(() => {
+                                        window.location.href = '/KoreaBlog/ListKoreaBlogForUser';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Thất bại!',
+                                        text: data.message,
+                                        icon: 'error',
+                                        confirmButtonText: 'OK'
+                                    }).then(() => {
+                                        window.location.href = '/KoreaBlog/ListKoreaBlogForUser';
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    title: 'Lỗi hệ thống!',
+                                    text: 'Không thể gửi bài viết. Vui lòng thử lại sau.',
+                                    icon: 'error'
+                                }).then(() => {
+                                    window.location.href = '/KoreaBlog/ListKoreaBlogForUser';
+                                });
+                            });
+                    }
+                });
+            });
+
+
+
+        // Add animation class when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const formGroups = document.querySelectorAll('.form-group');
+            formGroups.forEach(group => {
+                group.style.opacity = '0';
+            });
+            
+            // Trigger animations
+            setTimeout(() => {
+                formGroups.forEach(group => {
+                    group.style.animation = 'fadeIn 0.5s ease forwards';
+                });
+            }, 100);
+        });
+    </script>
+</body>
+
+</html>

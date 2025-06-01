@@ -2,6 +2,7 @@
 using DATN.Application.Dtos.BaseDtos;
 using DATN.Application.Dtos.ListeningDtos;
 using DATN.Application.Dtos.TestSetDtos;
+using DATN.Application.Dtos.TestSetDtos.ForAdmin;
 using DATN.Application.Services.Interfaces;
 using DATN.Domain.Entities;
 using DATN.Infrastructure.UnitOfWork;
@@ -80,6 +81,7 @@ namespace DATN.Application.Services.Implements
                 .Include(rq => rq.UserProgress)
                 .Include(rq => rq.ListeningQuestions)
                 .Include(rq => rq.Comments)
+                .ThenInclude(rq => rq.User)
                 .Where(rq => rq.IsDelele == false);
             var totalItem = query.Count();
 
@@ -91,6 +93,30 @@ namespace DATN.Application.Services.Implements
                 PageSize = pageSize,
                 TotalItem = totalItem,
                 Items = _mapper.Map<List<TestSetForUserDto>>(testSets)
+            };
+        }
+
+        public async Task<PageResultDto<ListTestSetForAdmin>> GetAllTestSetForAdminPagingAsync(int page, int pageSize)
+        {
+            var query = _unitOfWork.TestSetRepository.GetAllForPaging()
+              .Include(rq => rq.RankQuestion)
+                .Include(rq => rq.ReadingQuestions)
+                .Include(rq => rq.UserProgress)
+                .Include(rq => rq.ListeningQuestions)
+                 .Include(rq => rq.RankQuestion)
+                .Include(rq => rq.Comments)
+                .ThenInclude(rq => rq.User)
+                .Where(rq => rq.IsDelele == false);
+            var totalItem = query.Count();
+
+            var testSets = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            return new PageResultDto<ListTestSetForAdmin>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalItem = totalItem,
+                Items = _mapper.Map<List<ListTestSetForAdmin>>(testSets)
             };
         }
 
@@ -140,9 +166,318 @@ namespace DATN.Application.Services.Implements
         }
 
 
+        public async Task<PageResultDto<ListTestSetForAdmin>> GetAllTestSetForAdminPagingByRankAsync(int page, int pageSize, int rankId)
+        {
+            if (rankId <= 0)
+            {
+                return new PageResultDto<ListTestSetForAdmin>
+                {
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalItem = 0,
+                    Items = new List<ListTestSetForAdmin>()
+                };
+            }
+
+            var query = _unitOfWork.TestSetRepository.GetAllForPaging()
+                .Include(rq => rq.RankQuestion)
+                .Include(rq => rq.ReadingQuestions)
+                .Include(rq => rq.UserProgress)
+                .Include(rq => rq.ListeningQuestions)
+                .Include(rq => rq.RankQuestion)
+                .Include(rq => rq.Comments)
+                .Where(rq => rq.IsDelele == false)
+                .Where(rq => rq.RankQuestionId == rankId);
+
+            var totalItem = await query.CountAsync();
+
+            var testSets = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PageResultDto<ListTestSetForAdmin>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalItem = totalItem,
+                Items = _mapper.Map<List<ListTestSetForAdmin>>(testSets)
+            };
+        }
+
+
         public Task<Result> UpdateTestSetAsync(TestSet testSet)
         {
             throw new NotImplementedException();
         }
+
+        /* public async Task<double> ScoringTestSetAsync(SubmitTestDto submitTestDto)
+         {
+             var testSet = await GetTestSetByIdAsync(submitTestDto.TestSetId);
+
+             int totalQuestions = 0;
+             int correctCount = 0;
+
+             if (testSet.ReadingQuestions.Count == 0)
+             {
+                 // Listening Test
+                 totalQuestions = testSet.ListeningQuestions.Count;
+
+                 foreach (var question in testSet.ListeningQuestions)
+                 {
+                     var submitted = submitTestDto.Answers
+                         .FirstOrDefault(a => a.QuestionId == question.Id);
+
+                     if (submitted != null)
+                     {
+                         var correctAnswer = question.ListeningAnswers
+                             .FirstOrDefault(a => a.IsCorrect);
+
+                         if (correctAnswer != null && submitted.SelectedAnswerId == correctAnswer.Id)
+                         {
+                             correctCount++;
+                         }
+                     }
+                 }
+             }
+             else
+             {
+                 // Reading Test
+                 totalQuestions = testSet.ReadingQuestions.Count;
+
+                 foreach (var question in testSet.ReadingQuestions)
+                 {
+                     var submitted = submitTestDto.Answers
+                         .FirstOrDefault(a => a.QuestionId == question.Id);
+
+                     if (submitted != null)
+                     {
+                         var correctAnswer = question.ReadingAnswers
+                             .FirstOrDefault(a => a.IsCorrect);
+
+                         if (correctAnswer != null && submitted.SelectedAnswerId == correctAnswer.Id)
+                         {
+                             correctCount++;
+                         }
+                     }
+                 }
+             }
+
+             return totalQuestions == 0 ? 0 : Math.Round(100.0 * correctCount / totalQuestions, 2); // Trả về phần trăm
+         }*/
+
+        public async Task<DetailedScoringResultDto> ScoringTestSetAsync(SubmitTestDto submitTestDto)
+        {
+            var testSet = await GetTestSetByIdAsync(submitTestDto.TestSetId);
+            var result = new DetailedScoringResultDto
+            {
+                TotalQuestions = 0,
+                CorrectCount = 0,
+                QuestionResults = new List<QuestionResultDto>()
+            };
+
+            if (testSet.ReadingQuestions.Count == 0 || testSet.ReadingQuestions == null)
+            {
+                // Listening Test
+                result.TotalQuestions = testSet.ListeningQuestions.Count;
+
+                foreach (var question in testSet.ListeningQuestions)
+                {
+                    var submitted = submitTestDto.Answers
+                        .FirstOrDefault(a => a.QuestionId == question.Id);
+
+                    var correctAnswer = question.ListeningAnswers
+                        .FirstOrDefault(a => a.IsCorrect);
+
+                    var questionResult = new QuestionResultDto
+                    {
+                        QuestionId = question.Id,
+                        Question = question.Question,
+                        QuestionType = "Listening",
+                        QuestionAudioUrl = question.ListeningSoundURL,
+                        UserSelectedAnswerId = submitted?.SelectedAnswerId,
+                        UserSelectedAnswer = submitted != null ? 
+                            question.ListeningAnswers.FirstOrDefault(a => a.Id == submitted.SelectedAnswerId)?.Content : null,
+                        CorrectAnswerId = correctAnswer?.Id ?? 0,
+                        CorrectAnswer = correctAnswer?.Content,
+                        IsCorrect = submitted != null && correctAnswer != null && submitted.SelectedAnswerId == correctAnswer.Id,
+                        AnswerOptions = question.ListeningAnswers.Select(a => new AnswerOptionDto
+                        {
+                            Id = a.Id,
+                            Content = a.Content,
+                            IsCorrect = a.IsCorrect
+                        }).ToList()
+                    };
+
+                    if (questionResult.IsCorrect)
+                    {
+                        result.CorrectCount++;
+                    }
+
+                    result.QuestionResults.Add(questionResult);
+                }
+            }
+            if (testSet.ListeningQuestions.Count == 0 || testSet.ListeningQuestions == null)
+            {
+                // Reading Test
+                result.TotalQuestions = testSet.ReadingQuestions.Count;
+
+                foreach (var question in testSet.ReadingQuestions)
+                {
+                    var submitted = submitTestDto.Answers
+                        .FirstOrDefault(a => a.QuestionId == question.Id);
+
+                    var correctAnswer = question.ReadingAnswers
+                        .FirstOrDefault(a => a.IsCorrect);
+
+                    var questionResult = new QuestionResultDto
+                    {
+                        QuestionId = question.Id,
+                        Question = question.Question,
+                        QuestionType = "Reading",
+                        QuestionImageUrl = question.ReadingImageURL,
+                        UserSelectedAnswerId = submitted?.SelectedAnswerId,
+                        UserSelectedAnswer = submitted != null ? 
+                            question.ReadingAnswers.FirstOrDefault(a => a.Id == submitted.SelectedAnswerId)?.Content : null,
+                        CorrectAnswerId = correctAnswer?.Id ?? 0,
+                        CorrectAnswer = correctAnswer?.Content,
+                        IsCorrect = submitted != null && correctAnswer != null && submitted.SelectedAnswerId == correctAnswer.Id,
+                        AnswerOptions = question.ReadingAnswers.Select(a => new AnswerOptionDto
+                        {
+                            Id = a.Id,
+                            Content = a.Content,
+                            IsCorrect = a.IsCorrect
+                        }).ToList()
+                    };
+
+                    if (questionResult.IsCorrect)
+                    {
+                        result.CorrectCount++;
+                    }
+
+                    result.QuestionResults.Add(questionResult);
+                }
+            }
+
+            result.ScorePercentage = result.TotalQuestions == 0 ? 0 : Math.Round(100.0 * result.CorrectCount / result.TotalQuestions, 2);
+            return result;
+        }
+
+        public async Task<Result> UpdateReadingQuestionsAsync(int testSetId, List<int> questionIds)
+        {
+            try
+            {
+                // Validate input
+                if (testSetId <= 0)
+                    return Result.Failure("ID đề thi không hợp lệ.");
+
+                if (questionIds == null)
+                    return Result.Failure("Danh sách câu hỏi không được để trống.");
+
+                // Get test set with current questions
+                var testSet = await _unitOfWork.TestSetRepository.GetAll()
+                    .Include(ts => ts.ReadingQuestions)
+                    .FirstOrDefaultAsync(ts => ts.Id == testSetId);
+
+                if (testSet == null)
+                    return Result.Failure("Không tìm thấy đề thi.");
+
+                // Get all questions that need to be updated
+                var questions = await _unitOfWork.ReadingQuestionRepository.GetAll()
+                    .Where(q => questionIds.Contains(q.Id))
+                    .ToListAsync();
+
+                if (questions.Count != questionIds.Count)
+                    return Result.Failure("Một số câu hỏi không tồn tại trong hệ thống.");
+
+                // Remove questions that are no longer in the test set
+                var questionsToRemove = testSet.ReadingQuestions
+                    .Where(q => !questionIds.Contains(q.Id))
+                    .ToList();
+
+                foreach (var question in questionsToRemove)
+                {
+                    question.TestSetId = null;
+                    await _unitOfWork.ReadingQuestionRepository.Update(question);
+                }
+
+                // Add new questions to the test set
+                var questionsToAdd = questions
+                    .Where(q => q.TestSetId != testSetId)
+                    .ToList();
+
+                foreach (var question in questionsToAdd)
+                {
+                    question.TestSetId = testSetId;
+                    await _unitOfWork.ReadingQuestionRepository.Update(question);
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+                return Result.Success("Cập nhật câu hỏi đọc thành công.");
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure($"Có lỗi khi cập nhật câu hỏi đọc: {ex.Message}");
+            }
+        }
+
+        public async Task<Result> UpdateListeningQuestionsAsync(int testSetId, List<int> questionIds)
+        {
+            try
+            {
+                // Validate input
+                if (testSetId <= 0)
+                    return Result.Failure("ID đề thi không hợp lệ.");
+
+                if (questionIds == null)
+                    return Result.Failure("Danh sách câu hỏi không được để trống.");
+
+                // Get test set with current questions
+                var testSet = await _unitOfWork.TestSetRepository.GetAll()
+                    .Include(ts => ts.ListeningQuestions)
+                    .FirstOrDefaultAsync(ts => ts.Id == testSetId);
+
+                if (testSet == null)
+                    return Result.Failure("Không tìm thấy đề thi.");
+
+                // Get all questions that need to be updated
+                var questions = await _unitOfWork.ListenQuestionRepository.GetAll()
+                    .Where(q => questionIds.Contains(q.Id))
+                    .ToListAsync();
+
+                if (questions.Count != questionIds.Count)
+                    return Result.Failure("Một số câu hỏi không tồn tại trong hệ thống.");
+
+                // Remove questions that are no longer in the test set
+                var questionsToRemove = testSet.ListeningQuestions
+                    .Where(q => !questionIds.Contains(q.Id))
+                    .ToList();
+
+                foreach (var question in questionsToRemove)
+                {
+                    question.TestSetId = null;
+                    await _unitOfWork.ListenQuestionRepository.Update(question);
+                }
+
+                // Add new questions to the test set
+                var questionsToAdd = questions
+                    .Where(q => q.TestSetId != testSetId)
+                    .ToList();
+
+                foreach (var question in questionsToAdd)
+                {
+                    question.TestSetId = testSetId;
+                    await _unitOfWork.ListenQuestionRepository.Update(question);
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+                return Result.Success("Cập nhật câu hỏi nghe thành công.");
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure($"Có lỗi khi cập nhật câu hỏi nghe: {ex.Message}");
+            }
+        }
+
     }
 }

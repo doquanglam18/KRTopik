@@ -43,6 +43,7 @@
             font-size: 1.3rem;
         }
     </style>
+    @RenderSection("Styles", required: false)
 
 </head>
 
@@ -65,7 +66,7 @@
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" asp-action="ManageReadingQuestion" asp-controller="Admin">
                     <i class="fas fa-fw fa-file-alt"></i>
                     <span>Quản lý câu hỏi đọc</span>
@@ -85,14 +86,6 @@
                     <span>Quản lý đề thi</span>
                 </a>
             </li>
-
-            <li class="nav-item">
-                <a class="nav-link" asp-action="ManageComment" asp-controller="Admin">
-                    <i class="fas fa-fw fa-file-alt"></i>
-                    <span>Quản lý bình luận</span>
-                </a>
-            </li>
-
 
             <li class="nav-item">
                 <a class="nav-link" asp-action="ManageKoreaBlog" asp-controller="Admin">

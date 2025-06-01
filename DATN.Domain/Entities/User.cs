@@ -21,6 +21,9 @@ namespace DATN.Domain.Entities
         public Role Role { get; set; }
         public string? VerificationToken { get; set; }
 
+/*        public string? ResetPasswordToken { get; set; }
+        public DateTime? ResetPasswordTokenExpiry { get; set; }*/
+
         public List<SystemLogging>? SystemLoggings { get; set; }
 
         public List<RatingBlog>? RatingBlogs { get; set; }

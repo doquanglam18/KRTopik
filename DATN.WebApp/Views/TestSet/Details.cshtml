@@ -6,139 +6,554 @@
     var avgRating = (Model.Comments != null && Model.Comments.Any())
         ? Model.Comments.Average(c => c.Rating)
         : 0;
+    var avgRatingDisplay = avgRating.ToString("F1"); // Format to one decimal place
 }
 
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-5">
-                    <h2 class="text-center text-primary mb-4">@Model.TestName</h2>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            @{
-                                var userInfo = ViewData["UserInfo"] as DATN.Application.Dtos.UserDtos.UserOwnerDto;
-                            }
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <style>
+        :root {
+            --theme-primary: #007bff; /* #5E72E4; */
+            --theme-primary-dark: #0056b3; /* #324CBB; */
+            --theme-secondary: #6c757d; /* #8898AA; */
+            --theme-success: #28a745; /* #2DCE89; */
+            --theme-success-dark: #1e7e34; /* #24A46D; */
+            --theme-warning: #ffc107; /* #FB6340; */ /* Changed to Bootstrap default yellow for stars */
+            --theme-info: #17a2b8; /* #11CDEF; */
+            --theme-light-gray: #f4f6f9; /* #F8F9FA; */
+            --theme-text-dark: #333; /* #32325D; */
+            --theme-text-light: #555; /* #525F7F; */
+            --theme-border-color: #dee2e6; /* #E9ECEF; */
+            --theme-card-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            --theme-card-radius: 1rem; /* 16px */
+            --theme-button-radius: 0.5rem; /* 8px */
+        }
 
-                            @if (userInfo != null)
-                            {
-                                <div class="d-flex align-items-center mb-3">
-                                    <img src="@userInfo.AvatarImageUrl" alt="Avatar" class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;" />
-                                    <div>
-                                        <p class="mb-0"><strong>Người tạo:</strong> @userInfo.FullName</p>
+        body {
+            background-color: var(--theme-light-gray);
+            color: var(--theme-text-dark);
+        }
+
+        .details-section {
+            padding: 50px 0;
+        }
+
+        .card-details {
+            background-color: #fff;
+            border-radius: var(--theme-card-radius);
+            box-shadow: var(--theme-card-shadow);
+            border: none;
+            overflow: hidden; /* To ensure child elements respect border-radius */
+        }
+
+            .card-details .card-body {
+                padding: 30px 40px; /* Adjusted padding */
+            }
+
+        .test-title {
+            font-size: 2.2rem; /* Slightly reduced for balance */
+            font-weight: 700;
+            color: var(--theme-text-dark);
+            margin-bottom: 25px;
+            line-height: 1.3;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            color: var(--theme-text-light);
+            margin-bottom: 12px;
+            padding: 10px;
+            background-color: #fdfdff;
+            border-radius: 0.5rem;
+            border: 1px solid #eef2f7;
+        }
+
+            .info-item strong {
+                color: var(--theme-text-dark);
+                font-weight: 600;
+                margin-left: 5px;
+            }
+
+            .info-item i.bi {
+                color: var(--theme-primary);
+                font-size: 1.5rem; /* Increased icon size */
+                margin-right: 12px;
+                min-width: 24px; /* Ensure alignment */
+                text-align: center;
+            }
+
+        .creator-info .comment-avatar {
+            width: 48px;
+            height: 48px;
+            border: 2px solid var(--theme-primary);
+        }
+
+        .creator-info p {
+            margin-bottom: 0;
+        }
+
+        .rating-stars i {
+            font-size: 1.1rem; /* Slightly larger stars */
+            color: var(--theme-warning);
+        }
+
+        .rating-stars .bi-star {
+            color: #ccc;
+        }
+
+
+        .btn-do-test {
+            background: linear-gradient(135deg, var(--theme-success) 0%, var(--theme-success-dark) 100%);
+            border: none;
+            border-radius: var(--theme-button-radius);
+            padding: 14px 35px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+            .btn-do-test:hover {
+                transform: translateY(-3px) scale(1.03);
+                box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+                color: white;
+            }
+
+            .btn-do-test i {
+                margin-right: 8px;
+            }
+
+        .modal-content {
+            border-radius: var(--theme-card-radius);
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
+            color: white;
+            border-top-left-radius: var(--theme-card-radius);
+            border-top-right-radius: var(--theme-card-radius);
+            border-bottom: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+            .modal-header .modal-title {
+                font-weight: 600;
+            }
+
+            .modal-header .btn-close-white {
+                filter: invert(1) grayscale(100%) brightness(200%);
+            }
+
+
+        .form-floating > .form-control {
+            border-radius: var(--theme-button-radius);
+            border: 1px solid var(--theme-border-color);
+            padding: 1rem;
+        }
+
+        .form-floating > label {
+            padding: 1rem 1.25rem;
+            color: var(--theme-text-light);
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--theme-border-color);
+            background-color: #fcfdff;
+            border-bottom-left-radius: var(--theme-card-radius);
+            border-bottom-right-radius: var(--theme-card-radius);
+        }
+
+            .modal-footer .btn {
+                padding: 0.75rem 1.5rem;
+                font-weight: 500;
+                border-radius: var(--theme-button-radius);
+            }
+
+            .modal-footer .btn-primary {
+                background-color: var(--theme-primary);
+                border-color: var(--theme-primary);
+            }
+
+                .modal-footer .btn-primary:hover {
+                    background-color: var(--theme-primary-dark);
+                    border-color: var(--theme-primary-dark);
+                }
+
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--theme-text-dark);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--theme-primary);
+            display: inline-block;
+        }
+
+            .section-title i {
+                margin-right: 10px;
+                color: var(--theme-primary);
+            }
+
+
+        .comment-card {
+            background-color: #fff;
+            border-radius: var(--theme-button-radius); /* Slightly smaller radius for nested cards */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--theme-border-color);
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+
+            .comment-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            }
+
+            .comment-card .card-body {
+                padding: 20px;
+            }
+
+        .comment-avatar {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--theme-primary-dark);
+        }
+
+        .comment-user-name {
+            font-weight: 600;
+            color: var(--theme-text-dark);
+            margin-bottom: 3px;
+            font-size: 1.1rem;
+        }
+
+        .comment-rating i {
+            color: var(--theme-warning);
+            font-size: 0.95rem;
+        }
+
+        .comment-content {
+            color: var(--theme-text-light);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .comment-date {
+            font-size: 0.85rem;
+            color: var(--theme-secondary);
+        }
+
+        .no-comments {
+            padding: 20px;
+            text-align: center;
+            background-color: #f9f9f9;
+            border-radius: var(--theme-button-radius);
+            color: var(--theme-text-light);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--theme-text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: var(--theme-button-radius);
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--theme-border-color);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--theme-primary);
+                box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25); /* Bootstrap focus shadow */
+            }
+
+        textarea.form-control {
+            min-height: 120px;
+        }
+
+        .rating-input-group .form-check-input {
+            margin-top: .3em;
+            transform: scale(1.2); /* Make radio buttons slightly larger */
+        }
+
+        .rating-input-group .form-check-label {
+            display: inline-flex;
+            align-items: center;
+            font-size: 1rem;
+            color: var(--theme-text-light);
+        }
+
+            .rating-input-group .form-check-label i {
+                color: var(--theme-warning);
+                margin-left: 4px;
+            }
+
+        .btn-send-comment {
+            background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
+            border: none;
+            border-radius: var(--theme-button-radius);
+            padding: 10px 25px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+            .btn-send-comment:hover {
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+                color: white;
+            }
+
+            .btn-send-comment i {
+                margin-right: 6px;
+            }
+
+        hr.my-5 {
+            margin-top: 3rem !important;
+            margin-bottom: 3rem !important;
+            border-top: 1px solid var(--theme-border-color);
+        }
+
+    </style>
+}
+
+<section class="details-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="card card-details">
+                    <div class="card-body">
+                        <h1 class="text-center test-title">@Model.TestName</h1>
+
+                        <div class="row mb-4">
+                            <div class="col-lg-6 mb-3 mb-lg-0">
+                                @{
+                                    var userInfo = ViewData["UserInfo"] as DATN.Application.Dtos.UserDtos.UserOwnerDto;
+                                }
+
+                                @if (userInfo != null)
+                                {
+                                    <div class="info-item creator-info">
+                                        <img src="@userInfo.AvatarImageUrl" alt="Avatar" class="me-3 comment-avatar" />
+                                        <div>
+                                            <span class="text-muted d-block" style="font-size:0.9em">Người tạo:</span>
+                                            <strong class="fs-6">@userInfo.FullName</strong>
+                                        </div>
                                     </div>
+                                }
+                                else
+                                {
+                                    <div class="info-item">
+                                        <i class="bi bi-person-fill-slash"></i>
+                                        <div><strong>Người tạo:</strong> Không xác định</div>
+                                    </div>
+                                }
+
+                                <div class="info-item">
+                                    <i class="bi bi-music-note-list"></i>
+                                    <div><strong>Câu nghe:</strong> @Model.CountListeningQuestion câu</div>
                                 </div>
-                            }
-                            else
-                            {
-                                <p><strong>Người tạo:</strong> Không xác định</p>
-                            }
-
-                            <p><i class="bi bi-music-note-list"></i> <strong>Câu nghe:</strong> @Model.CountListeningQuestion</p>
-                            <p><i class="bi bi-book"></i> <strong>Câu đọc:</strong> @Model.CountReadingQuestion</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><i class="bi bi-people"></i> <strong>Số người đã làm:</strong> @Model.CountUserDo</p>
-                            <p><i class="bi bi-bar-chart-steps"></i> <strong>Trình độ:</strong> @Model.RankQuestionName</p>
-                            <p>
-                                <i class="bi bi-star-half"></i> <strong>Đánh giá trung bình:</strong>
-                                <span class="text-warning">
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        if (i <= Math.Floor(avgRating))
-                                        {
-                                            <i class="bi bi-star-fill"></i>
-                                        }
-                                        else if (i - avgRating < 1)
-                                        {
-                                            <i class="bi bi-star-half"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-star"></i>
-                                        }
-                                    }
-                                </span>
-                                <span class="text-muted">(@avgRating.ToString("0.0")/5)</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="text-center">
-                        <a asp-controller="TestSet" asp-action="DoTestSet" asp-route-id="@Model.Id" class="btn btn-lg btn-success shadow">
-                            <i class="bi bi-pencil-square me-2"></i> Làm bài ngay
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-5">
-                <h4 class="mb-4"><i class="bi bi-chat-left-text"></i> Bình luận từ người dùng</h4>
-
-                @if (Model.Comments != null && Model.Comments.Any())
-                {
-                    foreach (var comment in Model.Comments)
-                    {
-                        <div class="card mb-3 border-0 shadow-sm">
-                            <div class="card-body d-flex">
-                                <img src="@comment.UserAvatar" class="rounded-circle border me-4" width="64" height="64" alt="Avatar" style="object-fit: cover;" />
-                                <div>
-                                    <h5 class="mb-1">@comment.UserName</h5>
-                                    <div class="text-warning mb-2">
-                                        @for (int i = 1; i <= 5; i++)
-                                        {
-                                            if (i <= comment.Rating)
+                                <div class="info-item">
+                                    <i class="bi bi-book-fill"></i>
+                                    <div><strong>Câu đọc:</strong> @Model.CountReadingQuestion câu</div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="info-item">
+                                    <i class="bi bi-people-fill"></i>
+                                    <div><strong>Số người đã làm:</strong> @Model.CountUserDo lượt</div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="bi bi-bar-chart-line-fill"></i>
+                                    <div><strong>Trình độ:</strong> @Model.RankQuestionName</div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="bi bi-star-fill"></i>
+                                    <div>
+                                        <strong>Đánh giá:</strong>
+                                        <span class="ms-1 rating-stars">
+                                            @for (int i = 1; i <= 5; i++)
                                             {
-                                                <i class="bi bi-star-fill"></i>
+                                                if (avgRating >= i) // Full star
+                                                {
+                                                    <i class="bi bi-star-fill"></i>
+                                                }
+                                                else if (avgRating > i - 1 && avgRating < i) // Half star logic improved
+                                                {
+                                                    var decimalPart = avgRating - Math.Floor(avgRating);
+                                                    if (decimalPart >= 0.75)
+                                                    {
+                                                        <i class="bi bi-star-fill"></i>
+                                                        ;
+                                                    }
+                                                    else if (decimalPart >= 0.25)
+                                                    {
+                                                        <i class="bi bi-star-half"></i>
+                                                        ;
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-star"></i>
+                                                        ;
+                                                    }
+                                                }
+                                                else // Empty star
+                                                {
+                                                    <i class="bi bi-star"></i>
+                                                }
                                             }
-                                            else
-                                            {
-                                                <i class="bi bi-star"></i>
-                                            }
-                                        }
+                                        </span>
+                                        <span class="text-muted ms-1">(@avgRatingDisplay / 5.0)</span>
                                     </div>
-                                    <p class="mb-1">@comment.Content</p>
-                                    <small class="text-muted">Đăng lúc: @comment.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
                                 </div>
                             </div>
                         </div>
-                    }
-                }
-                else
-                {
-                    <p class="text-muted">Chưa có bình luận nào.</p>
-                }
-                <hr class="my-5" />
 
-                <h4 class="mb-3"><i class="bi bi-pencil-square"></i> Viết bình luận của bạn</h4>
+                        <div class="text-center my-4 pt-3">
+                            <button type="button" class="btn btn-lg btn-do-test" id="openTestModalBtn" data-bs-toggle="modal" data-bs-target="#startTestModal">
+                                <i class="bi bi-play-circle-fill"></i> Làm bài ngay
+                            </button>
+                        </div>
 
-                <form asp-controller="TestSet" asp-action="PostComment" method="post">
-                    <input type="hidden" name="TestSetId" value="@Model.Id" />
+                        <!-- Modal nhập thời gian -->
+                        <div class="modal fade" id="startTestModal" tabindex="-1" aria-labelledby="startTestModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <form asp-controller="TestSet" asp-action="DoTestSet" method="get">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="startTestModalLabel"><i class="bi bi-alarm-fill me-2"></i>Xác nhận thời gian làm bài</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <input type="hidden" name="id" value="@Model.Id" />
 
-                    <div class="mb-3">
-                        <label for="Content" class="form-label">Nội dung</label>
-                        <textarea name="Content" class="form-control" rows="4" required></textarea>
-                    </div>
+                                            <div class="form-floating mb-3">
+                                                <input type="number" class="form-control" name="timeLimit" id="timeLimit" min="1" max="100" value="60" required />
+                                                <label for="timeLimit">Thời gian làm bài (phút)</label>
+                                            </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Đánh giá</label>
-                        <div>
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="Rating" id="rating_@i" value="@i" @(i == 5 ? "checked" : "") />
-                                    <label class="form-check-label" for="rating_@i">@i <i class="bi bi-star-fill text-warning"></i></label>
+                                            <div class="alert alert-info d-flex align-items-center small" role="alert">
+                                                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                                                <div>
+                                                    Thời gian làm bài được tính bằng phút. Tối đa <strong>100 phút</strong>.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                <i class="bi bi-x-circle me-1"></i>Hủy
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-check-circle-fill me-1"></i>Bắt đầu làm bài
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
-                            }
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-send"></i> Gửi bình luận
-                    </button>
-                </form>
+                <div class="mt-5 pt-3">
+                    <h3 class="section-title mb-4"><i class="bi bi-chat-square-text-fill"></i> Bình luận từ người dùng</h3>
 
+                    @if (Model.Comments != null && Model.Comments.Any())
+                    {
+                        foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedDate)) // Sort by newest first
+                        {
+                            <div class="card comment-card mb-3">
+                                <div class="card-body d-flex align-items-start">
+                                    <img src="@comment.UserAvatar" class="me-3 comment-avatar" alt="Avatar @comment.UserName"
+                                         onerror="this.onerror=null; this.src='https://via.placeholder.com/50/EBF0F8/8898AA?text=U';" />
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="comment-user-name mb-0">@comment.UserName</h5>
+                                            <small class="comment-date">@comment.CreatedDate.ToString("dd/MM/yyyy 'lúc' HH:mm")</small>
+                                        </div>
+                                        <div class="text-warning my-1 comment-rating">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <i class="bi @(i <= comment.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                            }
+                                        </div>
+                                        <p class="comment-content">@Html.Raw(System.Text.Encodings.Web.HtmlEncoder.Default.Encode(comment.Content ?? "").Replace("\n", "<br />"))</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="no-comments">
+                            <i class="bi bi-chat-dots-fill fs-3 d-block mb-2"></i>
+                            Chưa có bình luận nào cho bộ đề này. Hãy là người đầu tiên chia sẻ cảm nghĩ của bạn!
+                        </div>
+                    }
+                    <hr class="my-5" />
+
+                    <h3 class="section-title mb-4"><i class="bi bi-pencil-fill"></i> Viết bình luận của bạn</h3>
+
+                    <form asp-controller="TestSet" asp-action="PostComment" method="post" class="p-3 bg-white rounded shadow-sm border">
+                        <input type="hidden" name="TestSetId" value="@Model.Id" />
+
+                        <div class="mb-3">
+                            <label for="Content" class="form-label">Nội dung bình luận:</label>
+                            <textarea name="Content" id="Content" class="form-control" rows="4" placeholder="Chia sẻ cảm nghĩ của bạn về bộ đề thi này..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label d-block">Đánh giá của bạn:</label>
+                            <div class="rating-input-group">
+                                @for (int i = 5; i >= 1; i--) // Display 5 stars first for better UX
+                                {
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="Rating" id="rating_@i" value="@i" @(i == 5 ? "checked" : "") required />
+                                        <label class="form-check-label" for="rating_@i">@i <i class="bi bi-star-fill"></i></label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-send-comment">
+                            <i class="bi bi-send-fill"></i> Gửi bình luận
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+@section Scripts {
+    <script>
+        // Small script to improve star rating display if needed,
+        // or handle any other dynamic interactions.
+        document.addEventListener('DOMContentLoaded', function () {
+            // Example: Smooth scroll to comment form if a link directs there
+            const writeCommentLink = document.querySelector('a[href="#write-comment"]');
+            if (writeCommentLink) {
+                writeCommentLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.getElementById('Content').focus();
+                });
+            }
+        });
+    </script>
+}

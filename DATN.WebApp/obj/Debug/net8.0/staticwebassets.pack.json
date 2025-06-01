@@ -7829,8 +7829,16 @@
       "PackagePath": "staticwebassets\\themelef\\images\\logokr.png"
     },
     {
+      "Id": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\themelef\\images\\logokrnotext.png",
+      "PackagePath": "staticwebassets\\themelef\\images\\logokrnotext.png"
+    },
+    {
       "Id": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\themelef\\images\\newskorea.png",
       "PackagePath": "staticwebassets\\themelef\\images\\newskorea.png"
+    },
+    {
+      "Id": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\themelef\\images\\newslogo.png",
+      "PackagePath": "staticwebassets\\themelef\\images\\newslogo.png"
     },
     {
       "Id": "D:\\DATN2025\\DATN\\DATN.WebApp\\wwwroot\\themelef\\images\\person_1.jpg",

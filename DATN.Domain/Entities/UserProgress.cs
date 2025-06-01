@@ -17,7 +17,6 @@ namespace DATN.Domain.Entities
         public DateTime FirstAttemptAt { get; set; }
         public DateTime LastAttemptAt { get; set; }
         public DateTime CompletedAt { get; set; }
-        public bool IsDelete { get; set; }
 
         public User User { get; set; }
 

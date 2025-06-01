@@ -8,6 +8,7 @@ namespace DATN.Application.Dtos.ListeningDtos
 {
     public class ListeningQuestionForTestDto
     {
+        public int Id { get; set; }
         public string Question { get; set; }
         public string ListeningSoundURL { get; set; }
         public List<ListeningAnswerForTestDto> ListeningAnswers { get; set; }

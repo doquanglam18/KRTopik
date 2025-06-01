@@ -1,0 +1,27 @@
+﻿using DATN.Application.Dtos.UserProgressDtos;
+using DATN.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DATN.Application.Dtos.UserDtos
+{
+    public class UserDetailForUserDto
+    {
+        public string FullName { get; set; }
+        public string? AvatarImageUrl { get; set; }
+        public string Email { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public int NumberOfContributions { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
+        public string RoleName { get; set; }
+
+        public List<UserProgressDto>? UserProgresses { get; set; }
+
+        public int CommentCount { get; set; }
+        public bool IsActive { get; set; }
+    }
+}

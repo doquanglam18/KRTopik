@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using DATN.Application.Dtos.BaseDtos;
 using DATN.Application.Dtos.ListeningDtos;
+using DATN.Application.Dtos.ListeningDtos.ForAddTestSet;
+using DATN.Application.Dtos.ReadingDtos;
+using DATN.Application.Dtos.ReadingDtos.ForAddTestSet;
 using DATN.Application.Services.Interfaces;
 using DATN.Domain.Entities;
 using DATN.Infrastructure.UnitOfWork;
@@ -78,6 +81,7 @@ namespace DATN.Application.Services.Implements
                     return Result.Failure("Không thể xóa câu hỏi đang thuộc 1 đề ôn tập !");
                 }
 
+
                 // Xóa câu hỏi
                 await _unitOfWork.ListenQuestionRepository.Delete(listeningQuestion);
                 await _unitOfWork.SaveChangesAsync();
@@ -115,6 +119,97 @@ namespace DATN.Application.Services.Implements
                 TotalItem = totalItem,
                 Items = _mapper.Map<List<ListeningQuestionDto>>(listeningQuestions)
             };
+        }
+        public async Task<List<ListeningQsDto>> GetListeningByRankIDNoPagging(int rankQuestionId)
+        {
+            var listeningQuestions = await _unitOfWork.ListenQuestionRepository
+                .GetAll()
+                .Include(u => u.RankQuestion)
+                .Include(u => u.ListeningAnswers)
+                .Include(u => u.TestSet)
+                .Where(u => u.RankQuestionId == rankQuestionId)
+                .Where(u => u.IsPublic == true)
+                .Where(u => u.TestSet == null)
+                .ToListAsync();
+
+            var listeningQuestionsDto = _mapper.Map<List<ListeningQsDto>>(listeningQuestions);
+            return listeningQuestionsDto;
+        }
+
+        public async Task<PageResultDto<ListeningQsDto>> GetListeningByRankID(int rankQuestionId, int page, int pageSize)
+        {
+            try
+            {
+                Console.WriteLine($"Getting listening questions for rank {rankQuestionId}, page {page}, pageSize {pageSize}");
+                
+                var query = _unitOfWork.ListenQuestionRepository.GetAllForPaging()
+                    .Include(u => u.RankQuestion)
+                    .Include(u => u.ListeningAnswers)
+                    .Include(u => u.TestSet)
+                    .Where(u => u.RankQuestionId == rankQuestionId);
+
+                var totalItem = query.Count();
+                Console.WriteLine($"Total items in database: {totalItem}");
+
+                if (totalItem == 0)
+                {
+                    Console.WriteLine("No questions found in database for this rank");
+                    return new PageResultDto<ListeningQsDto>
+                    {
+                        Page = page,
+                        PageSize = pageSize,
+                        TotalItem = 0,
+                        Items = new List<ListeningQsDto>()
+                    };
+                }
+
+                var listeningQuestions = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+                Console.WriteLine($"Retrieved {listeningQuestions.Count} questions from database");
+
+                if (listeningQuestions.Count == 0)
+                {
+                    Console.WriteLine("No questions found after paging");
+                    return new PageResultDto<ListeningQsDto>
+                    {
+                        Page = page,
+                        PageSize = pageSize,
+                        TotalItem = totalItem,
+                        Items = new List<ListeningQsDto>()
+                    };
+                }
+
+                var mappedItems = _mapper.Map<List<ListeningQsDto>>(listeningQuestions);
+                Console.WriteLine($"Mapped {mappedItems?.Count ?? 0} items to DTOs");
+
+                if (mappedItems == null || mappedItems.Count == 0)
+                {
+                    Console.WriteLine("Mapping resulted in no items");
+                    return new PageResultDto<ListeningQsDto>
+                    {
+                        Page = page,
+                        PageSize = pageSize,
+                        TotalItem = totalItem,
+                        Items = new List<ListeningQsDto>()
+                    };
+                }
+
+                var result = new PageResultDto<ListeningQsDto>
+                {
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalItem = totalItem,
+                    Items = mappedItems
+                };
+
+                Console.WriteLine($"Returning {result.Items.Count} items");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetListeningByRankID: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         public async Task<ListeningQuestion> GetListeningQuestionByIdAsync(int id)

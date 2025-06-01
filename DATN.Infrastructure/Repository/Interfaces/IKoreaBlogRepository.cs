@@ -9,5 +9,6 @@ namespace DATN.Infrastructure.Repository.Interfaces
 {
     public interface IKoreaBlogRepository : IGenericRepository<KoreaBlog>
     {
+        IQueryable<KoreaBlog> GetAllForPaging();
     }
 }

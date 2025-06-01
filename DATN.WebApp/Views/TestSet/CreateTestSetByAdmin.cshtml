@@ -1,0 +1,900 @@
+@using DATN.Application.Dtos.RankQuestionDtos
+@using DATN.Application.Dtos.ReadingDtos.ForAddTestSet
+@using DATN.Application.Dtos.ListeningDtos.ForAddTestSet
+@{
+    ViewData["Title"] = "Tạo bộ đề mới";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var rankQuestions = ViewData["RankQuestions"] as IEnumerable<RankQuestionDto>;
+    // Xử lý dữ liệu câu hỏi
+    List<ReadingQsDto> readingQuestions = null;
+    List<ListeningQsDto> listeningQuestions = null;
+
+    if (ViewData["Question"] != null)
+    {
+        // Thử cast sang cả hai loại
+        readingQuestions = ViewData["Question"] as List<ReadingQsDto>;
+        listeningQuestions = ViewData["Question"] as List<ListeningQsDto>;
+    }
+}
+
+@section Styles {
+    <style>
+        .create-test-section {
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+
+        .create-test-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .header-gradient {
+            background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #3A8DFF;
+            box-shadow: 0 0 0 0.2rem rgba(58, 141, 255, 0.25);
+        }
+
+        .question-list {
+            margin-top: 2rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .question-card.selected {
+            border-color: #3A8DFF;
+            background: #e8f0fe;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .question-type-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-reading {
+            background: #e8f0fe;
+            color: #3A8DFF;
+        }
+
+        .badge-listening {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading-spinner.active {
+            display: block;
+        }
+
+        .selected-question-tag {
+            background-color: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #1976d2;
+        }
+
+        .selected-question-tag .remove-question {
+            cursor: pointer;
+            color: #f44336;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .selected-question-tag .remove-question:hover {
+            color: #d32f2f;
+        }
+
+        .question-content {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .answers-container {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .list-group-item {
+            border: 1px solid #e9ecef;
+            margin-bottom: 4px;
+            border-radius: 4px !important;
+        }
+
+        .list-group-item-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-color: rgba(40, 167, 69, 0.2);
+        }
+
+        .audio-container {
+            background-color: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+
+        .image-container {
+            background-color: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .table td {
+            vertical-align: top;
+            padding: 12px;
+        }
+
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .selected-count-badge {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            margin: 0;
+            padding: 10px 15px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .highlight-error {
+            animation: shake 0.5s;
+            border: 2px solid #dc3545;
+        }
+
+        @@keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .question-checkbox:checked + .question-content {
+            background-color: #e8f0fe;
+            border-left-color: #3A8DFF;
+        }
+
+        .table tr.selected {
+            background-color: #e8f0fe;
+        }
+
+        .image-container img {
+            transition: transform 0.2s;
+        }
+
+        .image-container img:hover {
+            transform: scale(1.05);
+        }
+
+        .audio-container audio {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .list-group-item .flex-grow-1 {
+            overflow: hidden;
+        }
+
+        .list-group-item .flex-grow-1 img {
+            max-height: 100px;
+            border-radius: 4px;
+        }
+
+        .list-group-item .flex-grow-1 audio {
+            max-width: 250px;
+        }
+    </style>
+}
+
+<div class="create-test-section">
+    <div class="container">
+        <div class="create-test-card">
+            <div class="header-gradient">
+                <h4 class="mb-0">📝 Tạo bộ đề mới</h4>
+            </div>
+
+            <form id="createTestForm" method="post" asp-action="CreateTestSet" asp-controller="TestSet">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="testName" class="form-label">Tên bộ đề</label>
+                        <input type="text" class="form-control" id="testName" name="TestName" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="rankSelect" class="form-label">Cấp độ</label>
+                        <select id="rankSelect" name="RankQuestionId" class="form-select" required>
+                            <option value="">-- Chọn cấp độ --</option>
+                            @foreach (var rank in rankQuestions)
+                            {
+                                <option value="@rank.Id">@rank.RankQuestionName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="question-list" id="questionList">
+                    <div class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Đang tải câu hỏi...</p>
+                    </div>
+                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                        <table class="table table-hover" id="questionsTable">
+                            <thead class="table-light sticky-top bg-light">
+                                <tr>
+                                    <th style="width: 50px;">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="selectAll">
+                                        </div>
+                                    </th>
+                                    <th style="width: 80px;">ID</th>
+                                    <th style="width: 40%;">Câu hỏi</th>
+                                    <th style="width: 30%;">Đáp án</th>
+                                    <th style="width: 150px;">Loại</th>
+                                    <th style="width: 100px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Questions will be loaded here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Câu hỏi đã chọn</h5>
+                            <button class="btn btn-danger" id="clearSelection">
+                                <i class="fas fa-trash-alt me-2"></i>Xóa tất cả
+                            </button>
+                        </div>
+                        <div class="selected-questions mt-3">
+                            <div id="selectedQuestionsList" class="d-flex flex-wrap gap-2">
+                                <!-- Selected questions will be displayed here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Tạo bộ đề
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xem chi tiết câu hỏi -->
+<div class="modal fade" id="questionDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết câu hỏi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="questionDetailsContent">
+                    <!-- Question details will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let selectedQuestions = new Set();
+
+            // Cập nhật danh sách câu hỏi đã chọn
+            function updateSelectedQuestions() {
+                selectedQuestions.clear();
+                $('.question-checkbox:checked').each(function() {
+                    const questionId = $(this).val();
+                    if (questionId) {
+                        selectedQuestions.add(questionId.toString());
+                    }
+                });
+                updateSelectedQuestionsDisplay();
+                
+                // Thêm visual feedback cho số lượng câu hỏi đã chọn
+                const selectedCount = selectedQuestions.size;
+                const $submitButton = $('#createTestForm button[type="submit"]');
+                
+                if (selectedCount === 0) {
+                    $submitButton.prop('disabled', true)
+                        .html('<i class="fas fa-exclamation-circle me-2"></i>Vui lòng chọn ít nhất một câu hỏi');
+                } else {
+                    $submitButton.prop('disabled', false)
+                        .html(`<i class="fas fa-save me-2"></i>Tạo bộ đề (${selectedCount} câu hỏi)`);
+                }
+
+                // Thêm thông báo số lượng câu hỏi đã chọn
+                const $questionList = $('#questionList');
+                let $countBadge = $questionList.find('.selected-count-badge');
+                if ($countBadge.length === 0) {
+                    $countBadge = $('<div class="selected-count-badge alert alert-info mb-3"></div>');
+                    $questionList.prepend($countBadge);
+                }
+                
+                if (selectedCount > 0) {
+                    $countBadge.html(`
+                        <i class="fas fa-check-circle me-2"></i>
+                        Đã chọn <strong>${selectedCount}</strong> câu hỏi
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="clearSelection">
+                            <i class="fas fa-trash-alt me-1"></i>Xóa tất cả
+                        </button>
+                    `).show();
+                } else {
+                    $countBadge.html(`
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Vui lòng chọn ít nhất một câu hỏi
+                    `).show();
+                }
+            }
+
+            // Xử lý chọn tất cả
+            $('#selectAll').change(function() {
+                const isChecked = $(this).prop('checked');
+                $('.question-checkbox').prop('checked', isChecked);
+                updateSelectedQuestions();
+            });
+
+            // Xử lý chọn từng câu hỏi
+            $(document).on('change', '.question-checkbox', function() {
+                const allChecked = $('.question-checkbox:checked').length === $('.question-checkbox').length;
+                $('#selectAll').prop('checked', allChecked);
+                updateSelectedQuestions();
+            });
+
+            // Hiển thị danh sách câu hỏi đã chọn
+            function updateSelectedQuestionsDisplay() {
+                const container = $('#selectedQuestionsList');
+                container.empty();
+
+                selectedQuestions.forEach(questionId => {
+                    const row = $(`tr[data-question-id="${questionId}"]`);
+                    if (row.length === 0) return;
+
+                    const questionText = row.find('td:eq(2) .question-content p').text().trim();
+                    const type = row.find('td:eq(4) .badge').text().trim();
+                    
+                    if (!questionText || !type) return;
+
+                    const tag = $(`
+                        <div class="selected-question-tag">
+                            <span>${type} - ${questionText.substring(0, 30)}${questionText.length > 30 ? '...' : ''}</span>
+                            <i class="fas fa-times remove-question" data-question-id="${questionId}"></i>
+                        </div>
+                    `);
+                    container.append(tag);
+                });
+            }
+
+            // Xử lý xóa câu hỏi khỏi danh sách đã chọn
+            $(document).on('click', '.remove-question', function() {
+                const questionId = $(this).data('question-id')?.toString();
+                if (!questionId) return;
+
+                selectedQuestions.delete(questionId);
+                $(`.question-checkbox[value="${questionId}"]`).prop('checked', false);
+                updateSelectedQuestions();
+            });
+
+            // Xử lý xóa tất cả câu hỏi đã chọn
+            $('#clearSelection').click(function() {
+                if (selectedQuestions.size === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Thông báo',
+                        text: 'Không có câu hỏi nào để xóa.'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: "Bạn có chắc chắn muốn xóa tất cả câu hỏi đã chọn?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        selectedQuestions.clear();
+                        $('.question-checkbox, #selectAll').prop('checked', false);
+                        updateSelectedQuestionsDisplay();
+                        Swal.fire('Đã xóa!', 'Tất cả câu hỏi đã được xóa khỏi danh sách.', 'success');
+                    }
+                });
+            });
+
+            // Hàm kiểm tra và xử lý URL Cloudinary
+            function isCloudinaryUrl(url) {
+                return url && (url.includes('cloudinary.com') || url.includes('res.cloudinary.com'));
+            }
+
+            // Hàm render nội dung câu hỏi hoặc đáp án
+            function renderContent(content) {
+                if (!content) return '';
+                
+                // Kiểm tra nếu là URL Cloudinary
+                if (isCloudinaryUrl(content)) {
+                    // Kiểm tra nếu là file âm thanh
+                    if (content.match(/\.(mp3|wav|ogg|m4a)$/i)) {
+                        return `
+                            <div class="audio-container mb-2">
+                                <audio controls class="w-100" style="max-width: 300px;">
+                                    <source src="${content}" type="audio/mpeg">
+                                    Trình duyệt của bạn không hỗ trợ audio.
+                                </audio>
+                            </div>`;
+                    }
+                    // Kiểm tra nếu là file ảnh
+                    else if (content.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                        return `
+                            <div class="image-container mb-2">
+                                <img src="${content}" class="img-fluid rounded" style="max-height: 150px;" 
+                                     onclick="showFullImage(this.src)" 
+                                     style="cursor: pointer;" />
+                            </div>`;
+                    }
+                }
+                
+                // Nếu không phải URL Cloudinary, trả về nội dung gốc
+                return content;
+            }
+
+            // Hàm hiển thị ảnh full size
+            function showFullImage(src) {
+                Swal.fire({
+                    imageUrl: src,
+                    imageAlt: 'Hình ảnh câu hỏi',
+                    width: 'auto',
+                    padding: '1em',
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    background: '#fff',
+                    backdrop: 'rgba(0,0,0,0.8)'
+                });
+            }
+
+            // Cập nhật phần render câu hỏi trong bảng
+            $('#rankSelect').change(function() {
+                const rankId = $(this).val();
+                if (!rankId) {
+                    $('#questionList tbody').empty();
+                     // Hiển thị thông báo chọn cấp độ
+                    $('#questionList tbody').html('<tr><td colspan="6" class="text-center">Vui lòng chọn cấp độ để tải câu hỏi.</td></tr>');
+                    return;
+                }
+
+                if (selectedQuestions.size > 0) {
+                    Swal.fire({
+                        title: 'Cảnh báo!',
+                        text: 'Thay đổi cấp độ sẽ xóa tất cả câu hỏi đã chọn. Bạn có muốn tiếp tục?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Tiếp tục',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            // Reset to previous value
+                            $(this).val($(this).data('previous-value') || '');
+                            return;
+                        }
+                        // Store current value for next change
+                        $(this).data('previous-value', rankId);
+                        // Clear selected questions
+                        selectedQuestions.clear();
+                        updateSelectedQuestionsDisplay();
+                         // Sau khi xác nhận xóa và thay đổi cấp độ, fetch câu hỏi mới
+                         fetchQuestions(rankId);
+                    });
+                } else {
+                    // Store current value for next change
+                    $(this).data('previous-value', rankId);
+                    // Nếu không có câu hỏi nào được chọn, fetch luôn
+                    fetchQuestions(rankId);
+                }
+            });
+
+            // Hàm fetch và hiển thị câu hỏi
+            function fetchQuestions(rankId) {
+                 // Show loading spinner
+                $('.loading-spinner').addClass('active');
+                $('#questionList tbody').empty(); // Xóa nội dung cũ trước khi fetch
+
+                // Fetch questions based on rank
+                $.ajax({
+                    url: `/TestSet/CreateTestSetByAdmin?rankQuestionId=${rankId}`,
+                    type: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function(data) {
+                        $('.loading-spinner').removeClass('active');
+                        
+                        console.log("AJAX success. Data received:", data);
+
+                        // Clear previous questions (redundant but safe)
+                        $('#questionList tbody').empty();
+                        
+                        if (data.success) { // Kiểm tra thuộc tính success
+                            if (Array.isArray(data.questions) && data.questions.length > 0) {
+                                console.log("Found questions:", data.questions.length);
+                                data.questions.forEach(function(question) {
+                                    // Xác định loại câu hỏi dựa vào cấu trúc dữ liệu hoặc rankId
+                                    const questionType = question.listeningAnswers !== undefined ? 'Listening' : 'Reading';
+                                    const badgeClass = questionType === 'Reading' ? 'bg-primary' : 'bg-info';
+                                    
+                                    // Xử lý nội dung câu hỏi chính
+                                    // Sử dụng renderContent ngay đây để xử lý URL trong nội dung câu hỏi
+                                    const questionContentHtml = renderContent(question.question);
+                                    
+                                    // Xử lý media riêng cho Listening/Reading
+                                    let mediaContentHtml = '';
+                                    if (questionType === 'Listening' && question.listeningSoundURL) {
+                                         mediaContentHtml = renderContent(question.listeningSoundURL);
+                                    } else if (questionType === 'Reading' && question.readingImageURL) {
+                                         mediaContentHtml = renderContent(question.readingImageURL);
+                                    }
+
+                                    // Xử lý đáp án
+                                    const answers = questionType === 'Listening' ? question.listeningAnswers : question.readingAnswers;
+                                    let answersHtml = '';
+                                    if (answers && Array.isArray(answers)) {
+                                         answersHtml = answers.map(answer => {
+                                            // Sử dụng renderContent cho nội dung đáp án
+                                             const answerContentHtml = renderContent(answer.content);
+                                             return `
+                                                 <div class="list-group-item p-2 ${answer.isCorrect ? 'list-group-item-success' : ''}">
+                                                     <div class="d-flex align-items-center">
+                                                         <span class="badge ${answer.isCorrect ? 'bg-success' : 'bg-secondary'} me-2">
+                                                             ${answer.isCorrect ? '✓' : '○'}
+                                                         </span>
+                                                         <div class="flex-grow-1">${answerContentHtml}</div>
+                                                     </div>
+                                                 </div>
+                                             `;
+                                         }).join('');
+                                    }
+
+
+                                    const questionRow = `
+                                        <tr data-question-id="${question.id}">
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input question-checkbox" 
+                                                           type="checkbox" 
+                                                           value="${question.id}">
+                                                </div>
+                                            </td>
+                                            <td>${question.id}</td>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <div class="question-content mb-2">
+                                                        <strong>Câu hỏi:</strong>
+                                                        <div class="mb-2">${questionContentHtml}</div>
+                                                        ${mediaContentHtml}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="answers-container">
+                                                    <div class="list-group">
+                                                        ${answersHtml}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge ${badgeClass}">${questionType}</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary view-details" data-question-id="${question.id}">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                    $('#questionList tbody').append(questionRow);
+                                });
+
+                                // Reset select all checkbox
+                                $('#selectAll').prop('checked', false);
+                                // Clear selected questions
+                                selectedQuestions.clear();
+                                updateSelectedQuestionsDisplay();
+
+                            } else {
+                                console.log("API success but no questions found.");
+                                $('#questionList tbody').html('<tr><td colspan="6" class="text-center">Không có câu hỏi nào cho cấp độ này.</td></tr>');
+                            }
+                        } else { // Xử lý khi success là false
+                            console.error("API returned error:", data.message);
+                             Swal.fire({
+                                title: 'Lỗi!',
+                                text: data.message || 'Có lỗi xảy ra khi tải câu hỏi.', // Hiển thị thông báo lỗi từ controller
+                                icon: 'error'
+                            });
+                            $('#questionList tbody').html('<tr><td colspan="6" class="text-center">Không thể tải câu hỏi. Vui lòng thử lại sau.</td></tr>'); // Hoặc một thông báo lỗi khác
+                        }
+                    },
+                    error: function(xhr) {
+                        $('.loading-spinner').removeClass('active');
+                        console.error('AJAX Error:', xhr);
+                         let errorMessage = 'Không thể kết nối đến máy chủ để tải câu hỏi.'; // Thông báo lỗi chung cho trường hợp lỗi mạng/server
+                         if (xhr.responseJSON && xhr.responseJSON.message) {
+                              errorMessage = xhr.responseJSON.message; // Nếu controller trả về JSON lỗi có message
+                         } else if (xhr.responseText) {
+                             // Fallback: cố gắng hiển thị response text nếu không có JSON message
+                             errorMessage = "Lỗi máy chủ: " + xhr.responseText.substring(0, 100) + "..."; // Giới hạn độ dài
+                         }
+                         Swal.fire({
+                            title: 'Lỗi!',
+                            text: errorMessage,
+                            icon: 'error'
+                        });
+                        $('#questionList tbody').html('<tr><td colspan="6" class="text-center">Không thể tải câu hỏi. Vui lòng thử lại sau.</td></tr>');
+                    }
+                });
+            }
+
+            // Xử lý xem chi tiết câu hỏi
+            $(document).on('click', '.view-details', function() {
+                const questionId = $(this).data('question-id')?.toString();
+                if (!questionId) return;
+
+                const row = $(`tr[data-question-id="${questionId}"]`);
+                if (row.length === 0) return;
+
+                // Lấy nội dung HTML đã được render trong bảng
+                const questionContentHtml = row.find('td:eq(2) .question-content .mb-2').html()?.trim();
+                const mediaContentHtml = row.find('td:eq(2) .question-content > .audio-container, td:eq(2) .question-content > .image-container').prop('outerHTML') || '';
+                const type = row.find('td:eq(4) .badge').text()?.trim();
+                if (!questionContentHtml || !type) return;
+
+                let answersHtml = '';
+                 row.find('.answers-container .list-group-item').each(function() {
+                     answersHtml += $(this).prop('outerHTML');
+                 });
+
+                let content = `
+                    <div class="mb-3">
+                        <h6 class="text-muted">Loại câu hỏi</h6>
+                        <span class="badge ${type === 'Listening' ? 'bg-info' : 'bg-primary'}">${type}</span>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted">Câu hỏi</h6>
+                        <div class="p-3 bg-light rounded">${questionContentHtml} ${mediaContentHtml}</div> // Bao gồm cả media
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted">Đáp án</h6>
+                        <div class="list-group">${answersHtml}</div>
+                    </div>`;
+
+                $('#questionDetailsContent').html(content);
+                $('#questionDetailsModal').modal('show');
+            });
+
+            // Form submission
+            $('#createTestForm').submit(function(e) {
+                e.preventDefault();
+                
+                // Validate test name
+                const testName = $('#testName').val().trim();
+                if (!testName) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Vui lòng nhập tên bộ đề.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    $('#testName').focus();
+                    return;
+                }
+
+                // Validate rank selection
+                const rankId = $('#rankSelect').val();
+                if (!rankId) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Vui lòng chọn cấp độ cho bộ đề.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    $('#rankSelect').focus();
+                    return;
+                }
+
+                // Validate selected questions
+                if (selectedQuestions.size === 0) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Vui lòng chọn ít nhất một câu hỏi cho bộ đề.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    // Scroll to question list and highlight
+                    $('html, body').animate({
+                        scrollTop: $('#questionList').offset().top - 100
+                    }, 500);
+                    $('#questionList').addClass('highlight-error');
+                    setTimeout(() => {
+                        $('#questionList').removeClass('highlight-error');
+                    }, 2000);
+                    return;
+                }
+
+                // Show confirmation dialog
+                Swal.fire({
+                    title: 'Xác nhận tạo bộ đề?',
+                    html: `
+                        <div class="text-start">
+                            <p><strong>Tên bộ đề:</strong> ${testName}</p>
+                            <p><strong>Cấp độ:</strong> ${$('#rankSelect option:selected').text()}</p>
+                            <p><strong>Số câu hỏi đã chọn:</strong> ${selectedQuestions.size}</p>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Tạo bộ đề',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        Swal.fire({
+                            title: 'Đang tạo bộ đề...',
+                            text: 'Vui lòng đợi trong giây lát.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        const formData = {
+                            testName: testName,
+                            rankQuestionId: rankId,
+                            questionIds: Array.from(selectedQuestions)
+                        };
+
+                        // Submit form
+                        $.ajax({
+                            url: '/TestSet/CreateTestSet',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(formData),
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Thành công!',
+                                        text: 'Bộ đề đã được tạo thành công.',
+                                        icon: 'success',
+                                        confirmButtonText: 'OK'
+                                    }).then(() => {
+                                        window.location.href = '/Admin/ManageTestSet';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Lỗi!',
+                                        text: response.message || 'Có lỗi xảy ra khi tạo bộ đề.',
+                                        icon: 'error',
+                                        confirmButtonText: 'OK'
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                let errorMessage = 'Có lỗi xảy ra khi tạo bộ đề.';
+                                try {
+                                    const response = JSON.parse(xhr.responseText);
+                                    if (response.message) {
+                                        errorMessage = response.message;
+                                    }
+                                } catch (e) {
+                                    console.error('Error parsing response:', e);
+                                }
+                                Swal.fire({
+                                    title: 'Lỗi!',
+                                    text: errorMessage,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Update row selection style
+            $(document).on('change', '.question-checkbox', function() {
+                const $row = $(this).closest('tr');
+                if (this.checked) {
+                    $row.addClass('selected');
+                } else {
+                    $row.removeClass('selected');
+                }
+            });
+
+            // Initialize submit button state
+            updateSelectedQuestions();
+        });
+    </script>
+} 

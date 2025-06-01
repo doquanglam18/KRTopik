@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DATN.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+25e8494fcc41381421750f995d9d1b2a2a0236c4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee161cee05f75d3362fa630454e4761068b21feb")]
 [assembly: System.Reflection.AssemblyProductAttribute("DATN.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DATN.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

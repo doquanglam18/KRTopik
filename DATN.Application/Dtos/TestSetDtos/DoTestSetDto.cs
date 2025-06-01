@@ -20,6 +20,6 @@ namespace DATN.Application.Dtos.TestSetDtos
         public List<ReadingQuestionForTestDto>? readingQuestions { get; set; }
         public string RankQuestionName { get; set; }
 
-        public int AvgRating { get; set; }
+        public double AvgRating { get; set; }
     }
 }
