@@ -319,6 +319,35 @@
             vertical-align: text-bottom;
         }
 
+    /* Script Container Styles */
+    .script-container {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .script-container:hover {
+        background-color: #f1f3f5;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .script-container h6 {
+        color: #6c5ce7;
+        font-weight: 600;
+    }
+
+    .script-container .bi {
+        margin-right: 0.5rem;
+    }
+
+    .script-text {
+        color: #495057;
+        line-height: 1.6;
+        font-size: 0.95rem;
+        white-space: pre-line;
+    }
+
     /* SweetAlert Customizations */
     .swal2-popup {
         border-radius: 1rem !important;
@@ -415,6 +444,16 @@
                                         <source src="@question.QuestionAudioUrl" type="audio/mpeg" />
                                         Trình duyệt không hỗ trợ audio.
                                     </audio>
+                                }
+
+                                @if (question.QuestionType == "Listening" && !string.IsNullOrEmpty(question.ListeningScript))
+                                {
+                                    <div class="script-container mt-3 p-3 bg-light rounded">
+                                        <h6 class="mb-2 text-primary">
+                                            <i class="bi bi-file-text"></i> Script:
+                                        </h6>
+                                        <p class="mb-0 script-text">@Html.Raw(@question.ListeningScript)</p>
+                                    </div>
                                 }
                             </div>
 

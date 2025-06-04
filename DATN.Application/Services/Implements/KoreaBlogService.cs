@@ -100,6 +100,27 @@ namespace DATN.Application.Services.Implements
             return blog;
         }
 
+        public async Task<Result> UpdateViewBlog(int id)
+        {
+            var koreaBlog = await _unitOfWork.KoreaBlogRepository.GetByIdAsync(id);
+            if (koreaBlog == null)
+            {
+                return Result.Failure("Không tìm thấy blog với ID đã cho.");
+            }
+            try
+            {
+                koreaBlog.View += 1; // Tăng số lượt xem lên 1
+                await _unitOfWork.KoreaBlogRepository.Update(koreaBlog);
+                await _unitOfWork.SaveChangesAsync();
+
+                return Result.Success("Cập nhật lượt xem blog thành công.");
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure("Đã xảy ra lỗi khi cập nhật lượt xem blog: " + ex.Message);
+            }
+        }
+
         public async Task<Result> UpdateKoreaBlogAsync(KoreaBlog koreaBlog)
         {
             try

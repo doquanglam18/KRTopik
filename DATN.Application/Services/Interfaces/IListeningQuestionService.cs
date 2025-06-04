@@ -18,7 +18,9 @@ namespace DATN.Application.Services.Interfaces
         Task<Result> UpdateListeningQuestionAsync(ListeningQuestion listeningQuestion);
         Task<Result> DeleteListeningQuestionAsync(int id);
         Task<PageResultDto<ListeningQuestionDto>> GetAllListeningQuestionsPagingAsync(int page, int pageSize);
-        Task<PageResultDto<ListeningQsDto>> GetListeningByRankID(int rankQuestionId, int page, int pageSize);
+        Task<PageResultDto<ListeningQsDto>> GetListeningByRankID(int rankQuestionId, int page, int pageSize, int testSetId);
         Task<List<ListeningQsDto>> GetListeningByRankIDNoPagging(int rankQuestionId);
+
+        Task<Result> UpdateListeningQuestionAsyncByIdForNullTestSet(int questionId);
     }
 }

@@ -6,6 +6,39 @@
     Layout = "~/Views/Shared/_SystemAdminLayout.cshtml";
 }
 
+<style>
+    .table-container {
+        max-height: 600px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+    }
+    
+    .table-container thead th {
+        position: sticky;
+        top: 0;
+        background-color: #212529;
+        z-index: 1;
+    }
+
+    .table-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+
 <div class="container-fluid p-3">
     <div class="d-flex justify-content-center align-items-center">
         <h1 class="h3 mb-4 text-primary fw-bold">Nhật ký hệ thống</h1>
@@ -13,17 +46,17 @@
 
     @if (Model != null && Model.Any())
     {
-        <div class="table-responsive">
-            <table class="table table-hover table-bordered w-100">
+        <div class="table-container">
+            <table class="table table-hover table-bordered mb-0">
                 <thead class="table-dark text-white text-center">
                     <tr>
-                        <th>STT</th>
-                        <th>Người dùng</th>
-                        <th>IP</th>
-                        <th>Hành động</th>
+                        <th style="width: 80px">STT</th>
+                        <th style="width: 150px">Người dùng</th>
+                        <th style="width: 120px">IP</th>
+                        <th style="width: 150px">Hành động</th>
                         <th>Chi tiết</th>
-                        <th>Ngày tạo</th>
-                        <th>Ngày cập nhật</th>
+                        <th style="width: 150px">Ngày tạo</th>
+                        <th style="width: 150px">Ngày cập nhật</th>
                     </tr>
                 </thead>
                 <tbody>

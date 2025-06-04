@@ -71,6 +71,8 @@ namespace DATN.WebApp.Controllers
                 return NotFound("Không có thông tin người dùng.");
             }
 
+            await _httpClient.PutAsync($"{apiUrl}/updateView/{id}", null);
+
             // Chuyển "data" thành UserOwnerDto
             var user = JsonSerializer.Deserialize<UserOwnerDto>(dataElement.GetRawText(), new JsonSerializerOptions
             {
@@ -86,6 +88,12 @@ namespace DATN.WebApp.Controllers
         [HttpGet]
         public IActionResult CreateKoreaBlog()
         {
+            // Kiểm tra xem người dùng đã đăng nhập chưa
+            var token = HttpContext.Session.GetString("JWTToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                return Json(new { success = false, message = "Bạn cần đăng nhập mới có thể đăng bài!" });
+            }
             return View();
         }
 

@@ -188,10 +188,10 @@ namespace DATN.WebAPI.Controllers
         }
 
 
-        [HttpGet("forAddTest/{rankQuestionId}/{page}/{pageSize}")]
-        public async Task<IActionResult> GetListeningQuestionForAddTest([FromRoute] int rankQuestionId , [FromRoute] int page, [FromRoute] int pageSize)
+        [HttpGet("forAddTest/{rankQuestionId}/{page}/{pageSize}/{testSetId}")]
+        public async Task<IActionResult> GetListeningQuestionForAddTest([FromRoute] int rankQuestionId , [FromRoute] int page, [FromRoute] int pageSize, [FromRoute] int testSetId)
         {
-            var listeningQuestions = await _listeningQuestionService.GetListeningByRankID(rankQuestionId, page, pageSize);
+            var listeningQuestions = await _listeningQuestionService.GetListeningByRankID(rankQuestionId, page, pageSize, testSetId);
             return Ok(listeningQuestions);
         }
 

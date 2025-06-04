@@ -32,7 +32,7 @@
         }
 
         .header-gradient {
-            background: linear-gradient(90deg, #D16BA5, #3A8DFF);
+            background: linear-gradient(90deg, #D16BA5,rgb(125, 174, 242));
             color: white;
             padding: 1rem 2rem;
             border-radius: 10px;
@@ -260,7 +260,11 @@
                 <h4 class="mb-0">📝 Tạo bộ đề mới</h4>
             </div>
 
-            <form id="createTestForm" method="post" asp-action="CreateTestSet" asp-controller="TestSet">
+            <form id="createTestForm" method="post" asp-action="CreateTestSetByAdmin" asp-controller="TestSet">
+                <input type="hidden" id="createdBy" name="CreatedBy" value="@User.FindFirst("UserId")?.Value" />
+                <input type="hidden" id="isDelete" name="IsDelele" value="false" />
+                <input type="hidden" id="createdDate" name="CreatedDate" value="@DateTime.UtcNow.ToString("o")" />
+                <input type="hidden" id="updatedDate" name="UpdatedDate" value="@DateTime.UtcNow.ToString("o")" />
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="testName" class="form-label">Tên bộ đề</label>
@@ -352,23 +356,30 @@
 </div>
 
 @section Scripts {
+    <!-- Add SweetAlert2 library -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
         $(document).ready(function() {
             let selectedQuestions = new Set();
 
             // Cập nhật danh sách câu hỏi đã chọn
             function updateSelectedQuestions() {
+                console.log('Updating selected questions...'); // Debug log
                 selectedQuestions.clear();
                 $('.question-checkbox:checked').each(function() {
                     const questionId = $(this).val();
+                    console.log('Found checked question:', questionId); // Debug log
                     if (questionId) {
                         selectedQuestions.add(questionId.toString());
                     }
                 });
+                console.log('Current selected questions:', Array.from(selectedQuestions)); // Debug log
                 updateSelectedQuestionsDisplay();
                 
                 // Thêm visual feedback cho số lượng câu hỏi đã chọn
                 const selectedCount = selectedQuestions.size;
+                console.log('Selected count:', selectedCount); // Debug log
                 const $submitButton = $('#createTestForm button[type="submit"]');
                 
                 if (selectedCount === 0) {
@@ -412,6 +423,7 @@
 
             // Xử lý chọn từng câu hỏi
             $(document).on('change', '.question-checkbox', function() {
+                console.log('Checkbox changed:', $(this).val(), $(this).prop('checked')); // Debug log
                 const allChecked = $('.question-checkbox:checked').length === $('.question-checkbox').length;
                 $('#selectAll').prop('checked', allChecked);
                 updateSelectedQuestions();
@@ -426,19 +438,28 @@
                     const row = $(`tr[data-question-id="${questionId}"]`);
                     if (row.length === 0) return;
 
-                    const questionText = row.find('td:eq(2) .question-content p').text().trim();
+                    // Sửa lại cách lấy nội dung câu hỏi
+                    const questionContent = row.find('td:eq(2) .question-content .mb-2').text().trim();
                     const type = row.find('td:eq(4) .badge').text().trim();
                     
-                    if (!questionText || !type) return;
+                    if (!questionContent || !type) {
+                        console.log('Could not find content for question:', questionId); // Debug log
+                        return;
+                    }
+
+                    console.log('Adding question to display:', { id: questionId, content: questionContent, type: type }); // Debug log
 
                     const tag = $(`
                         <div class="selected-question-tag">
-                            <span>${type} - ${questionText.substring(0, 30)}${questionText.length > 30 ? '...' : ''}</span>
+                            <span>${type} - ${questionContent.substring(0, 30)}${questionContent.length > 30 ? '...' : ''}</span>
                             <i class="fas fa-times remove-question" data-question-id="${questionId}"></i>
                         </div>
                     `);
                     container.append(tag);
                 });
+
+                // Debug log số lượng câu hỏi đã hiển thị
+                console.log('Displayed questions count:', container.children().length);
             }
 
             // Xử lý xóa câu hỏi khỏi danh sách đã chọn
@@ -754,6 +775,8 @@
             // Form submission
             $('#createTestForm').submit(function(e) {
                 e.preventDefault();
+                console.log('Form submitted'); // Debug log
+                console.log('Selected questions at submit:', Array.from(selectedQuestions)); // Debug log
                 
                 // Validate test name
                 const testName = $('#testName').val().trim();
@@ -782,14 +805,15 @@
                 }
 
                 // Validate selected questions
-                if (selectedQuestions.size === 0) {
+                const selectedCount = selectedQuestions.size;
+                console.log('Validating selected questions count:', selectedCount); // Debug log
+                if (!selectedCount || selectedCount === 0) {
                     Swal.fire({
                         title: 'Lỗi!',
                         text: 'Vui lòng chọn ít nhất một câu hỏi cho bộ đề.',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
-                    // Scroll to question list and highlight
                     $('html, body').animate({
                         scrollTop: $('#questionList').offset().top - 100
                     }, 500);
@@ -818,6 +842,8 @@
                     cancelButtonText: 'Hủy'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        console.log('User confirmed creation'); // Debug log
+                        
                         // Show loading state
                         Swal.fire({
                             title: 'Đang tạo bộ đề...',
@@ -830,38 +856,65 @@
                             }
                         });
 
-                        const formData = {
-                            testName: testName,
-                            rankQuestionId: rankId,
-                            questionIds: Array.from(selectedQuestions)
+                        // Tạo object dữ liệu
+                        const requestData = {
+                            TestName: testName,
+                            RankQuestionId: parseInt(rankId),
+                            CreatedBy: crypto.randomUUID(), // Tạo một Guid mới
+                            IsDelele: $('#isDelete').val() === 'true',
+                            CreatedDate: $('#createdDate').val(),
+                            UpdatedDate: $('#updatedDate').val(),
+                            QuestionIds: Array.from(selectedQuestions).map(id => parseInt(id))
                         };
 
-                        // Submit form
+                        console.log('CreatedBy (new Guid):', requestData.CreatedBy); // Debug log
+                        console.log('Full request data:', requestData); // Debug log
+
+                        // Gửi request bằng jQuery AJAX
                         $.ajax({
-                            url: '/TestSet/CreateTestSet',
+                            url: $('#createTestForm').attr('action'),
                             type: 'POST',
+                            data: JSON.stringify(requestData),
                             contentType: 'application/json',
-                            data: JSON.stringify(formData),
+                            dataType: 'json',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            beforeSend: function(xhr) {
+                                console.log('Request is being sent...');
+                            },
                             success: function(response) {
+                                console.log('Response received:', response);
                                 if (response.success) {
                                     Swal.fire({
-                                        title: 'Thành công!',
-                                        text: 'Bộ đề đã được tạo thành công.',
                                         icon: 'success',
-                                        confirmButtonText: 'OK'
+                                        title: 'Thành công!',
+                                        text: response.message || 'Bộ đề đã được tạo thành công.',
+                                        showConfirmButton: true
                                     }).then(() => {
-                                        window.location.href = '/Admin/ManageTestSet';
+                                        if (response.redirectUrl) {
+                                            window.location.href = response.redirectUrl;
+                                        } else {
+                                            window.location.href = '@Url.Action("ListTestSetForAdmin", "TestSet")';
+                                        }
                                     });
                                 } else {
+                                    console.error('Error in response:', response);
                                     Swal.fire({
-                                        title: 'Lỗi!',
-                                        text: response.message || 'Có lỗi xảy ra khi tạo bộ đề.',
                                         icon: 'error',
-                                        confirmButtonText: 'OK'
+                                        title: 'Lỗi!',
+                                        text: response.message || 'Có lỗi xảy ra khi tạo bộ đề.'
                                     });
                                 }
                             },
-                            error: function(xhr) {
+                            error: function(xhr, status, error) {
+                                console.error('AJAX Error:', {
+                                    status: status,
+                                    error: error,
+                                    response: xhr.responseText
+                                });
                                 let errorMessage = 'Có lỗi xảy ra khi tạo bộ đề.';
                                 try {
                                     const response = JSON.parse(xhr.responseText);
@@ -872,10 +925,9 @@
                                     console.error('Error parsing response:', e);
                                 }
                                 Swal.fire({
-                                    title: 'Lỗi!',
-                                    text: errorMessage,
                                     icon: 'error',
-                                    confirmButtonText: 'OK'
+                                    title: 'Lỗi!',
+                                    text: errorMessage
                                 });
                             }
                         });

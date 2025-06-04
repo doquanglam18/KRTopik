@@ -15,7 +15,7 @@ namespace DATN.Application.Services.Interfaces
     {
         Task<IEnumerable<TestSet>> GetAllTestSetAsync();
         Task<TestSet> GetTestSetByIdAsync(int id);
-        Task<Result> CreateTestSetAsync(TestSet testSet);
+        Task<ResultV<int>> CreateTestSetAsync(TestSet testSet);
         Task<Result> UpdateTestSetAsync(TestSet testSet);
         Task<Result> DeleteTestSetAsync(int id);
         Task<PageResultDto<TestSetForUserDto>> GetAllTestSetPagingAsync(int page, int pageSize);

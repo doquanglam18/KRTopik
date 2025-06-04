@@ -18,6 +18,7 @@ namespace DATN.Application.Dtos.TestSetDtos
         public string QuestionType { get; set; } // "Listening" or "Reading"
         public string QuestionImageUrl { get; set; } // For reading questions
         public string QuestionAudioUrl { get; set; } // For listening questions
+        public string? ListeningScript { get; set; } // Script for listening questions
         public int? UserSelectedAnswerId { get; set; }
         public string UserSelectedAnswer { get; set; }
         public int CorrectAnswerId { get; set; }

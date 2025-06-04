@@ -7,6 +7,7 @@ using DATN.Application.Dtos.ReadingDtos.ForAddTestSet;
 using DATN.Application.Services.Interfaces;
 using DATN.Domain.Entities;
 using DATN.Infrastructure.UnitOfWork;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -103,11 +104,13 @@ namespace DATN.Application.Services.Implements
         }
 
         public async Task<PageResultDto<ListeningQuestionDto>> GetAllListeningQuestionsPagingAsync(int page, int pageSize)
-        {
-            var query = _unitOfWork.ListenQuestionRepository.GetAllForPaging()
+        {    
+             var   query = _unitOfWork.ListenQuestionRepository.GetAllForPaging()
                .Include(u => u.RankQuestion)
                .Include(u => u.ListeningAnswers)
                .Include(u => u.TestSet);
+            
+
             var totalItem = query.Count();
 
             var listeningQuestions = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
@@ -136,7 +139,7 @@ namespace DATN.Application.Services.Implements
             return listeningQuestionsDto;
         }
 
-        public async Task<PageResultDto<ListeningQsDto>> GetListeningByRankID(int rankQuestionId, int page, int pageSize)
+        public async Task<PageResultDto<ListeningQsDto>> GetListeningByRankID(int rankQuestionId, int page, int pageSize, int testSetId)
         {
             try
             {
@@ -146,7 +149,8 @@ namespace DATN.Application.Services.Implements
                     .Include(u => u.RankQuestion)
                     .Include(u => u.ListeningAnswers)
                     .Include(u => u.TestSet)
-                    .Where(u => u.RankQuestionId == rankQuestionId);
+                    .Where(u => u.RankQuestionId == rankQuestionId)
+                    .Where(u => u.TestSetId == testSetId || u.TestSetId == null);
 
                 var totalItem = query.Count();
                 Console.WriteLine($"Total items in database: {totalItem}");
@@ -216,6 +220,44 @@ namespace DATN.Application.Services.Implements
         {
             var listeningQuestion = await _unitOfWork.ListenQuestionRepository.GetByIdAsync(id);
             return listeningQuestion;
+        }
+        public async Task<Result> UpdateListeningQuestionAsyncByIdForNullTestSet(int questionId)
+        {
+            try
+            {
+                // Lấy câu hỏi và kiểm tra null
+                var question = await GetListeningQuestionByIdAsync(questionId);
+                if (question == null)
+                {
+                    return Result.Failure($"Không tìm thấy câu hỏi với ID: {questionId}");
+                }
+
+                // Kiểm tra xem câu hỏi có thuộc test set nào không
+                if (question.TestSetId == null)
+                {
+                    return Result.Success("Câu hỏi đã không thuộc test set nào.");
+                }
+
+                // Cập nhật TestSetId thành null
+                question.TestSetId = null;
+
+                // Lưu thay đổi
+                await _unitOfWork.ListenQuestionRepository.Update(question);
+                var saveResult = await _unitOfWork.SaveChangesAsync();
+
+                if (saveResult > 0)
+                {
+                    return Result.Success("Cập nhật câu hỏi thành công.");
+                }
+                else
+                {
+                    return Result.Failure("Không có thay đổi nào được lưu.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure($"Có lỗi xảy ra khi cập nhật câu hỏi: {ex.Message}");
+            }
         }
 
         public async Task<Result> UpdateListeningQuestionAsync(ListeningQuestion existingQuestion)

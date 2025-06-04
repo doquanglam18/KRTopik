@@ -14,6 +14,7 @@ builder.Services.AddSession(options =>
 });
 
 
+
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.ConfigureApplicationCookie(options =>

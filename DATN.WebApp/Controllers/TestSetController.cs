@@ -20,6 +20,8 @@ using DATN.Application.Dtos.ListeningDtos.ForAddTestSet;
 using DATN.Application.Dtos.ReadingDtos.ForAddTestSet;
 using Microsoft.AspNetCore.Authentication;
 using System.Drawing.Printing;
+using Microsoft.Extensions.Logging;
+using System.IO;
 
 namespace DATN.WebApp.Controllers
 {
@@ -30,10 +32,13 @@ namespace DATN.WebApp.Controllers
 
         private readonly HttpClient _httpClient;
         private const string apiUrl = "https://localhost:7208/api/testset";
+        private const string API_BASE_URL = "https://localhost:7208/api";
+        private readonly ILogger<TestSetController> _logger;
 
-        public TestSetController(HttpClient httpClient)
+        public TestSetController(HttpClient httpClient, ILogger<TestSetController> logger)
         {
             _httpClient = httpClient;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -107,14 +112,24 @@ namespace DATN.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> DoTestSet(int id, int timeLimit)
         {
-
             // Kiểm tra xem người dùng đã đăng nhập chưa bằng Session JWTToken
             var token = HttpContext.Session.GetString("JWTToken");
 
             if (string.IsNullOrEmpty(token))
             {
-                // Nếu chưa có token, chuyển hướng về trang đăng nhập
+                // Nếu là AJAX request, trả về status code 401
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Unauthorized();
+                }
+                // Nếu là request thông thường, chuyển hướng về trang đăng nhập
                 return RedirectToAction("Login", "User");
+            }
+
+            // Nếu là AJAX request và đã đăng nhập, trả về OK
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Ok();
             }
 
             var handler = new JwtSecurityTokenHandler();
@@ -236,7 +251,7 @@ namespace DATN.WebApp.Controllers
 
                 if ((testSet.RankQuestionId >= 1 && testSet.RankQuestionId <= 12) || testSet.RankQuestionId == 21)
                 {
-                    questions = await _httpClient.GetAsync($"https://localhost:7208/api/readingquestion/forAddTest/{testSet.RankQuestionId}/{page}/{pageSize}");
+                    questions = await _httpClient.GetAsync($"https://localhost:7208/api/readingquestion/forAddTest/{testSet.RankQuestionId}/{page}/{pageSize}/{testSetId}");
                     if (questions.IsSuccessStatusCode)
                     {
                         var readingQuestions = await questions.Content.ReadFromJsonAsync<PageResultDto<ReadingQsDto>>();
@@ -245,7 +260,7 @@ namespace DATN.WebApp.Controllers
                 }
                 else if(testSet.RankQuestionId >= 13 && testSet.RankQuestionId <= 20)
                 {
-                    questions = await _httpClient.GetAsync($"https://localhost:7208/api/listeningquestion/forAddTest/{testSet.RankQuestionId}/{page}/{pageSize}");
+                    questions = await _httpClient.GetAsync($"https://localhost:7208/api/listeningquestion/forAddTest/{testSet.RankQuestionId}/{page}/{pageSize}/{testSetId}");
                     if (questions.IsSuccessStatusCode)
                     {
                         var listeningQuestions = await questions.Content.ReadFromJsonAsync<PageResultDto<ListeningQsDto>>();
@@ -320,6 +335,19 @@ namespace DATN.WebApp.Controllers
         {
             try
             {
+
+                // Lấy token từ session hoặc nơi lưu trữ token
+                var token = HttpContext.Session.GetString("JWTToken"); // hoặc lấy từ Cookie, TempData...
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(new { message = "Token xác thực không tồn tại hoặc đã hết hạn." });
+                }
+
+                // Thêm Authorization header vào HttpClient
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+
                 // Lấy dữ liệu từ API (bất đồng bộ)
                 var rankQuestions = await _httpClient.GetFromJsonAsync<IEnumerable<RankQuestionDto>>("https://localhost:7208/api/rankquestion/getall");
                 ViewData["RankQuestions"] = rankQuestions;
@@ -405,6 +433,228 @@ namespace DATN.WebApp.Controllers
                 return StatusCode(500, "Có lỗi xảy ra khi tải trang tạo đề thi.");
             }
         }
+
+
+        [HttpPost]
+        [Consumes("application/json")]
+        public async Task<IActionResult> CreateTestSetByAdmin([FromBody] TestSetForCreateDto model)
+        {
+            // Log chi tiết về request
+            _logger.LogInformation("=== CreateTestSetByAdmin POST Action Started ===");
+            _logger.LogInformation($"Request Content-Type: {Request.ContentType}");
+            _logger.LogInformation($"Request Headers: {string.Join(", ", Request.Headers.Select(h => $"{h.Key}: {h.Value}"))}");
+            
+            // Log raw request body
+            Request.EnableBuffering();
+            var body = await new StreamReader(Request.Body).ReadToEndAsync();
+            Request.Body.Position = 0;
+            _logger.LogInformation($"Raw request body: {body}");
+
+            // Log model binding result
+            _logger.LogInformation($"Model binding result: {System.Text.Json.JsonSerializer.Serialize(model)}");
+            _logger.LogInformation($"ModelState.IsValid: {ModelState.IsValid}");
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ModelState Errors:");
+                foreach (var modelStateEntry in ModelState.Values)
+                {
+                    foreach (var error in modelStateEntry.Errors)
+                    {
+                        _logger.LogWarning($"Error: {error.ErrorMessage}");
+                    }
+                }
+            }
+
+            // Validate QuestionIds
+            if (model == null)
+            {
+                _logger.LogWarning("Model is null");
+                return Json(new { 
+                    success = false, 
+                    message = "Dữ liệu không hợp lệ." 
+                });
+            }
+
+            _logger.LogInformation($"Model properties: TestName={model.TestName}, RankQuestionId={model.RankQuestionId}, CreatedBy={model.CreatedBy}, QuestionIds count={model.QuestionIds?.Count ?? 0}");
+
+            if (model.QuestionIds == null || !model.QuestionIds.Any())
+            {
+                _logger.LogWarning("QuestionIds is null or empty");
+                return Json(new { 
+                    success = false, 
+                    message = "Danh sách câu hỏi không được để trống." 
+                });
+            }
+
+            try
+            {
+                // Lấy token từ session
+                var token = HttpContext.Session.GetString("JWTToken");
+                _logger.LogInformation($"JWT Token exists: {!string.IsNullOrEmpty(token)}");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogWarning("JWT Token is missing");
+                    return Unauthorized(new { message = "Token xác thực không tồn tại hoặc đã hết hạn." });
+                }
+
+                // Thêm Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                _logger.LogInformation("Authorization header added to HttpClient");
+
+                // Gọi API
+                _logger.LogInformation($"Calling API: {API_BASE_URL}/testset/create");
+                var response = await _httpClient.PostAsJsonAsync($"{API_BASE_URL}/testset/create", model);
+                _logger.LogInformation($"API Response Status: {response.StatusCode}");
+
+                var responseContent = await response.Content.ReadFromJsonAsync<ApiResponse>();
+                _logger.LogInformation($"API Response Content: {System.Text.Json.JsonSerializer.Serialize(responseContent)}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Test set created successfully");
+                    return Json(new { 
+                        success = true, 
+                        message = "Tạo đề thi thành công!",
+                        redirectUrl = Url.Action("ManageTestSet", "Admin") 
+                    });
+                }
+                else
+                {
+                    var errorMessage = "Không thể tạo bộ đề thi. Vui lòng thử lại sau.";
+                    try 
+                    {
+                        var errorResponse = await response.Content.ReadFromJsonAsync<ApiResponse>();
+                        if (errorResponse?.Message != null)
+                        {
+                            errorMessage = errorResponse.Message;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Error parsing API response: {ex.Message}");
+                    }
+
+                    _logger.LogWarning($"Failed to create test set: {errorMessage}");
+                    return Json(new { 
+                        success = false, 
+                        message = errorMessage 
+                    });
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError($"API Connection Error: {ex.Message}");
+                return Json(new { 
+                    success = false, 
+                    message = "Không thể kết nối đến server. Vui lòng thử lại sau." 
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unexpected Error: {ex.Message}");
+                _logger.LogError($"Stack Trace: {ex.StackTrace}");
+                return Json(new { 
+                    success = false, 
+                    message = "Có lỗi xảy ra khi tạo bộ đề thi. Vui lòng thử lại sau." 
+                });
+            }
+            finally
+            {
+                _logger.LogInformation("=== CreateTestSetByAdmin POST Action Completed ===");
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                // Lấy token từ session
+                var token = HttpContext.Session.GetString("JWTToken");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Token xác thực không tồn tại hoặc đã hết hạn." });
+                }
+
+                // Thêm Authorization header vào HttpClient
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                // Gọi API để xóa test set
+                var response = await _httpClient.DeleteAsync($"{apiUrl}/delete/{id}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                
+                _logger.LogInformation($"API Response Content: {responseContent}"); // Log để debug
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Nếu response là JSON
+                    if (responseContent.TrimStart().StartsWith("{"))
+                    {
+                        try 
+                        {
+                            var result = JsonSerializer.Deserialize<ApiResponse>(responseContent, new JsonSerializerOptions 
+                            { 
+                                PropertyNameCaseInsensitive = true 
+                            });
+                            return Json(new { success = true, message = result?.Message ?? "Xóa bộ đề thi thành công!" });
+                        }
+                        catch (JsonException ex)
+                        {
+                            _logger.LogError($"Error deserializing success response: {ex.Message}");
+                            return Json(new { success = true, message = "Xóa bộ đề thi thành công!" });
+                        }
+                    }
+                    // Nếu response là text thuần túy
+                    return Json(new { success = true, message = responseContent });
+                }
+                else
+                {
+                    // Nếu response là JSON
+                    if (responseContent.TrimStart().StartsWith("{"))
+                    {
+                        try 
+                        {
+                            var errorResult = JsonSerializer.Deserialize<ApiResponse>(responseContent, new JsonSerializerOptions 
+                            { 
+                                PropertyNameCaseInsensitive = true 
+                            });
+
+                            if (errorResult?.Message != null)
+                            {
+                                _logger.LogInformation($"Parsed error message: {errorResult.Message}");
+                                return Json(new { success = false, message = errorResult.Message });
+                            }
+
+                            // Nếu không parse được ApiResponse, thử parse trực tiếp message
+                            var errorJson = JsonSerializer.Deserialize<JsonElement>(responseContent);
+                            if (errorJson.TryGetProperty("message", out var messageElement))
+                            {
+                                var message = messageElement.GetString();
+                                _logger.LogInformation($"Extracted message from JSON: {message}");
+                                return Json(new { success = false, message = message ?? "Không thể xóa bộ đề thi." });
+                            }
+                        }
+                        catch (JsonException ex)
+                        {
+                            _logger.LogError($"Error parsing error response: {ex.Message}");
+                        }
+                    }
+                    
+                    // Nếu response là text thuần túy hoặc không parse được JSON
+                    _logger.LogWarning($"Using raw response content as message: {responseContent}");
+                    return Json(new { success = false, message = responseContent });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error deleting test set: {ex.Message}");
+                return Json(new { success = false, message = "Có lỗi xảy ra khi xóa bộ đề thi: " + ex.Message });
+            }
+        }
+
 
     }
 }

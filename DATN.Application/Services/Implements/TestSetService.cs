@@ -19,17 +19,22 @@ namespace DATN.Application.Services.Implements
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public TestSetService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IReadingQuestionService _readingQuestionService;
+        private readonly IListeningQuestionService _listeningQuestionService;
+        public TestSetService(IUnitOfWork unitOfWork, IMapper mapper, IReadingQuestionService readingQuestionService, IListeningQuestionService listeningQuestionService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _readingQuestionService = readingQuestionService;
+            _listeningQuestionService = listeningQuestionService;
         }
-        public async Task<Result> CreateTestSetAsync(TestSet testSet)
+
+        public async Task<ResultV<int>> CreateTestSetAsync(TestSet testSet)
         {
             // 1. Validate đầu vào
             if (testSet.RankQuestionId <= 0)
             {
-                return Result.Failure("Mức độ đề không hợp lệ !");
+                return ResultV<int>.Failure("Mức độ đề không hợp lệ !");
             }
 
             // 2. Gán giá trị mặc định
@@ -46,22 +51,76 @@ namespace DATN.Application.Services.Implements
             try
             {
                 // 3. Thêm vào context và lưu
-                await _unitOfWork.TestSetRepository.Add(testSet);
-                await _unitOfWork.SaveChangesAsync();
+                var check = await _unitOfWork.TestSetRepository.AddTestSet(testSet);
+                var saveResult = await _unitOfWork.SaveChangesAsync();
 
-                return Result.Success("Thêm đề thành công !");
+                // Kiểm tra kết quả lưu
+                if (saveResult <= 0)
+                {
+                    return ResultV<int>.Failure("Không thể lưu bộ đề thi. Vui lòng thử lại sau.");
+                }
+
+
+                return ResultV<int>.Success(check.Id, "Thêm đề thành công !");
             }
             catch (Exception ex)
             {
                 // Log lỗi nếu cần
-                return Result.Failure($"Có lỗi khi tạo đề: {ex.Message}");
+                return ResultV<int>.Failure($"Có lỗi khi tạo đề: {ex.Message}");
             }
         }
 
 
-        public Task<Result> DeleteTestSetAsync(int id)
+        public async Task<Result> DeleteTestSetAsync(int id)
         {
-            throw new NotImplementedException();
+            try 
+            {
+                // Lấy test set và include các câu hỏi liên quan
+                var testSet = await _unitOfWork.TestSetRepository.GetAll()
+                    .Include(ts => ts.ReadingQuestions)
+                    .Include(ts => ts.ListeningQuestions)
+                    .FirstOrDefaultAsync(ts => ts.Id == id);
+
+                if (testSet == null)
+                {
+                    return Result.Failure("Không tìm thấy bộ đề thi với ID đã cho.");
+                }
+
+                if (testSet.UserProgress?.Count > 0)
+                {
+                    return Result.Failure("Không thể xóa bộ đề thi vì đã có người làm.");
+                }
+
+                if(testSet.ReadingQuestions != null)
+                {
+                    // Cập nhật TestSetId = null cho các câu hỏi Reading
+                    foreach (var question in testSet.ReadingQuestions.ToList())
+                    {
+                        await _readingQuestionService.UpdateReadingQuestionAsyncByIdForNullTestSet(question.Id);
+                    }
+                }
+
+                if(testSet.ListeningQuestions != null)
+                {
+                    // Cập nhật TestSetId = null cho các câu hỏi Listening
+                    foreach (var question in testSet.ListeningQuestions.ToList())
+                    {
+                        await _listeningQuestionService.UpdateListeningQuestionAsyncByIdForNullTestSet(question.Id);
+                    }
+                }
+                // Đánh dấu test set là đã xóa
+                testSet.IsDelele = true;
+                testSet.UpdatedDate = DateTime.UtcNow;
+
+                await _unitOfWork.TestSetRepository.Update(testSet);
+                await _unitOfWork.SaveChangesAsync();
+
+                return Result.Success("Xóa bộ đề thi thành công!");
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure($"Có lỗi xảy ra khi xóa bộ đề thi: {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<TestSet>> GetAllTestSetAsync()
@@ -122,7 +181,12 @@ namespace DATN.Application.Services.Implements
 
         public async Task<TestSet> GetTestSetByIdAsync(int id)
         {
-            var testSet = await _unitOfWork.TestSetRepository.GetByIdAsync(id);
+            var testSet = await _unitOfWork.TestSetRepository.GetAll()
+                .Include(ts => ts.ListeningQuestions)
+                    .ThenInclude(lq => lq.ListeningAnswers)
+                .Include(ts => ts.ReadingQuestions)
+                    .ThenInclude(rq => rq.ReadingAnswers)
+                .FirstOrDefaultAsync(ts => ts.Id == id);
             return testSet;
         }
 
@@ -295,6 +359,7 @@ namespace DATN.Application.Services.Implements
                         Question = question.Question,
                         QuestionType = "Listening",
                         QuestionAudioUrl = question.ListeningSoundURL,
+                        ListeningScript = question.ListeningScript,
                         UserSelectedAnswerId = submitted?.SelectedAnswerId,
                         UserSelectedAnswer = submitted != null ? 
                             question.ListeningAnswers.FirstOrDefault(a => a.Id == submitted.SelectedAnswerId)?.Content : null,

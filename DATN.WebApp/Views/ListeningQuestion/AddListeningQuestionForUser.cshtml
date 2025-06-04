@@ -1,0 +1,515 @@
+﻿@using DATN.Application.Dtos.RankQuestionDtos
+@using DATN.Application.Dtos.ListeningDtos
+@model ListeningQuestionCreateDto
+@{
+    ViewData["Title"] = "Thêm Câu Hỏi Nghe Hiểu";
+    Layout = null;
+    var now = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- jQuery (required for some Bootstrap features) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 2px solid #f0f0f0;
+            padding: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5c636a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+        }
+
+        .answer-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .answer-container:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-input-container input[type="file"] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .custom-file-label {
+            display: block;
+            padding: 0.75rem;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        /* Styles cho SweetAlert2 */
+        .swal2-popup {
+            font-size: 1rem !important;
+            border-radius: 15px !important;
+        }
+
+        .swal2-title {
+            font-size: 1.5rem !important;
+            color: #333 !important;
+        }
+
+        .swal2-html-container {
+            font-size: 1rem !important;
+            margin: 1rem 0 !important;
+            color: #666 !important;
+        }
+
+        .swal2-confirm {
+            background-color: #0d6efd !important;
+            border-radius: 8px !important;
+            padding: 0.75rem 1.5rem !important;
+        }
+
+        .swal2-cancel {
+            background-color: #6c757d !important;
+            border-radius: 8px !important;
+            padding: 0.75rem 1.5rem !important;
+        }
+
+        .swal2-icon {
+            transform: scale(0.8);
+            border-width: 3px !important;
+        }
+
+        .swal2-actions {
+            margin-top: 1.5rem !important;
+            gap: 0.5rem !important;
+        }
+
+        .swal2-validation-message {
+            margin: 0.5rem 0 !important;
+            color: #dc3545 !important;
+            font-size: 0.9rem !important;
+            text-align: left !important;
+        }
+
+        .swal2-icon.swal2-error {
+            border-color: #dc3545 !important;
+            color: #dc3545 !important;
+        }
+
+        .swal2-icon.swal2-success {
+            border-color: #198754 !important;
+            color: #198754 !important;
+        }
+
+        .swal2-icon.swal2-warning {
+            border-color: #ffc107 !important;
+            color: #ffc107 !important;
+        }
+
+        .swal2-icon.swal2-info {
+            border-color: #0dcaf0 !important;
+            color: #0dcaf0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center text-primary mb-0">
+                    <i class="fas fa-headphones me-2"></i>Đóng góp Câu Hỏi Nghe Hiểu
+                </h2>
+            </div>
+            <div class="card-body p-4">
+                <form id="listeningQuestionForm" method="post" enctype="multipart/form-data">
+                    <div class="form-group mb-4">
+                        <label for="Question" class="form-label required-field">Nội dung câu hỏi</label>
+                        <textarea asp-for="Question" class="form-control" rows="4" placeholder="Nhập nội dung câu hỏi..." required></textarea>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="ListeningScript" class="form-label required-field">Transcript (nếu có)</label>
+                        <textarea asp-for="ListeningScript" class="form-control" rows="3" placeholder="Nhập transcript..." required></textarea>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="RankQuestionId" class="form-label required-field">Mức độ câu hỏi</label>
+                        <select asp-for="RankQuestionId" class="form-control" required>
+                            @foreach (var rankQuestion in (IEnumerable<RankQuestionDto>)ViewData["RankQuestions"])
+                            {
+                                <option value="@rankQuestion.Id">@rankQuestion.RankQuestionName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="Sound" class="form-label required-field">Tệp âm thanh</label>
+                        <div class="file-input-container">
+                            <input type="file" name="Sound" class="form-control" accept="audio/*" required />
+                            <div class="custom-file-label">
+                                <i class="fas fa-music me-2"></i>Chọn file âm thanh
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="answers-container" class="mb-4">
+                        <h4 class="fw-bold text-success mb-3">
+                            <i class="fas fa-list-check me-2"></i>Đáp án
+                        </h4>
+
+                        @for (int i = 0; i < 4; i++)
+                        {
+                            <div class="answer-container p-3 mb-3">
+                                <label class="form-label fw-bold">Đáp án @(i + 1)</label>
+                                <input type="hidden" name="ListeningAnswers[@i].Id" value="0" />
+
+                                <div class="mb-3">
+                                    <input type="text" name="ListeningAnswers[@i].Content" 
+                                           class="form-control" 
+                                           placeholder="Nhập nội dung đáp án @(i + 1)" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Hoặc chọn ảnh:</label>
+                                    <div class="file-input-container">
+                                        <input type="file" name="ListeningAnswers[@i].Image" 
+                                               class="form-control" 
+                                               accept="image/*" />
+                                        <div class="custom-file-label">
+                                            <i class="fas fa-image me-2"></i>Chọn hình ảnh
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" 
+                                           name="CorrectAnswerIndex" value="@i" 
+                                           id="answer_@i" />
+                                    <label class="form-check-label" for="answer_@i">
+                                        <i class="fas fa-check-circle me-1"></i>Là đáp án đúng
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <input type="hidden" name="CreatedDate" value="@now" />
+                    <input type="hidden" name="UpdatedDate" value="@now" />
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="@Url.Action("Profile", "User")" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Lưu câu hỏi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById('listeningQuestionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            let isValid = true;
+            let errorMessages = [];
+
+            // Validate Question
+            const question = formData.get('Question')?.trim();
+            if (!question) {
+                errorMessages.push('Vui lòng nhập nội dung câu hỏi');
+                isValid = false;
+            }
+
+            // Validate ListeningScript
+            const script = formData.get('ListeningScript')?.trim();
+            if (!script) {
+                errorMessages.push('Vui lòng nhập transcript cho câu hỏi nghe');
+                isValid = false;
+            }
+
+            // Validate RankQuestionId
+            const rankId = formData.get('RankQuestionId');
+            if (!rankId) {
+                errorMessages.push('Vui lòng chọn mức độ câu hỏi');
+                isValid = false;
+            }
+
+            // Validate Sound file
+            const soundFile = formData.get('Sound');
+            if (!soundFile || soundFile.size === 0) {
+                errorMessages.push('Câu hỏi nghe bắt buộc phải có file âm thanh');
+                isValid = false;
+            } else {
+                // Kiểm tra định dạng file âm thanh
+                const allowedTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg'];
+                if (!allowedTypes.includes(soundFile.type)) {
+                    errorMessages.push('File âm thanh phải có định dạng MP3, WAV hoặc OGG');
+                    isValid = false;
+                }
+            }
+
+            // Validate Answers
+            let missingAnswers = [];
+            let hasValidAnswer = false;
+            for (let i = 0; i < 4; i++) {
+                const content = formData.get(`ListeningAnswers[${i}].Content`)?.trim();
+                const image = formData.get(`ListeningAnswers[${i}].Image`);
+                
+                if ((!content || content === "") && (!image || image.size === 0)) {
+                    missingAnswers.push(`Đáp án ${i + 1}`);
+                } else {
+                    hasValidAnswer = true;
+                    // Kiểm tra định dạng file ảnh nếu có
+                    if (image && image.size > 0) {
+                        const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                        if (!allowedImageTypes.includes(image.type)) {
+                            errorMessages.push(`Đáp án ${i + 1}: File ảnh phải có định dạng JPG, PNG hoặc GIF`);
+                            isValid = false;
+                        }
+                    }
+                }
+            }
+
+            if (!hasValidAnswer) {
+                errorMessages.push('Vui lòng nhập ít nhất một đáp án (text hoặc hình ảnh)');
+                isValid = false;
+            }
+
+            if (missingAnswers.length > 0) {
+                errorMessages.push(`Vui lòng điền đầy đủ ${missingAnswers.join(", ")}`);
+                isValid = false;
+            }
+
+            // Validate Correct Answer
+            const correctAnswerIndex = formData.get("CorrectAnswerIndex");
+            if (correctAnswerIndex === null) {
+                errorMessages.push('Bạn phải chọn một đáp án đúng');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Vui lòng kiểm tra lại thông tin',
+                    html: errorMessages.map(msg => `<div class="text-start mb-2"><i class="fas fa-exclamation-circle me-2"></i>${msg}</div>`).join(''),
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        container: 'my-swal'
+                    }
+                });
+                return;
+            }
+
+            // Hiển thị thông báo xác nhận trước khi gửi
+            Swal.fire({
+                title: 'Xác nhận đóng góp',
+                text: 'Bạn có chắc chắn muốn đóng góp câu hỏi này?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Hiển thị thông báo đang xử lý
+                    Swal.fire({
+                        title: 'Vui lòng chờ...',
+                        text: 'Đang gửi dữ liệu...',
+                        icon: 'info',
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Gửi form
+                    fetch('@Url.Action("AddListeningQuestion", "ListeningQuestion")', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        Swal.close();
+
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công',
+                                text: 'Bạn đã đóng góp câu hỏi nghe thành công ! Cảm ơn bạn !',
+                                timer: 5000,
+                                showConfirmButton: true
+                            }).then(() => {
+                                window.location.href = '@Url.Action("Profile", "User")';
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Thất bại',
+                                text: data.message || 'Có lỗi xảy ra khi gửi câu hỏi',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.close();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: 'Có lỗi xảy ra khi gửi biểu mẫu. Vui lòng thử lại sau.',
+                        });
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        });
+
+        // Thêm style cho thông báo lỗi
+        const style = document.createElement('style');
+        style.textContent = `
+            .my-swal .swal2-html-container {
+                text-align: left !important;
+            }
+            .my-swal .swal2-html-container i {
+                color: #dc3545;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Xử lý hiển thị tên file
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Kiểm tra kích thước file
+                    const maxSize = 10 * 1024 * 1024; // 10MB
+                    if (file.size > maxSize) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: 'File không được vượt quá 10MB',
+                            confirmButtonText: 'OK'
+                        });
+                        this.value = ''; // Xóa file đã chọn
+                        this.nextElementSibling.textContent = this.nextElementSibling.textContent.split(':')[0];
+                        return;
+                    }
+
+                    // Hiển thị tên file và kích thước
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                    this.nextElementSibling.innerHTML = `
+                        <i class="fas ${this.accept.includes('audio') ? 'fa-music' : 'fa-image'} me-2"></i>
+                        ${file.name} (${fileSize} MB)
+                    `;
+                } else {
+                    this.nextElementSibling.textContent = this.nextElementSibling.textContent.split(':')[0];
+                }
+            });
+        });
+    </script>
+</body>
+</html>

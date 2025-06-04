@@ -152,6 +152,10 @@ namespace DATN.Application.AutoMapper
                 .ReverseMap();
 
 
+            CreateMap<TestSetForCreateDto, TestSet>()
+                .ReverseMap();
+
+
 
 
             CreateMap<Role, RoleDto>().ReverseMap();

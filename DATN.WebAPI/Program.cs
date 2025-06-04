@@ -1,4 +1,5 @@
 ﻿using CloudinaryDotNet;
+using DATN.Application.Dtos.GeminiDtos;
 using DATN.Application.Services;
 using DATN.Application.Services.Implements;
 using DATN.Application.Services.Interfaces;
@@ -29,6 +30,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("https://localhost:7161")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
+// Add Memory Cache
+builder.Services.AddMemoryCache();
+
 builder.Services.AddDbContext<DATNContext>(ops => ops.UseSqlServer(builder.Configuration.GetConnectionString("DATNConnect")));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -45,6 +61,15 @@ builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IListeningQuestionService, ListeningQuestionService>();
 builder.Services.AddTransient<ITestSetService, TestSetService>();
 builder.Services.AddTransient<IUserProgressService,  UserProgressService>();
+builder.Services.AddTransient<GeminiService>();
+builder.Services.AddTransient<ITestSetStatisticsService, TestSetStatisticsService>();
+/*builder.Services.AddTransient<IStatisticsService, StatisticsService>();*/
+
+
+
+builder.Services.Configure<GeminiSettings>(builder.Configuration.GetSection("Gemini"));
+builder.Services.AddHttpClient<GeminiService>();
+
 
 var jwtSetting = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.UTF8.GetBytes(jwtSetting["Key"] ?? throw new InvalidOperationException("Jwt key is missing"));
@@ -90,6 +115,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Add CORS middleware before other middleware
+app.UseCors("AllowFrontend");
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -97,3 +125,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+

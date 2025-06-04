@@ -42,6 +42,7 @@ namespace DATN.WebAPI.Controllers
             _environment = environment;
         }
 
+
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllKoreaBlogQuestion()
         {
@@ -214,6 +215,23 @@ namespace DATN.WebAPI.Controllers
             {
                 _logger.LogError(ex, "Lỗi khi xóa blog với ID: {Id}", id);
                 return StatusCode(500, new { success = false, message = "Lỗi máy chủ nội bộ." });
+            }
+        }
+
+
+        [HttpPut("updateView/{id}")]
+        public async Task<IActionResult> UpdateViewBlog([FromRoute] int id)
+        {
+            var result = await _koreaBlogService.UpdateViewBlog(id);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Cập nhật lượt xem blog thành công với ID: {Id}", id);
+                return Ok(new { success = true, message = "Cập nhật lượt xem thành công!" });
+            }
+            else
+            {
+                _logger.LogWarning("Cập nhật lượt xem blog thất bại! Lỗi: {Message}", result.Message);
+                return BadRequest(new { success = false, message = result.Message });
             }
         }
 

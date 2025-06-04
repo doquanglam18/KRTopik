@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace DATN.Application.Services.Implements
 {
@@ -21,10 +22,12 @@ namespace DATN.Application.Services.Implements
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public ReadingQuestionService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly ILogger<ReadingQuestionService> _logger;
+        public ReadingQuestionService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<ReadingQuestionService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
 
         }
         public async Task<Result> CreateReadingQuestionAsync(ReadingQuestion readingQuestion)
@@ -64,13 +67,14 @@ namespace DATN.Application.Services.Implements
             }
         }
 
-        public async Task<PageResultDto<ReadingQsDto>> GetReadingByRankID(int rankQuestionId, int page, int pageSize)
+        public async Task<PageResultDto<ReadingQsDto>> GetReadingByRankID(int rankQuestionId, int page, int pageSize, int testSetId)
         {
             var query = _unitOfWork.ReadingQuestionRepository.GetAllForPaging()
               .Include(u => u.RankQuestion)
               .Include(u => u.ReadingAnswers)
               .Include(u => u.TestSet)
-              .Where(u => u.RankQuestionId == rankQuestionId);
+              .Where(u => u.RankQuestionId == rankQuestionId)
+              .Where(u => u.TestSetId == testSetId || u.TestSetId == null);
             var totalItem = query.Count();
 
             var readingQuestions = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
@@ -188,6 +192,50 @@ namespace DATN.Application.Services.Implements
              }
          }*/
 
+        public async Task<Result> UpdateReadingQuestionAsyncByIdForNullTestSet(int questionId)
+        {
+            try
+            {
+                // Lấy câu hỏi và kiểm tra null
+                var question = await GetReadingQuestionByIdAsync(questionId);
+                if (question == null)
+                {
+                    _logger.LogWarning($"Không tìm thấy câu hỏi Reading với ID: {questionId}");
+                    return Result.Failure($"Không tìm thấy câu hỏi với ID: {questionId}");
+                }
+
+                // Kiểm tra xem câu hỏi có thuộc test set nào không
+                if (question.TestSetId == null)
+                {
+                    _logger.LogInformation($"Câu hỏi Reading ID: {questionId} đã không thuộc test set nào");
+                    return Result.Success("Câu hỏi đã không thuộc test set nào.");
+                }
+
+                // Cập nhật TestSetId thành null
+                question.TestSetId = null;
+                _logger.LogInformation($"Đang cập nhật TestSetId thành null cho câu hỏi Reading ID: {questionId}");
+
+                // Lưu thay đổi
+                await _unitOfWork.ReadingQuestionRepository.Update(question);
+                var saveResult = await _unitOfWork.SaveChangesAsync();
+
+                if (saveResult > 0)
+                {
+                    _logger.LogInformation($"Đã cập nhật thành công TestSetId thành null cho câu hỏi Reading ID: {questionId}");
+                    return Result.Success("Cập nhật câu hỏi thành công.");
+                }
+                else
+                {
+                    _logger.LogWarning($"Không có thay đổi nào được lưu cho câu hỏi Reading ID: {questionId}");
+                    return Result.Failure("Không có thay đổi nào được lưu.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Lỗi khi cập nhật TestSetId cho câu hỏi Reading ID: {questionId}");
+                return Result.Failure($"Có lỗi xảy ra khi cập nhật câu hỏi: {ex.Message}");
+            }
+        }
 
         public async Task<Result> UpdateReadingQuestionAsync(ReadingQuestion existingQuestion)
         {

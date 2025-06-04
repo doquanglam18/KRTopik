@@ -1,6 +1,7 @@
 ﻿using DATN.Application.Dtos.RankQuestionDtos;
 using DATN.Application.Dtos.ReadingDtos;
 using DATN.Application.Dtos.UserDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -9,6 +10,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.Intrinsics.Arm;
 using System.Text;
+using System.Text.Json;
 
 namespace DATN.WebApp.Controllers
 {
@@ -233,17 +235,147 @@ namespace DATN.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var response = await _httpClient.DeleteAsync($"{apiUrl}/{id}");
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"{apiUrl}/{id}");
+                var responseContent = await response.Content.ReadAsStringAsync();
 
-            if (response.IsSuccessStatusCode)
-            {
-                return Json(new { success = true, message = "Xóa câu hỏi đọc thành công !" });
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Xóa câu hỏi đọc thành công!" });
+                }
+                else
+                {
+                    string errorMessage;
+                    // Thử parse response như JSON
+                    if (responseContent.TrimStart().StartsWith("{"))
+                    {
+                        try 
+                        {
+                            var errorJson = System.Text.Json.JsonSerializer.Deserialize<JsonElement>(responseContent);
+                            // Lấy message từ JSON nếu có
+                            if (errorJson.TryGetProperty("message", out var messageElement))
+                            {
+                                errorMessage = messageElement.GetString() ?? responseContent;
+                            }
+                            else
+                            {
+                                errorMessage = responseContent;
+                            }
+                        }
+                        catch
+                        {
+                            errorMessage = responseContent;
+                        }
+                    }
+                    else
+                    {
+                        // Nếu không phải JSON, sử dụng trực tiếp nội dung
+                        errorMessage = responseContent;
+                    }
+
+                    return Json(new { success = false, message = errorMessage });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return Json(new { success = false, message = $"Xóa thất bại: {error}" });
+                return Json(new { success = false, message = "Có lỗi xảy ra khi xóa câu hỏi đọc." });
             }
+        }
+
+
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> AddReadingQuestionForUser()
+        {
+            // Lấy dữ liệu từ API (bất đồng bộ)
+            var rankQuestions = await _httpClient.GetFromJsonAsync<IEnumerable<RankQuestionDto>>("https://localhost:7208/api/rankquestion/getall");
+
+            var rankReadingQuestion = rankQuestions.Where(x => x.RankQuestionName.Contains("Đọc")).ToList();
+
+            // Lưu vào ViewData
+            ViewData["RankQuestions"] = rankReadingQuestion;
+
+            return View();
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddReadingQuestionForUser(ReadingQuestionCreateDto createDto, IFormFile? image)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Lấy chỉ số đáp án đúng từ form (radio button)
+                    var correctAnswerIndexString = Request.Form["CorrectAnswerIndex"];
+                    if (int.TryParse(correctAnswerIndexString, out int correctAnswerIndex))
+                    {
+                        for (int i = 0; i < createDto.ReadingAnswers.Count; i++)
+                        {
+                            createDto.ReadingAnswers[i].IsCorrect = (i == correctAnswerIndex);
+                        }
+                    }
+
+                    // Tạo MultipartFormDataContent để gửi yêu cầu đến API
+                    var content = new MultipartFormDataContent();
+
+                    // Gửi ảnh nếu có
+                    if (image != null)
+                    {
+                        var fileContent = new StreamContent(image.OpenReadStream());
+                        fileContent.Headers.ContentType = new MediaTypeHeaderValue(image.ContentType);
+                        content.Add(fileContent, "image", image.FileName);
+                    }
+
+                    // Gửi các thuộc tính chính
+                    content.Add(new StringContent(createDto.Question), "Question");
+                    content.Add(new StringContent(createDto.RankQuestionId.ToString()), "RankQuestionId");
+                    content.Add(new StringContent(createDto.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss")), "CreatedDate");
+                    content.Add(new StringContent(createDto.UpdatedDate.ToString("yyyy-MM-ddTHH:mm:ss")), "UpdatedDate");
+
+                    // Gửi danh sách ReadingAnswers
+                    for (int i = 0; i < createDto.ReadingAnswers.Count; i++)
+                    {
+                        var answer = createDto.ReadingAnswers[i];
+                        content.Add(new StringContent(answer.Content), $"ReadingAnswers[{i}].Content");
+                        content.Add(new StringContent(answer.IsCorrect.ToString().ToLower()), $"ReadingAnswers[{i}].IsCorrect");
+                    }
+
+                    // Gọi API để tạo mới câu hỏi
+                    var response = await _httpClient.PostAsync($"{apiUrl}/add", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Tạo câu hỏi thành công!",
+                            redirectUrl = Url.Action("ManageReadingQuestion", "Admin")
+                        });
+                    }
+                    else
+                    {
+                        var errorMessage = await response.Content.ReadAsStringAsync();
+                        return Json(new
+                        {
+                            success = false,
+                            message = $"Tạo câu hỏi thất bại: {errorMessage}",
+                            redirectUrl = Url.Action("ManageReadingQuestion", "Admin")
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+                }
+            }
+
+            return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
         }
 
     }

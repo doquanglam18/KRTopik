@@ -12,6 +12,7 @@ using System.Drawing.Printing;
 using DATN.Application.Dtos.TestSetDtos.ForAdmin;
 using DATN.WebAPI.Extensions;
 using System.Security.Claims;
+using System.Linq;
 
 namespace DATN.WebAPI.Controllers
 {
@@ -151,7 +152,7 @@ namespace DATN.WebAPI.Controllers
                 {
                     if (userProgress.BestResults > bestResultUP.BestResults)
                     {
-                        _userProgressService.UpdateAllBestScore(userProgress.BestResults, submitTestDto.TestSetId, userId);
+                        await _userProgressService.UpdateAllBestScore(userProgress.BestResults, submitTestDto.TestSetId, userId);
                     }
                     else
                     {
@@ -214,6 +215,97 @@ namespace DATN.WebAPI.Controllers
                 return StatusCode(500, new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateTestSet([FromBody] TestSetForCreateDto testSetForCreateDto)
+        {
+            if (testSetForCreateDto == null)
+                return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ." });
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ.", errors = ModelState.Values.SelectMany(v => v.Errors) });
+            }
+
+            // Validate QuestionIds
+            if (testSetForCreateDto.QuestionIds == null || !testSetForCreateDto.QuestionIds.Any())
+            {
+                return BadRequest(new { success = false, message = "Danh sách câu hỏi không được để trống." });
+            }
+
+            // Lấy UserId trực tiếp từ ClaimsPrincipal
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { success = false, message = "Người dùng chưa đăng nhập." });
+            }
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            testSetForCreateDto.CreatedBy = userId;
+
+            try 
+            {
+                var testSet = _mapper.Map<TestSet>(testSetForCreateDto);
+                var resultV = await _testSetService.CreateTestSetAsync(testSet);
+
+                if (!resultV.IsSuccess)
+                    return BadRequest(new { success = false, message = resultV.Message });
+
+                Result updateResult = null;
+                // Xác định loại câu hỏi dựa vào RankQuestionId
+                if ((testSet.RankQuestionId >= 1 && testSet.RankQuestionId <= 12) || testSet.RankQuestionId == 21)
+                {
+                    // Xử lý câu hỏi Reading
+                    updateResult = await _testSetService.UpdateReadingQuestionsAsync(resultV.Data, testSetForCreateDto.QuestionIds);
+                }
+                else if (testSet.RankQuestionId >= 13 && testSet.RankQuestionId <= 20)
+                {
+                    // Xử lý câu hỏi Listening
+                    updateResult = await _testSetService.UpdateListeningQuestionsAsync(resultV.Data, testSetForCreateDto.QuestionIds);
+                }
+                else
+                {
+                    // Nếu loại câu hỏi không hợp lệ, xóa TestSet vừa tạo
+                    await _testSetService.DeleteTestSetAsync(resultV.Data);
+                    return BadRequest(new { success = false, message = "Loại câu hỏi không hợp lệ." });
+                }
+
+                if (!updateResult.IsSuccess)
+                {
+                    // Nếu cập nhật câu hỏi thất bại, xóa TestSet vừa tạo
+                    await _testSetService.DeleteTestSetAsync(resultV.Data);
+                    return BadRequest(new { success = false, message = updateResult.Message });
+                }
+
+                return Ok(new { 
+                    success = true, 
+                    message = "Tạo đề thành công !",
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                return StatusCode(500, new { 
+                    success = false, 
+                    message = "Có lỗi xảy ra khi tạo đề thi.",
+                    error = ex.Message 
+                });
+            }
+        }
+
+
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteTestSet(int id)
+        {
+            var result = await _testSetService.DeleteTestSetAsync(id);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(new { success = true, message = result.Message });
+        }
+
 
 
     }

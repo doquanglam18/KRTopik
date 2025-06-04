@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DATN.WebApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee161cee05f75d3362fa630454e4761068b21feb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bddeacfb59da69830fc2cb50dbd89f6509fc7875")]
 [assembly: System.Reflection.AssemblyProductAttribute("DATN.WebApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DATN.WebApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

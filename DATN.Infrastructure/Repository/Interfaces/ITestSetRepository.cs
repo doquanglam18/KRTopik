@@ -10,5 +10,6 @@ namespace DATN.Infrastructure.Repository.Interfaces
     public interface ITestSetRepository : IGenericRepository<TestSet>
     {
         IQueryable<TestSet> GetAllForPaging();
+        Task<TestSet> AddTestSet(TestSet entity);
     }
 }

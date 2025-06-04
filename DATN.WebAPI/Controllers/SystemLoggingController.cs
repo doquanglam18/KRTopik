@@ -90,19 +90,6 @@ namespace DATN.WebAPI.Controllers
             return Ok(chartData);
         }
 
-        [HttpGet("export/excel")]
-        public async Task<IActionResult> ExportExcel(DateTime? from, DateTime? to, string? action, string? ip, Guid? userId)
-        {
-            var file = await _loggingService.ExportToExcelAsync(from, to, action, ip, userId);
-            return File(file.Content, file.ContentType, file.FileName);
-        }
-
-        [HttpGet("export/pdf")]
-        public async Task<IActionResult> ExportPdf(DateTime? from, DateTime? to, string? action, string? ip, Guid? userId)
-        {
-            var file = await _loggingService.ExportToPdfAsync(from, to, action, ip, userId);
-            return File(file.Content, file.ContentType, file.FileName);
-        }
 
 
 

@@ -92,8 +92,12 @@ namespace DATN.Application.Services.Implements
             var user = await _unitOfWork.UserRepository.GetUserForLogin(email, passWord);
             if (user == null)
             {
-                return ResultV<User>.Failure("Tài khoản hoặc mật khẩu không chính xác !");
+                return ResultV<User>.Failure("Email hoặc mật khẩu không chính xác.");
 
+            }
+            else if(user.IsActive == false)
+            {
+                return ResultV<User>.Failure("Tài khoản đã bị khóa, vui lòng liên hệ người quản trị hệ thống.");
             }
             else
             {

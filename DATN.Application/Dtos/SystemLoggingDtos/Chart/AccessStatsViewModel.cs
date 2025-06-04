@@ -13,9 +13,6 @@ namespace DATN.Application.Dtos.SystemLoggingDtos.Chart
 
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
-        public string? ActionName { get; set; }
-        public string? IP { get; set; }
-        public Guid? UserId { get; set; }
     }
 
 }

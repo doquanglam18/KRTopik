@@ -8,15 +8,16 @@
 <style>
     .table th, .table td {
         vertical-align: middle !important;
+        padding: 1rem !important;
     }
 
-        .table td ul {
-            padding-left: 1.2rem;
-            margin: 0;
-        }
+    .table td ul {
+        padding-left: 1.2rem;
+        margin: 0;
+    }
 
     .correct-answer {
-        color: red;
+        color: #28a745;
         font-weight: 600;
     }
 
@@ -57,18 +58,194 @@
         }
 
     .btn-warning {
-        background-color: #f0ad4e;
+        background: linear-gradient(135deg, #f39c12, #f1c40f);
         border: none;
+        color: white;
+        font-weight: 500;
+    }
+
+    .btn-warning:hover {
+        background: linear-gradient(135deg, #e67e22, #f39c12);
+        transform: translateY(-1px);
     }
 
     .btn-danger {
-        background-color: #d9534f;
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
         border: none;
+        color: white;
+        font-weight: 500;
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #c0392b, #a93226);
+        transform: translateY(-1px);
     }
 
     .table thead {
         background: linear-gradient(90deg, #D16BA5, #3A8DFF);
         color: white;
+    }
+
+    /* Updated table styles */
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        background: white;
+    }
+
+    .table thead th {
+        background: white;
+        color: #2d3748;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border-bottom: 2px solid #e2e8f0;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #edf2f7;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8fafc;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .table td {
+        border: none;
+        color: #4a5568;
+        font-size: 0.95rem;
+    }
+
+    /* Updated container styles */
+    .table-container {
+        max-height: 600px;
+        overflow-y: auto;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background: white;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* Updated search and filter styles */
+    .search-filter-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .search-input {
+        border-radius: 0.75rem;
+        border: 2px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .search-input:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .rank-filter {
+        border-radius: 0.75rem;
+        border: 2px solid #e2e8f0;
+        padding: 0.75rem;
+        min-width: 200px;
+        font-size: 0.95rem;
+        color: #4a5568;
+        background-color: white;
+    }
+
+    .rank-filter:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    /* Updated button styles */
+    .btn-outline-secondary {
+        border: 2px solid #e2e8f0;
+        color: #4a5568;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8fafc;
+        border-color: #3498db;
+        color: #3498db;
+    }
+
+    /* Status badge styles */
+    .badge {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+
+    .badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* No results message */
+    .no-results {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 1rem;
+        margin-top: 1.5rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .no-results i {
+        color: #3498db;
+        margin-bottom: 1rem;
+    }
+
+    .no-results h5 {
+        color: #2d3748;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .no-results p {
+        color: #718096;
+    }
+
+    /* Scrollbar styles */
+    .table-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+        background: #a0aec0;
     }
 </style>
 
@@ -82,9 +259,36 @@
         </a>
     </div>
 
+    <!-- Search and Filter Section -->
+    <div class="search-filter-container">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <input type="text" 
+                       id="searchInput" 
+                       class="search-input" 
+                       placeholder="Tìm kiếm theo nội dung câu hỏi..."
+                       onkeyup="filterQuestions()">
+            </div>
+            <div class="col-md-4">
+                <select id="rankFilter" class="rank-filter" onchange="filterQuestions()">
+                    <option value="">Tất cả cấp độ</option>
+                    @foreach (var rank in Model.Select(q => q.RankQuestionName).Distinct().OrderBy(r => r))
+                    {
+                        <option value="@rank">@rank</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                    <i class="fas fa-redo me-2"></i>Đặt lại
+                </button>
+            </div>
+        </div>
+    </div>
+
     @if (Model != null && Model.Any())
     {
-        <div class="table-responsive">
+        <div class="table-container">
             <table class="table table-bordered table-hover align-middle text-center">
                 <thead>
                     <tr>
@@ -100,10 +304,12 @@
                         <th>Hành động</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="questionsTableBody">
                     @foreach (var q in Model)
                     {
-                        <tr>
+                        <tr class="question-row" 
+                            data-question="@q.Question.ToLower()" 
+                            data-rank="@q.RankQuestionName">
                             <td>@q.Id</td>
                             <td class="text-start">@Html.Raw(q.Question)</td>
 @*                             <td>
@@ -138,37 +344,50 @@
 
                             <td>
                                 <div class="d-flex justify-content-center flex-wrap gap-2">
-                                    <form asp-action="UpdateReadingQuestion" asp-controller="ReadingQuestion" method="get">
-                                        <input type="hidden" name="Id" value="@q.Id" />
-                                        <input type="hidden" name="Question" value="@q.Question" />
-                                        <input type="hidden" name="ReadingImageURL" value="@q.ReadingImageURL" />
-                                        <input type="hidden" name="TestSetId" value="@q.TestSetId" />
-                                        <input type="hidden" name="TestSetName" value="@q.TestSetName" />
-                                        <input type="hidden" name="RankQuestionId" value="@q.RankQuestionId" />
-                                        <input type="hidden" name="RankQuestionName" value="@q.RankQuestionName" />
-                                        <input type="hidden" name="CreatedDate" value="@q.CreatedDate.ToString("o")" />
-                                        <input type="hidden" name="UpdatedDate" value="@q.UpdatedDate.ToString("o")" />
-                                        @for (int i = 0; i < q.ReadingAnswers.Count; i++)
-                                        {
-                                            <input type="hidden" name="ReadingAnswers[@i].Id" value="@q.ReadingAnswers[i].Id" />
-                                            <input type="hidden" name="ReadingAnswers[@i].Content" value="@q.ReadingAnswers[i].Content" />
-                                            <input type="hidden" name="ReadingAnswers[@i].IsCorrect" value="@q.ReadingAnswers[i].IsCorrect.ToString().ToLower()" />
-                                        }
-                                        <button type="submit" class="btn btn-warning btn-sm rounded-pill">
-                                            <i class="fas fa-edit"></i> Sửa
+                                    @if (q.TestSetId == null && string.IsNullOrEmpty(q.TestSetName))
+                                    {
+                                        <form asp-action="UpdateReadingQuestion" asp-controller="ReadingQuestion" method="get">
+                                            <input type="hidden" name="Id" value="@q.Id" />
+                                            <input type="hidden" name="Question" value="@q.Question" />
+                                            <input type="hidden" name="ReadingImageURL" value="@q.ReadingImageURL" />
+                                            <input type="hidden" name="TestSetId" value="@q.TestSetId" />
+                                            <input type="hidden" name="TestSetName" value="@q.TestSetName" />
+                                            <input type="hidden" name="RankQuestionId" value="@q.RankQuestionId" />
+                                            <input type="hidden" name="RankQuestionName" value="@q.RankQuestionName" />
+                                            <input type="hidden" name="CreatedDate" value="@q.CreatedDate.ToString("o")" />
+                                            <input type="hidden" name="UpdatedDate" value="@q.UpdatedDate.ToString("o")" />
+                                            @for (int i = 0; i < q.ReadingAnswers.Count; i++)
+                                            {
+                                                <input type="hidden" name="ReadingAnswers[@i].Id" value="@q.ReadingAnswers[i].Id" />
+                                                <input type="hidden" name="ReadingAnswers[@i].Content" value="@q.ReadingAnswers[i].Content" />
+                                                <input type="hidden" name="ReadingAnswers[@i].IsCorrect" value="@q.ReadingAnswers[i].IsCorrect.ToString().ToLower()" />
+                                            }
+                                            <button type="submit" class="btn btn-warning btn-sm rounded-pill">
+                                                <i class="fas fa-edit"></i> Sửa
+                                            </button>
+                                        </form>
+
+                                        <button type="button" class="btn btn-danger btn-sm rounded-pill" onclick="deleteReadingQuestion(@q.Id)">
+                                            <i class="fas fa-trash-alt"></i> Xóa
                                         </button>
-                                    </form>
-
-                                    <button type="button" class="btn btn-danger btn-sm rounded-pill" onclick="deleteReadingQuestion(@q.Id)">
-                                        <i class="fas fa-trash-alt"></i> Xóa
-                                    </button>
-
+                                    }
+                                    else 
+                                    {
+                                        <button type="button" class="btn btn-secondary btn-sm rounded-pill" disabled title="Câu hỏi này đã thuộc bộ đề và không thể chỉnh sửa">
+                                            <i class="fas fa-lock"></i> Đã khóa
+                                        </button>
+                                    }
                                 </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
+        </div>
+        <div id="noResults" class="no-results" style="display: none;">
+            <i class="fas fa-search fa-2x mb-3 text-muted"></i>
+            <h5>Không tìm thấy câu hỏi nào</h5>
+            <p class="text-muted">Hãy thử tìm kiếm với từ khóa khác hoặc đặt lại bộ lọc</p>
         </div>
     }
     else
@@ -267,6 +486,44 @@
                         });
                 }
             });
+        }
+    </script>
+
+    <script>
+        // New search and filter functionality
+        function filterQuestions() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rankFilter = document.getElementById('rankFilter').value;
+            const rows = document.getElementsByClassName('question-row');
+            let visibleCount = 0;
+
+            for (let row of rows) {
+                const question = row.getAttribute('data-question');
+                const rank = row.getAttribute('data-rank');
+                const matchesSearch = question.includes(searchText);
+                const matchesRank = !rankFilter || rank === rankFilter;
+
+                if (matchesSearch && matchesRank) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+
+            // Show/hide no results message
+            const noResults = document.getElementById('noResults');
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('rankFilter').value = '';
+            filterQuestions();
         }
     </script>
 

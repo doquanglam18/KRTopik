@@ -16,10 +16,8 @@ namespace DATN.Application.Services.Interfaces
 
 
         Task<IEnumerable<AccessStatsDto>> GetAccessStatsAsync(DateTime? fromDate, DateTime? toDate, string? action, string? ip, Guid? userId);
-
         Task<IEnumerable<ChartDataDto>> GetDailyAccessChartAsync(DateTime? fromDate, DateTime? toDate);
-        Task<FileResult> ExportToExcelAsync(DateTime? fromDate, DateTime? toDate, string? action, string? ip, Guid? userId);
-        Task<FileResult> ExportToPdfAsync(DateTime? fromDate, DateTime? toDate, string? action, string? ip, Guid? userId);
-    }
+        
+     }
 
 }

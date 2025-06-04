@@ -19,5 +19,7 @@ namespace DATN.Application.Services.Interfaces
         Task<PageResultDto<KoreaBlogForList>> GetAllKoreaBlogPagingAsync(int page, int pageSize);
         Task<PageResultDto<KoreaBlogForList>> GetAllKoreaBlogForSearchPagingAsync(string searchName, int page, int pageSize);
         Task<PageResultDto<KoreaBlogForList>> GetAllKoreaBlogPagingAsyncForAdmin(int page, int pageSize);
+
+        Task<Result> UpdateViewBlog(int id);
     }
 }

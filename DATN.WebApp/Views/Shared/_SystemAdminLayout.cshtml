@@ -42,6 +42,7 @@
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
+
             <!-- Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-controller="SystemAdmin" asp-action="Index">
                 <div class="sidebar-brand-icon rotate-n-15">
@@ -52,28 +53,44 @@
 
             <hr class="sidebar-divider my-0" />
 
+            @{
+                var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+                var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+            }
+
+            @{
+
+                bool isAccountActive = currentController == "SystemAdmin" && currentAction == "Index";
+                bool isLoggingActive = currentController == "SystemAdmin" && currentAction == "ManageSystemLogging";
+                bool isStatsActive = currentController == "SystemAdmin" && currentAction == "AccessStats";
+            }
+
+
+
             <!-- Quản lý tài khoản (default active) -->
-            <li class="nav-item active">
+            <li class="nav-item @(isAccountActive ? "active" : "")">
                 <a class="nav-link" asp-controller="SystemAdmin" asp-action="Index">
                     <i class="fas fa-fw fa-user"></i>
                     <span>Quản lý tài khoản</span>
                 </a>
             </li>
 
-            <li class="nav-item">
+            <li class="nav-item @(isLoggingActive ? "active" : "")">
                 <a class="nav-link" asp-controller="SystemAdmin" asp-action="ManageSystemLogging">
                     <i class="fas fa-fw fa-file-alt"></i>
                     <span>Hoạt động người dùng trên hệ thống</span>
                 </a>
             </li>
 
+
             <!-- Thống kê hệ thống -->
-            <li class="nav-item">
+            <li class="nav-item @(isStatsActive ? "active" : "")">
                 <a class="nav-link" asp-controller="SystemAdmin" asp-action="AccessStats">
                     <i class="fas fa-fw fa-file-alt"></i>
                     <span>Thống kê hệ thống</span>
                 </a>
             </li>
+
 
             <form id="logoutForm" class="text-center mt-3">
                 @Html.AntiForgeryToken()

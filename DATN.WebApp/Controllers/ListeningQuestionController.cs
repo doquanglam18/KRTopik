@@ -3,6 +3,7 @@ using DATN.Application.Dtos.RankQuestionDtos;
 using DATN.Application.Dtos.ReadingDtos;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace DATN.WebApp.Controllers
 {
@@ -251,17 +252,163 @@ namespace DATN.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var response = await _httpClient.DeleteAsync($"{apiUrl}/{id}");
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"{apiUrl}/{id}");
+                var responseContent = await response.Content.ReadAsStringAsync();
 
-            if (response.IsSuccessStatusCode)
-            {
-                return Json(new { success = true, message = "Xóa câu hỏi nghe thành công !" });
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Xóa câu hỏi nghe thành công!" });
+                }
+                else
+                {
+                    string errorMessage;
+                    // Thử parse response như JSON
+                    if (responseContent.TrimStart().StartsWith("{"))
+                    {
+                        try 
+                        {
+                            var errorJson = System.Text.Json.JsonSerializer.Deserialize<JsonElement>(responseContent);
+                            // Lấy message từ JSON nếu có
+                            if (errorJson.TryGetProperty("message", out var messageElement))
+                            {
+                                errorMessage = messageElement.GetString() ?? responseContent;
+                            }
+                            else
+                            {
+                                errorMessage = responseContent;
+                            }
+                        }
+                        catch
+                        {
+                            errorMessage = responseContent;
+                        }
+                    }
+                    else
+                    {
+                        // Nếu không phải JSON, sử dụng trực tiếp nội dung
+                        errorMessage = responseContent;
+                    }
+
+                    return Json(new { success = false, message = errorMessage });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                return Json(new { success = false, message = $"Xóa thất bại: {error}" });
+                return Json(new { success = false, message = "Có lỗi xảy ra khi xóa câu hỏi nghe." });
             }
+        }
+
+
+
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> AddListeningQuestionForUser()
+        {
+            // Lấy dữ liệu từ API (bất đồng bộ)
+            var rankQuestions = await _httpClient.GetFromJsonAsync<IEnumerable<RankQuestionDto>>("https://localhost:7208/api/rankquestion/getall");
+
+            var rankReadingQuestion = rankQuestions.Where(x => x.RankQuestionName.Contains("Nghe")).ToList();
+
+            // Lưu vào ViewData
+            ViewData["RankQuestions"] = rankReadingQuestion;
+
+            return View();
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddListeningQuestionForUser(ListeningQuestionCreateDto createDto, IFormFile? sound)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Lấy chỉ số đáp án đúng từ form (radio button)
+                    var correctAnswerIndexString = Request.Form["CorrectAnswerIndex"];
+                    if (int.TryParse(correctAnswerIndexString, out int correctAnswerIndex))
+                    {
+                        for (int i = 0; i < createDto.ListeningAnswers.Count; i++)
+                        {
+                            createDto.ListeningAnswers[i].IsCorrect = (i == correctAnswerIndex);
+                        }
+                    }
+
+                    // Tạo MultipartFormDataContent để gửi yêu cầu đến API
+                    var content = new MultipartFormDataContent();
+
+                    // Gửi sound nếu có
+                    if (sound != null)
+                    {
+                        var fileContent = new StreamContent(sound.OpenReadStream());
+                        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(sound.ContentType);
+                        content.Add(fileContent, "sound", sound.FileName);
+                    }
+
+                    // Gửi các thuộc tính chính
+                    content.Add(new StringContent(createDto.Question), "Question");
+                    content.Add(new StringContent(createDto.RankQuestionId.ToString()), "RankQuestionId");
+                    content.Add(new StringContent(createDto.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss")), "CreatedDate");
+                    content.Add(new StringContent(createDto.UpdatedDate.ToString("yyyy-MM-ddTHH:mm:ss")), "UpdatedDate");
+                    content.Add(new StringContent(createDto.ListeningScript.ToString()), "ListeningScript");
+
+                    // Gửi danh sách ReadingAnswers
+                    for (int i = 0; i < createDto.ListeningAnswers.Count; i++)
+                    {
+                        var answer = createDto.ListeningAnswers[i];
+
+                        if (answer.Content == null)
+                        {
+                            answer.Content = string.Empty;
+                        }
+                        content.Add(new StringContent(answer.Content), $"ListeningAnswers[{i}].Content");
+                        content.Add(new StringContent(answer.IsCorrect.ToString().ToLower()), $"ListeningAnswers[{i}].IsCorrect");
+
+                        // GỬI FILE ẢNH nếu có
+                        if (answer.Image != null)
+                        {
+                            var imageContent = new StreamContent(answer.Image.OpenReadStream());
+                            imageContent.Headers.ContentType = new MediaTypeHeaderValue(answer.Image.ContentType);
+                            content.Add(imageContent, $"ListeningAnswers[{i}].Image", answer.Image.FileName);
+                        }
+                    }
+
+
+                    // Gọi API để tạo mới câu hỏi
+                    var response = await _httpClient.PostAsync($"{apiUrl}/add", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Tạo câu hỏi nghe thành công!",
+                            redirectUrl = Url.Action("ManageListeningQuestion", "Admin")
+                        });
+                    }
+                    else
+                    {
+                        var errorMessage = await response.Content.ReadAsStringAsync();
+                        return Json(new
+                        {
+                            success = false,
+                            message = $"Tạo câu hỏi thất bại: {errorMessage}",
+                            redirectUrl = Url.Action("ManageListeningQuestion", "Admin")
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+                }
+            }
+
+            return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
         }
 
     }

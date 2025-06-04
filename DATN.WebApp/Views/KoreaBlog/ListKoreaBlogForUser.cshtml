@@ -87,7 +87,7 @@
 <div class="container mt-5 pt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-bold mb-0">Tin Tức Hàn Quốc</h1>
-        <a href="@Url.Action("CreateKoreaBlog", "KoreaBlog")" class="btn btn-success">
+        <a href="javascript:void(0);" onclick="checkAuthAndNavigate()" class="btn btn-success">
             <i class="bi bi-plus-circle me-1"></i> Đăng bài
         </a>
     </div>
@@ -210,6 +210,38 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function checkAuthAndNavigate() {
+            fetch('@Url.Action("CreateKoreaBlog", "KoreaBlog")')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success === false) {
+                        Swal.fire({
+                            title: 'Thông báo',
+                            text: data.message,
+                            icon: 'warning',
+                            confirmButtonText: 'Đăng nhập',
+                            showCancelButton: true,
+                            cancelButtonText: 'Hủy'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/User/Login';
+                            }
+                        });
+                    } else {
+                        window.location.href = '@Url.Action("CreateKoreaBlog", "KoreaBlog")';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Lỗi',
+                        text: 'Có lỗi xảy ra, vui lòng thử lại sau!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+        }
+
         $(document).ready(function() {
             // Handle items per page change
             $('#pageSize').change(function() {

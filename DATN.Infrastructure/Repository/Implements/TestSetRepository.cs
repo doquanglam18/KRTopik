@@ -16,6 +16,13 @@ namespace DATN.Infrastructure.Repository.Implements
         {
         }
 
+
+            public async Task<TestSet> AddTestSet(TestSet entity)
+            {
+                var result = await _context.Set<TestSet>().AddAsync(entity);
+                return result.Entity;
+            }
+
         public override IQueryable<TestSet> GetAll()
         {
             return _context.testSet

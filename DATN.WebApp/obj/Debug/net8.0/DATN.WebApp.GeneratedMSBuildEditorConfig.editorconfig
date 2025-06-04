@@ -42,6 +42,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlVGVzdFNldC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/DATN2025/DATN/DATN.WebApp/Views/Admin/TestSetStatistics.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVGVzdFNldFN0YXRpc3RpY3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DATN2025/DATN/DATN.WebApp/Views/Home/Contact.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxDb250YWN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -70,12 +74,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGVuaW5nUXVlc3Rpb25cQWRkTGlzdGVuaW5nUXVlc3Rpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/DATN2025/DATN/DATN.WebApp/Views/ListeningQuestion/AddListeningQuestionForUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGVuaW5nUXVlc3Rpb25cQWRkTGlzdGVuaW5nUXVlc3Rpb25Gb3JVc2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DATN2025/DATN/DATN.WebApp/Views/ListeningQuestion/UpdateListeningQuestion.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGVuaW5nUXVlc3Rpb25cVXBkYXRlTGlzdGVuaW5nUXVlc3Rpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DATN2025/DATN/DATN.WebApp/Views/ReadingQuestion/AddReadingQuestion.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVhZGluZ1F1ZXN0aW9uXEFkZFJlYWRpbmdRdWVzdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN2025/DATN/DATN.WebApp/Views/ReadingQuestion/AddReadingQuestionForUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVhZGluZ1F1ZXN0aW9uXEFkZFJlYWRpbmdRdWVzdGlvbkZvclVzZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DATN2025/DATN/DATN.WebApp/Views/ReadingQuestion/UpdateReadingQuestion.cshtml]

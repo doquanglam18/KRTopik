@@ -66,33 +66,72 @@
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
-            <li class="nav-item">
+            @{
+                var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+                var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+            }
+
+            @{
+                bool isReadingActive = currentController == "Admin" && currentAction == "ManageReadingQuestion"
+                || currentController == "ReadingQuestion" &&
+                (currentAction == "AddReadingQuestion" || currentAction == "UpdateReadingQuestion");
+            }
+            <li class="nav-item @(isReadingActive ? "active" : "")">
                 <a class="nav-link" asp-action="ManageReadingQuestion" asp-controller="Admin">
                     <i class="fas fa-fw fa-file-alt"></i>
                     <span>Quản lý câu hỏi đọc</span>
                 </a>
             </li>
 
-            <li class="nav-item active">
+
+
+            @{
+                var isActive =
+                (currentController == "Admin" && currentAction == "ManageListeningQuestion") ||
+                (currentController == "ListeningQuestion" && currentAction == "AddListeningQuestion") ||
+                (currentController == "ListeningQuestion" && currentAction == "UpdateListeningQuestion");
+            }
+            <li class="nav-item @(isActive ? "active" : "")">
                 <a class="nav-link" asp-action="ManageListeningQuestion" asp-controller="Admin">
                     <i class="fas fa-fw fa-file-alt"></i>
                     <span>Quản lý câu hỏi nghe</span>
                 </a>
             </li>
 
-            <li class="nav-item">
+
+            @{
+                bool isTestSetActive = currentController == "Admin" && currentAction == "ManageTestSet"
+                || currentController == "TestSet" &&
+                (currentAction == "CreateTestSetByAdmin" || currentAction == "TestSetDetailsForAdmin");
+            }
+            <li class="nav-item @(isTestSetActive ? "active" : "")">
                 <a class="nav-link" asp-action="ManageTestSet" asp-controller="Admin">
                     <i class="fas fa-fw fa-file-alt"></i>
                     <span>Quản lý đề thi</span>
                 </a>
             </li>
 
-            <li class="nav-item">
+
+            @{
+                bool isKoreaBlogActive = currentController == "Admin" && currentAction == "ManageKoreaBlog"
+                || currentController == "KoreaBlog" &&
+                (currentAction == "CreateKoreaBlog" || currentAction == "Details");
+            }
+            <li class="nav-item @(isKoreaBlogActive ? "active" : "")">
                 <a class="nav-link" asp-action="ManageKoreaBlog" asp-controller="Admin">
                     <i class="fas fa-fw fa-tags"></i>
                     <span>Quản lý bài viết tiếng Hàn</span>
                 </a>
             </li>
+
+
+            <li class="nav-item ">
+                <a class="nav-link" asp-action="TestSetStatistics" asp-controller="Admin">
+                    <i class="fas fa-fw fa-tags"></i>
+                    <span>Thống kê</span>
+                </a>
+            </li>
+
 
 
             <a class="btn btn-primary custom-back-btn" asp-action="Index" asp-controller="Home">

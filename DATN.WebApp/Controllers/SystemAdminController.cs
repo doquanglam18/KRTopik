@@ -121,23 +121,25 @@ namespace DATN.WebApp.Controllers
 
 
         [HttpGet]
-        // Trang thống kê chính
-        public async Task<IActionResult> AccessStats(DateTime? fromDate, DateTime? toDate, string? actionName, string? ip, Guid? userId)
+        public async Task<IActionResult> AccessStats(DateTime? fromDate, DateTime? toDate)
         {
             // Lấy JWT token từ session
             var token = HttpContext.Session.GetString("JWTToken");
 
             if (string.IsNullOrEmpty(token))
             {
-                // Nếu chưa có token, chuyển về trang đăng nhập
                 return RedirectToAction("Login", "User");
             }
 
             // Thêm token vào header
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+            // Xử lý ngày để lấy từ đầu ngày đến cuối ngày
+            var fromDateTime = fromDate.HasValue ? fromDate.Value.Date : (DateTime?)null;
+            var toDateTime = toDate.HasValue ? toDate.Value.Date.AddDays(1).AddSeconds(-1) : (DateTime?)null;
+
             // Gọi API để lấy dữ liệu thống kê
-            var queryParams = $"?fromDate={fromDate?.ToString("yyyy-MM-ddTHH:mm:ss")}&toDate={toDate?.ToString("yyyy-MM-ddTHH:mm:ss")}&actionName={actionName}&ip={ip}&userId={userId}";
+            var queryParams = $"?from={fromDateTime?.ToString("yyyy-MM-ddTHH:mm:ss")}&to={toDateTime?.ToString("yyyy-MM-ddTHH:mm:ss")}";
             var statsResponse = await _httpClient.GetFromJsonAsync<IEnumerable<AccessStatsDto>>($"{apiBaseUrl}/stats{queryParams}");
 
             // Gọi API lấy dữ liệu vẽ biểu đồ
@@ -149,44 +151,13 @@ namespace DATN.WebApp.Controllers
                 Stats = statsResponse?.ToList() ?? new List<AccessStatsDto>(),
                 ChartData = chartResponse?.ToList() ?? new List<ChartDataDto>(),
                 FromDate = fromDate,
-                ToDate = toDate,
-                ActionName = actionName,
-                IP = ip,
-                UserId = userId
+                ToDate = toDate
             };
 
             return View(viewModel);
         }
 
-        // Xuất Excel
-        public async Task<IActionResult> ExportExcel(DateTime? fromDate, DateTime? toDate, string? actionName, string? ip, Guid? userId)
-        {
-            var queryParams = $"?fromDate={fromDate:yyyy-MM-dd}&toDate={toDate:yyyy-MM-dd}&actionName={actionName}&ip={ip}&userId={userId}";
-            var response = await _httpClient.GetAsync($"{apiBaseUrl}/export/excel{queryParams}");
-
-            if (!response.IsSuccessStatusCode)
-                return BadRequest("Không thể xuất Excel");
-
-            var content = await response.Content.ReadAsByteArrayAsync();
-            var fileName = $"AccessStats_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-
-            return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-        }
-
-        // Xuất PDF
-        public async Task<IActionResult> ExportPdf(DateTime? fromDate, DateTime? toDate, string? actionName, string? ip, Guid? userId)
-        {
-            var queryParams = $"?fromDate={fromDate:yyyy-MM-dd}&toDate={toDate:yyyy-MM-dd}&actionName={actionName}&ip={ip}&userId={userId}";
-            var response = await _httpClient.GetAsync($"{apiBaseUrl}/export/pdf{queryParams}");
-
-            if (!response.IsSuccessStatusCode)
-                return BadRequest("Không thể xuất PDF");
-
-            var content = await response.Content.ReadAsByteArrayAsync();
-            var fileName = $"AccessStats_{DateTime.Now:yyyyMMddHHmmss}.pdf";
-
-            return File(content, "application/pdf", fileName);
-        }
+ 
     }
 
 }

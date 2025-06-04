@@ -1,0 +1,1353 @@
+@* @{
+    ViewData["Title"] = "Thống kê bài thi";
+    Layout = "_AdminLayout";
+    var rankQuestions = ViewData["RankQuestions"] as IEnumerable<DATN.Application.Dtos.RankQuestionDtos.RankQuestionDto>;
+}
+
+@section Styles {
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Thống kê bài thi</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Admin">Dashboard</a></li>
+        <li class="breadcrumb-item active">Thống kê bài thi</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-chart-area me-1"></i>
+            Bộ lọc thống kê
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="timeUnit">Đơn vị thời gian</label>
+                        <select id="timeUnit" class="form-select">
+                            <option value="0">Ngày</option>
+                            <option value="1">Tuần</option>
+                            <option value="2">Tháng</option>
+                            <option value="3">Năm</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="startDate">Từ ngày</label>
+                        <input type="date" id="startDate" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="endDate">Đến ngày</label>
+                        <input type="date" id="endDate" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="rankFilter">Cấp độ</label>
+                        <select id="rankFilter" class="form-select">
+                            <option value="0">Tất cả</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button id="btnFilter" class="btn btn-primary">
+                        <i class="fas fa-filter me-1"></i> Lọc
+                    </button>
+                    <button id="btnExport" class="btn btn-success">
+                        <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Số lượt làm bài theo cấp độ
+                </div>
+                <div class="card-body">
+                    <canvas id="attemptsChart" width="100%" height="40"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-users me-1"></i>
+                    Số người dùng theo cấp độ
+                </div>
+                <div class="card-body">
+                    <canvas id="usersChart" width="100%" height="40"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Chi tiết thống kê
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="statisticsTable" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Cấp độ</th>
+                            <th>Ngày</th>
+                            <th>Số lượt làm</th>
+                            <th>Số người dùng</th>
+                            <th>Điểm trung bình</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- jQuery (nếu chưa có trong _AdminLayout) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap Bundle (nếu chưa có trong _AdminLayout) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+
+    <script>
+        // Thêm console.log để debug
+        console.log('Page loaded');
+        console.log('Token:', '@Context.Session.GetString("JWTToken")');
+        console.log('RankQuestions:', @Html.Raw(Json.Serialize(rankQuestions)));
+
+        let attemptsChart = null;
+        let usersChart = null;
+        let statisticsData = [];
+        let statisticsTable = null;
+
+        $(document).ready(function () {
+            console.log('Document ready');
+            
+            // Check authentication
+            const token = '@Context.Session.GetString("JWTToken")';
+            if (!token) {
+                console.log('No token found, redirecting to login');
+                window.location.href = '/User/Login';
+                return;
+            }
+
+            console.log('Token found, setting up AJAX defaults');
+            // Set default authorization header
+            $.ajaxSetup({
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText,
+                        statusCode: xhr.status
+                    });
+                }
+            });
+
+            // Initialize date inputs with default values
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            $('#startDate').val(lastMonth.toISOString().split('T')[0]);
+            $('#endDate').val(today.toISOString().split('T')[0]);
+
+            // Initialize DataTable
+            statisticsTable = $('#statisticsTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/vi.json'
+                },
+                order: [[1, 'asc'], [0, 'asc']],
+                pageLength: 10,
+                responsive: true
+            });
+
+            // Load ranks from ViewData
+            const rankFilter = $('#rankFilter');
+            @foreach (var rank in rankQuestions)
+            {
+                <text>
+                rankFilter.append(`<option value="@rank.Id">@rank.RankQuestionName</option>`);
+                </text>
+            }
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Load initial data
+            loadStatistics();
+
+            // Event handlers
+            $('#btnFilter').click(loadStatistics);
+            $('#btnExport').click(exportToExcel);
+
+            // Thêm sự kiện cho các input lọc
+            $('#timeUnit, #startDate, #endDate, #rankFilter').on('change', function() {
+                // Tự động lọc khi thay đổi bất kỳ giá trị nào
+                loadStatistics();
+            });
+
+            // Thêm validation cho date inputs
+            $('#startDate, #endDate').on('change', function() {
+                const startDate = new Date($('#startDate').val());
+                const endDate = new Date($('#endDate').val());
+                
+                if (startDate > endDate) {
+                    alert('Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc');
+                    $(this).val(''); // Clear invalid date
+                }
+            });
+
+            // Thêm sự kiện cho nút Export
+            $('#btnExport').click(function() {
+                if (statisticsData.length === 0) {
+                    alert('Không có dữ liệu để xuất');
+                    return;
+                }
+                exportToExcel();
+            });
+
+            // Thêm event listener cho select box để debug
+            $('#rankFilter').on('change', function() {
+                const selectedRankId = parseInt($(this).val());
+                console.log('Rank filter changed:', {
+                    value: $(this).val(),
+                    parsedValue: selectedRankId,
+                    type: typeof selectedRankId
+                });
+            });
+        });
+
+        function loadStatistics() {
+            console.log('loadStatistics called');
+            
+            // Kiểm tra token
+            const token = '@Context.Session.GetString("JWTToken")';
+            if (!token) {
+                console.log('No token found in loadStatistics, redirecting to login');
+                window.location.href = '/User/Login';
+                return;
+            }
+
+            // Validate dates
+            const startDate = $('#startDate').val();
+            const endDate = $('#endDate').val();
+            
+            if (!startDate || !endDate) {
+                alert('Vui lòng chọn khoảng thời gian');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc');
+                return;
+            }
+
+            // Lấy và kiểm tra rankId
+            const rankId = parseInt($('#rankFilter').val());
+            console.log('Selected rankId:', rankId, 'Type:', typeof rankId);
+
+            const request = {
+                startDate: startDate,
+                endDate: endDate,
+                timeUnit: parseInt($('#timeUnit').val())
+            };
+
+            console.log('Request data:', request);
+
+            // Xác định URL dựa trên rankId
+            let url;
+            if (rankId === 0) {
+                url = '/Admin/GetTestSetStatistics';
+                console.log('Using general statistics endpoint');
+            } else {
+                // Thêm rankId vào URL thay vì request body
+                url = `/Admin/GetTestSetStatisticsByRank?rankId=${rankId}`;
+                console.log('Using rank-specific endpoint with rankId in URL:', rankId);
+            }
+
+            console.log('Sending request to:', url);
+
+            // Show loading state
+            $('#btnFilter').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang tải...');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                data: JSON.stringify(request),
+                success: function (response) {
+                    console.log('Received response:', response);
+                    
+                    // Reset loading state
+                    $('#btnFilter').prop('disabled', false).html('<i class="fas fa-filter me-1"></i> Lọc');
+                    
+                    // Kiểm tra nếu response là một mảng trực tiếp
+                    if (Array.isArray(response)) {
+                        statisticsData = response;
+                        updateCharts();
+                        updateTable();
+                    }
+                    // Kiểm tra nếu response có cấu trúc { success, data }
+                    else if (response && response.success && Array.isArray(response.data)) {
+                        statisticsData = response.data;
+                        updateCharts();
+                        updateTable();
+                    }
+                    // Kiểm tra nếu response có cấu trúc { data: [...] }
+                    else if (response && Array.isArray(response.data)) {
+                        statisticsData = response.data;
+                        updateCharts();
+                        updateTable();
+                    }
+                    else {
+                        console.error('Invalid response format:', response);
+                        alert('Định dạng dữ liệu không hợp lệ. Vui lòng thử lại sau.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Reset loading state
+                    $('#btnFilter').prop('disabled', false).html('<i class="fas fa-filter me-1"></i> Lọc');
+                    
+                    console.error('Error in loadStatistics:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText,
+                        statusCode: xhr.status,
+                        url: url,
+                        requestData: request,
+                        rankId: rankId
+                    });
+                    
+                    if (xhr.status === 401) {
+                        alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                        window.location.href = '/User/Login';
+                    } else {
+                        alert('Không thể tải dữ liệu thống kê. Vui lòng thử lại sau.');
+                    }
+                }
+            });
+        }
+
+        function initializeCharts() {
+            const attemptsCtx = document.getElementById('attemptsChart').getContext('2d');
+            const usersCtx = document.getElementById('usersChart').getContext('2d');
+
+            attemptsChart = new Chart(attemptsCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            usersChart = new Chart(usersCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            if (!statisticsData || statisticsData.length === 0) {
+                console.log('No data to update charts');
+                // Clear charts
+                attemptsChart.data.labels = [];
+                attemptsChart.data.datasets = [];
+                attemptsChart.update();
+                
+                usersChart.data.labels = [];
+                usersChart.data.datasets = [];
+                usersChart.update();
+                return;
+            }
+
+            const timeUnit = $('#timeUnit').val();
+            const dateFormat = getDateFormat(timeUnit);
+
+            // Group data by date and rank
+            const groupedData = {};
+            statisticsData.forEach(item => {
+                const date = new Date(item.date).toLocaleDateString('vi-VN', dateFormat);
+                if (!groupedData[date]) {
+                    groupedData[date] = {};
+                }
+                if (!groupedData[date][item.rankQuestionName]) {
+                    groupedData[date][item.rankQuestionName] = {
+                        attempts: 0,
+                        users: 0
+                    };
+                }
+                groupedData[date][item.rankQuestionName].attempts += item.totalAttempts;
+                groupedData[date][item.rankQuestionName].users += item.totalUsers;
+            });
+
+            // Prepare chart data
+            const dates = Object.keys(groupedData).sort();
+            const ranks = [...new Set(statisticsData.map(item => item.rankQuestionName))];
+
+            // Update attempts chart
+            attemptsChart.data.labels = dates;
+            attemptsChart.data.datasets = ranks.map(rank => ({
+                label: rank,
+                data: dates.map(date => groupedData[date][rank]?.attempts || 0),
+                backgroundColor: getRandomColor()
+            }));
+            attemptsChart.update();
+
+            // Update users chart
+            usersChart.data.labels = dates;
+            usersChart.data.datasets = ranks.map(rank => ({
+                label: rank,
+                data: dates.map(date => groupedData[date][rank]?.users || 0),
+                backgroundColor: getRandomColor()
+            }));
+            usersChart.update();
+        }
+
+        function updateTable() {
+            statisticsTable.clear();
+
+            if (!statisticsData || statisticsData.length === 0) {
+                console.log('No data to update table');
+                statisticsTable.draw();
+                return;
+            }
+
+            const timeUnit = $('#timeUnit').val();
+            const dateFormat = getDateFormat(timeUnit);
+
+            statisticsData.forEach(item => {
+                statisticsTable.row.add([
+                    item.rankQuestionName,
+                    new Date(item.date).toLocaleDateString('vi-VN', dateFormat),
+                    item.totalAttempts,
+                    item.totalUsers,
+                    item.averageScore.toFixed(2)
+                ]);
+            });
+
+            statisticsTable.draw();
+        }
+
+        function getDateFormat(timeUnit) {
+            switch (parseInt(timeUnit)) {
+                case 0: return { day: '2-digit', month: '2-digit', year: 'numeric' };
+                case 1: return { day: '2-digit', month: '2-digit', year: 'numeric' };
+                case 2: return { month: '2-digit', year: 'numeric' };
+                case 3: return { year: 'numeric' };
+                default: return { day: '2-digit', month: '2-digit', year: 'numeric' };
+            }
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function exportToExcel() {
+            const timeUnit = $('#timeUnit').val();
+            const dateFormat = getDateFormat(timeUnit);
+            
+            // Prepare data for export
+            const exportData = statisticsData.map(item => ({
+                'Cấp độ': item.rankQuestionName,
+                'Ngày': new Date(item.date).toLocaleDateString('vi-VN', dateFormat),
+                'Số lượt làm': item.totalAttempts,
+                'Số người dùng': item.totalUsers,
+                'Điểm trung bình': item.averageScore.toFixed(2)
+            }));
+
+            // Convert to worksheet
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Thống kê");
+
+            // Generate filename
+            const startDate = $('#startDate').val();
+            const endDate = $('#endDate').val();
+            const filename = `ThongKeBaiThi_${startDate}_${endDate}.xlsx`;
+
+            // Save file
+            XLSX.writeFile(wb, filename);
+        }
+    </script>
+}  *@
+
+
+
+
+@{
+    ViewData["Title"] = "Thống kê bài thi";
+    Layout = "_AdminLayout";
+    var rankQuestions = ViewData["RankQuestions"] as IEnumerable<DATN.Application.Dtos.RankQuestionDtos.RankQuestionDto>;
+}
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <!-- Bootstrap Datepicker -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <style>
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: none;
+            margin-bottom: 24px;
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            padding: 1.25rem 1.5rem;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0.75rem 0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+        
+        .btn {
+            border-radius: 8px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5bc7;
+            border-color: #3a5bc7;
+        }
+        
+        .btn-success {
+            background-color: #1cc88a;
+            border-color: #1cc88a;
+        }
+        
+        .btn-success:hover {
+            background-color: #17a673;
+            border-color: #17a673;
+        }
+        
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .dataTables_wrapper .dataTables_filter input {
+            border-radius: 8px;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            border-left: 4px solid #4e73df;
+            border-radius: 8px;
+        }
+        
+        .stat-card .card-body {
+            padding: 1rem 1.5rem;
+        }
+        
+        .stat-card h6 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+        
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #e0e0e0;
+        }
+    </style>
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4 fw-bold">Thống kê luyện đề</h1>
+    <ol class="breadcrumb mb-4">
+       @*  <li class="breadcrumb-item"><a href="/Admin"><i class="fas fa-home me-1"></i> Dashboard</a></li> *@
+        <li class="breadcrumb-item active"><i class="fas fa-chart-bar me-1"></i> Thống kê ôn luyện đề</li>
+    </ol>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-filter me-2"></i>
+                    <span class="fw-bold">Bộ lọc thống kê</span>
+                </div>
+                <button class="btn btn-sm btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+        <div class="collapse show" id="filterCollapse">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="timeUnit" class="form-label">Đơn vị thời gian</label>
+                        <select id="timeUnit" class="form-select">
+                            <option value="0">Ngày</option>
+                            <option value="1">Tuần</option>
+                            <option value="2">Tháng</option>
+                            <option value="3">Năm</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="startDate" class="form-label">Từ ngày</label>
+                        <div class="input-group">
+                            <input type="text" id="startDate" class="form-control datepicker" placeholder="dd/mm/yyyy" />
+                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="endDate" class="form-label">Đến ngày</label>
+                        <div class="input-group">
+                            <input type="text" id="endDate" class="form-control datepicker" placeholder="dd/mm/yyyy" />
+                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="rankFilter" class="form-label">Cấp độ</label>
+                        <select id="rankFilter" class="form-select">
+                            <option value="0">Tất cả</option>
+                            @foreach (var rank in rankQuestions)
+                            {
+                                <option value="@rank.Id">@rank.RankQuestionName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12 d-flex justify-content-end">
+                        <button id="btnReset" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-undo me-1"></i> Đặt lại
+                        </button>
+                        <button id="btnFilter" class="btn btn-primary me-2">
+                            <i class="fas fa-filter me-1"></i> Áp dụng
+                        </button>
+                        <button id="btnExport" class="btn btn-success">
+                            <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card mb-4">
+                <div class="card-body">
+                    <h6>Tổng lượt làm bài</h6>
+                    <h3 id="totalAttempts">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card mb-4">
+                <div class="card-body">
+                    <h6>Tổng người dùng</h6>
+                    <h3 id="totalUsers">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card mb-4">
+                <div class="card-body">
+                    <h6>Điểm trung bình</h6>
+                    <h3 id="averageScore">0.00</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card mb-4">
+                <div class="card-body">
+                    <h6>Số cấp độ</h6>
+                    <h3 id="totalRanks">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    <span class="fw-bold">Số lượt làm bài theo cấp độ</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="attemptsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <i class="fas fa-users me-2"></i>
+                    <span class="fw-bold">Số người dùng theo cấp độ</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="usersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-table me-2"></i>
+                    <span class="fw-bold">Chi tiết thống kê</span>
+                </div>
+                <div>
+                    <button id="refreshTable" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="statisticsTable" class="table table-striped table-hover table-bordered w-100">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Cấp độ</th>
+                            <th>Ngày</th>
+                            <th>Số lượt làm</th>
+                            <th>Số người dùng</th>
+                            <th>Điểm trung bình</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    
+    <!-- Bootstrap Datepicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.vi.min.js"></script>
+    
+    <!-- Moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.min.js"></script>
+
+    <script>
+        // Thêm console.log để debug
+        console.log('Page loaded');
+        console.log('Token:', '@Context.Session.GetString("JWTToken")');
+        console.log('RankQuestions:', @Html.Raw(Json.Serialize(rankQuestions)));
+
+        let attemptsChart = null;
+        let usersChart = null;
+        let statisticsData = [];
+        let statisticsTable = null;
+        const colorPalette = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796', '#5a5c69'];
+
+        $(document).ready(function () {
+            console.log('Document ready');
+            
+            // Initialize datepicker
+            $('.datepicker').datepicker({
+                format: 'dd/mm/yyyy',
+                language: 'vi',
+                autoclose: true,
+                todayHighlight: true
+            });
+
+            // Set default dates
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            $('#startDate').datepicker('setDate', lastMonth);
+            $('#endDate').datepicker('setDate', today);
+
+            // Check authentication
+            const token = '@Context.Session.GetString("JWTToken")';
+            if (!token) {
+                console.log('No token found, redirecting to login');
+                window.location.href = '/User/Login';
+                return;
+            }
+
+            console.log('Token found, setting up AJAX defaults');
+            // Set default authorization header
+            $.ajaxSetup({
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText,
+                        statusCode: xhr.status
+                    });
+                    
+                    if (xhr.status === 401) {
+                        alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                        window.location.href = '/User/Login';
+                    } else {
+                        alert('Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.');
+                    }
+                }
+            });
+
+            // Initialize DataTable
+            statisticsTable = $('#statisticsTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json'
+                },
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                order: [[1, 'asc'], [0, 'asc']],
+                pageLength: 10,
+                responsive: true,
+                columnDefs: [
+                    { targets: 0, width: '20%' },
+                    { targets: 1, width: '20%' },
+                    { targets: 2, width: '15%', className: 'text-end' },
+                    { targets: 3, width: '15%', className: 'text-end' },
+                    { targets: 4, width: '15%', className: 'text-end' }
+                ]
+            });
+
+            // Initialize charts
+            initializeCharts();
+            
+            // Load initial data
+            loadStatistics();
+
+            // Event handlers
+            $('#btnFilter').click(loadStatistics);
+            $('#btnExport').click(exportToExcel);
+            $('#refreshTable').click(loadStatistics);
+            $('#btnReset').click(resetFilters);
+
+            // Thêm sự kiện cho các input lọc
+            $('#timeUnit, #rankFilter').on('change', function() {
+                loadStatistics();
+            });
+
+            // Thêm validation cho date inputs
+            $('#startDate, #endDate').on('changeDate', function() {
+                const startDate = $('#startDate').datepicker('getDate');
+                const endDate = $('#endDate').datepicker('getDate');
+                
+                if (startDate && endDate && startDate > endDate) {
+                    alert('Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc');
+                    $(this).datepicker('clearDates');
+                } else {
+                    loadStatistics();
+                }
+            });
+        });
+
+        function resetFilters() {
+            $('#timeUnit').val('0');
+            
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            $('#startDate').datepicker('setDate', lastMonth);
+            $('#endDate').datepicker('setDate', today);
+            
+            $('#rankFilter').val('0');
+            
+            loadStatistics();
+        }
+
+        function loadStatistics() {
+            console.log('loadStatistics called');
+            
+            // Kiểm tra token
+            const token = '@Context.Session.GetString("JWTToken")';
+            if (!token) {
+                console.log('No token found in loadStatistics, redirecting to login');
+                window.location.href = '/User/Login';
+                return;
+            }
+
+            // Validate dates
+            const startDate = $('#startDate').datepicker('getDate');
+            const endDate = $('#endDate').datepicker('getDate');
+            
+            if (!startDate || !endDate) {
+                alert('Vui lòng chọn khoảng thời gian');
+                return;
+            }
+
+            if (startDate > endDate) {
+                alert('Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc');
+                return;
+            }
+
+            // Lấy và kiểm tra rankId
+            const rankId = parseInt($('#rankFilter').val());
+            console.log('Selected rankId:', rankId, 'Type:', typeof rankId);
+
+            const request = {
+                startDate: moment(startDate).format('YYYY-MM-DD'),
+                endDate: moment(endDate).format('YYYY-MM-DD'),
+                timeUnit: parseInt($('#timeUnit').val())
+            };
+
+            console.log('Request data:', request);
+
+            // Xác định URL dựa trên rankId
+            let url;
+            if (rankId === 0) {
+                url = '/Admin/GetTestSetStatistics';
+                console.log('Using general statistics endpoint');
+            } else {
+                // Thêm rankId vào URL thay vì request body
+                url = `/Admin/GetTestSetStatisticsByRank?rankId=${rankId}`;
+                console.log('Using rank-specific endpoint with rankId in URL:', rankId);
+            }
+
+            console.log('Sending request to:', url);
+
+            // Show loading state
+            $('#btnFilter').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang tải...');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(request),
+                success: function (response) {
+                    console.log('Received response:', response);
+                    
+                    // Reset loading state
+                    $('#btnFilter').prop('disabled', false).html('<i class="fas fa-filter me-1"></i> Áp dụng');
+                    
+                    // Kiểm tra nếu response là một mảng trực tiếp
+                    if (Array.isArray(response)) {
+                        statisticsData = response;
+                        updateSummaryCards();
+                        updateCharts();
+                        updateTable();
+                    }
+                    // Kiểm tra nếu response có cấu trúc { success, data }
+                    else if (response && response.success && Array.isArray(response.data)) {
+                        statisticsData = response.data;
+                        updateSummaryCards();
+                        updateCharts();
+                        updateTable();
+                    }
+                    // Kiểm tra nếu response có cấu trúc { data: [...] }
+                    else if (response && Array.isArray(response.data)) {
+                        statisticsData = response.data;
+                        updateSummaryCards();
+                        updateCharts();
+                        updateTable();
+                    }
+                    else {
+                        console.error('Invalid response format:', response);
+                        alert('Định dạng dữ liệu không hợp lệ. Vui lòng thử lại sau.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Reset loading state
+                    $('#btnFilter').prop('disabled', false).html('<i class="fas fa-filter me-1"></i> Áp dụng');
+                    
+                    console.error('Error in loadStatistics:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText,
+                        statusCode: xhr.status,
+                        url: url,
+                        requestData: request,
+                        rankId: rankId
+                    });
+                }
+            });
+        }
+
+        function updateSummaryCards() {
+            if (!statisticsData || statisticsData.length === 0) {
+                $('#totalAttempts').text('0');
+                $('#totalUsers').text('0');
+                $('#averageScore').text('0.00');
+                $('#totalRanks').text('0');
+                return;
+            }
+
+            const totalAttempts = statisticsData.reduce((sum, item) => sum + item.totalAttempts, 0);
+            const totalUsers = statisticsData.reduce((sum, item) => sum + item.totalUsers, 0);
+            const averageScore = statisticsData.reduce((sum, item) => sum + item.averageScore, 0) / statisticsData.length;
+            const uniqueRanks = new Set(statisticsData.map(item => item.rankQuestionId)).size;
+
+            $('#totalAttempts').text(totalAttempts.toLocaleString());
+            $('#totalUsers').text(totalUsers.toLocaleString());
+            $('#averageScore').text(averageScore.toFixed(2));
+            $('#totalRanks').text(uniqueRanks);
+        }
+
+        function initializeCharts() {
+            const attemptsCtx = document.getElementById('attemptsChart').getContext('2d');
+            const usersCtx = document.getElementById('usersChart').getContext('2d');
+
+            attemptsChart = new Chart(attemptsCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            usersChart = new Chart(usersCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            if (!statisticsData || statisticsData.length === 0) {
+                console.log('No data to update charts');
+                // Clear charts
+                attemptsChart.data.labels = [];
+                attemptsChart.data.datasets = [];
+                attemptsChart.update();
+                
+                usersChart.data.labels = [];
+                usersChart.data.datasets = [];
+                usersChart.update();
+                return;
+            }
+
+            const timeUnit = $('#timeUnit').val();
+            const dateFormat = getDateFormat(timeUnit);
+
+            // Group data by date and rank
+            const groupedData = {};
+            statisticsData.forEach(item => {
+                const date = formatDate(new Date(item.date), timeUnit);
+                if (!groupedData[date]) {
+                    groupedData[date] = {};
+                }
+                if (!groupedData[date][item.rankQuestionName]) {
+                    groupedData[date][item.rankQuestionName] = {
+                        attempts: 0,
+                        users: 0
+                    };
+                }
+                groupedData[date][item.rankQuestionName].attempts += item.totalAttempts;
+                groupedData[date][item.rankQuestionName].users += item.totalUsers;
+            });
+
+            // Prepare chart data
+            const dates = Object.keys(groupedData).sort();
+            const ranks = [...new Set(statisticsData.map(item => item.rankQuestionName))];
+
+            // Update attempts chart
+            attemptsChart.data.labels = dates;
+            attemptsChart.data.datasets = ranks.map((rank, index) => ({
+                label: rank,
+                data: dates.map(date => groupedData[date][rank]?.attempts || 0),
+                backgroundColor: colorPalette[index % colorPalette.length],
+                borderColor: colorPalette[index % colorPalette.length],
+                borderWidth: 1
+            }));
+            attemptsChart.update();
+
+            // Update users chart
+            usersChart.data.labels = dates;
+            usersChart.data.datasets = ranks.map((rank, index) => ({
+                label: rank,
+                data: dates.map(date => groupedData[date][rank]?.users || 0),
+                backgroundColor: colorPalette[index % colorPalette.length],
+                borderColor: colorPalette[index % colorPalette.length],
+                borderWidth: 1
+            }));
+            usersChart.update();
+        }
+
+        function formatDate(date, timeUnit) {
+            switch (parseInt(timeUnit)) {
+                case 0: // Day
+                    return moment(date).format('DD/MM/YYYY');
+                case 1: // Week
+                    return 'Tuần ' + moment(date).format('WW/YYYY');
+                case 2: // Month
+                    return moment(date).format('MM/YYYY');
+                case 3: // Year
+                    return moment(date).format('YYYY');
+                default:
+                    return moment(date).format('DD/MM/YYYY');
+            }
+        }
+
+        function getDateFormat(timeUnit) {
+            switch (parseInt(timeUnit)) {
+                case 0: return 'DD/MM/YYYY';
+                case 1: return 'Tuần WW/YYYY';
+                case 2: return 'MM/YYYY';
+                case 3: return 'YYYY';
+                default: return 'DD/MM/YYYY';
+            }
+        }
+
+        function updateTable() {
+            statisticsTable.clear();
+
+            if (!statisticsData || statisticsData.length === 0) {
+                console.log('No data to update table');
+                statisticsTable.draw();
+                return;
+            }
+
+            const timeUnit = $('#timeUnit').val();
+
+            statisticsData.forEach(item => {
+                statisticsTable.row.add([
+                    item.rankQuestionName,
+                    formatDate(new Date(item.date), timeUnit),
+                    item.totalAttempts.toLocaleString(),
+                    item.totalUsers.toLocaleString(),
+                    item.averageScore.toFixed(2)
+                ]);
+            });
+
+            statisticsTable.draw();
+        }
+
+        function exportToExcel() {
+            if (!statisticsData || statisticsData.length === 0) {
+                alert('Không có dữ liệu để xuất');
+                return;
+            }
+
+            const timeUnit = $('#timeUnit').val();
+            const startDate = $('#startDate').datepicker('getDate');
+            const endDate = $('#endDate').datepicker('getDate');
+            
+            // Prepare data for export
+            const exportData = statisticsData.map(item => ({
+                'Cấp độ': item.rankQuestionName,
+                'Ngày': formatDate(new Date(item.date), timeUnit),
+                'Số lượt làm': item.totalAttempts,
+                'Số người dùng': item.totalUsers,
+                'Điểm trung bình': item.averageScore.toFixed(2)
+            }));
+
+            // Add summary row
+            exportData.push({});
+            exportData.push({
+                'Cấp độ': 'TỔNG CỘNG',
+                'Số lượt làm': statisticsData.reduce((sum, item) => sum + item.totalAttempts, 0),
+                'Số người dùng': statisticsData.reduce((sum, item) => sum + item.totalUsers, 0),
+                'Điểm trung bình': (statisticsData.reduce((sum, item) => sum + item.averageScore, 0) / statisticsData.length).toFixed(2)
+            });
+
+            // Convert to worksheet
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            
+            // Add styling to header and summary
+            if (!ws['!cols']) ws['!cols'] = [];
+            ws['!cols'][0] = { width: 30 };
+            ws['!cols'][1] = { width: 20 };
+            ws['!cols'][2] = { width: 15 };
+            ws['!cols'][3] = { width: 15 };
+            ws['!cols'][4] = { width: 15 };
+            
+            // Merge cells for summary
+            ws['!merges'] = [
+                { s: { r: exportData.length - 1, c: 0 }, e: { r: exportData.length - 1, c: 1 } }
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Thống kê");
+
+            // Generate filename
+            const filename = `ThongKeBaiThi_${moment(startDate).format('DDMMYYYY')}_${moment(endDate).format('DDMMYYYY')}.xlsx`;
+
+            // Save file
+            XLSX.writeFile(wb, filename);
+        }
+    </script>
+}
